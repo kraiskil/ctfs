@@ -21,3 +21,9 @@ target_link_options(treefrog
 		-L${OPENCM3_DIR}/lib
 		-nostartfiles
 	)
+# Print some memory usage statistics.
+add_custom_command(
+	TARGET treefrog
+	POST_BUILD
+	COMMAND arm-none-eabi-readelf -l $<TARGET_FILE:treefrog>
+	)
