@@ -8,3 +8,4 @@ void sleep_a_bit(void);
 
 /* Platform-level interfaces */
 void play_croak(void);
+void sleep_for(void);

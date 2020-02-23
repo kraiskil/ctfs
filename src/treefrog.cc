@@ -13,7 +13,9 @@ void treefrog(void)
 
 bool should_I_croak(void)
 {
-	return true;
+	static bool rv=true;
+	rv = !rv;
+	return rv;
 }
 
 void croak(void)
@@ -27,6 +29,8 @@ void croak(void)
 // frog-level sleep, when there are no croaks to join
 void sleep_a_bit(void)
 {
+	// TODO: determine how long to sleep
 
+	sleep_for(/*TODO pass value */);
 }
 
