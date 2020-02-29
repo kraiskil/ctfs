@@ -16,3 +16,9 @@ elseif("${CMAKE_SYSTEM_NAME}" STREQUAL Generic)
 	add_subdirectory(target/opencm3)
 endif()
 
+if( NOT ${CMAKE_SYSTEM_NAME} STREQUAL "Generic" )
+	enable_testing()
+	add_subdirectory(googletest)
+	add_subdirectory(tests)
+endif()
+
