@@ -5,6 +5,7 @@ if( NOT OPENCM3_DIR )
 endif()
 
 add_executable(treefrog 
+	io.cc
 	main.cc
 	)
 target_link_libraries(treefrog libtreefrog opencm3_stm32f0)
