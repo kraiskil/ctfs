@@ -4,15 +4,19 @@ void treefrog(void)
 {
 	while(true)
 	{
-		if( should_I_croak() )
+		int16_t buffer[croak_buffer_size_samples];
+		listen_for_croaks(buffer);
+
+		if( should_I_croak(buffer) )
 			croak();
 		else
 			sleep_a_bit();
 	}
 }
 
-bool should_I_croak(void)
+bool should_I_croak(int16_t *buffer)
 {
+	(void) buffer;
 	static bool rv=true;
 	rv = !rv;
 	return rv;
