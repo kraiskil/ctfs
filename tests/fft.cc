@@ -3,17 +3,38 @@
 
 #include "fft.h"
 
+class fft_test : public testing::Test
+{
+public:
+	void SetUp(void) override
+	{
+		fs = 8000;
+		fft_size = 256;
+		in = (int16_t*)calloc(fft_size, sizeof(int16_t));
+		out = (int16_t*)calloc(fft_size, sizeof(int16_t));
 
-void add_sine(int16_t *in, int fft_size, int peak, int fs, int f_input)
-{
-	for (int i = 0; i < fft_size; i++) {
-		in[i] += peak * sin(2 * M_PI * i * f_input / fs);
+		/* How wide is half a bin, in Hz */
+		bin_accuracy = ((float)fs / 2) / fft_size;
 	}
-}
-float index_to_frequency(int idx, int fs, int fft_size)
-{
-	return (float)idx * fs / fft_size;
-}
+
+	void add_sine(int peak, int f_input)
+	{
+		for (int i = 0; i < fft_size; i++) {
+			in[i] += peak * sin(2 * M_PI * i * f_input / fs);
+		}
+	}
+
+	float index_to_frequency(int idx, int fs, int fft_size)
+	{
+		return (float)idx * fs / fft_size;
+	}
+
+	int fs;
+	int fft_size;
+	int16_t *in;
+	int16_t *out;
+	float bin_accuracy;
+};
 
 TEST(fft, index_of_peak)
 {
@@ -27,29 +48,39 @@ TEST(fft, index_of_peak)
 	EXPECT_EQ(5, index_of_peak(buf, 8));
 }
 
-TEST(fft, one_sine)
+TEST_F(fft_test, one_sine)
 {
-	int     fs = 8000;
-	int     fft_size = 2048;
-	int     peak_amplitude = 256;
-	int     peak_fequency = 500;
-	int16_t in[fft_size];
-	int16_t out[fft_size];
-
 	add_sine(
-		in,
-		fft_size,
-		peak_amplitude,
-		fs,
-		peak_fequency);
+		256,  //amplitude
+		500); //frequency
 
 	frog_fft(in, out, fft_size);
 
-	int max_i = index_of_peak(out, fft_size);
-	std::cout << "max_i: " << max_i << std::endl;
+	int max_i = index_of_peak(out, fft_size / 2);
 	ASSERT_NEAR(
 		500,
 		index_to_frequency(max_i, fs, fft_size),
-		((float)fs / 2) / fft_size); // Frequency bin accuracy
+		bin_accuracy);
+}
+
+TEST_F(fft_test, many_sines)
+{
+	add_sine(
+		100,  //amplitude
+		500); //frequency
+	add_sine(
+		80,    //amplitude
+		1000); //frequency
+	add_sine(
+		50,    //amplitude
+		1200); //frequency
+
+	frog_fft(in, out, fft_size);
+
+	int max_i = index_of_peak(out, fft_size / 2);
+	ASSERT_NEAR(
+		500,
+		index_to_frequency(max_i, fs, fft_size),
+		bin_accuracy);
 }
 
