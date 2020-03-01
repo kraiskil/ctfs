@@ -24,11 +24,6 @@ public:
 		}
 	}
 
-	float index_to_frequency(int idx, int fs, int fft_size)
-	{
-		return (float)idx * fs / fft_size;
-	}
-
 	int fs;
 	int fft_size;
 	int16_t *in;
@@ -46,6 +41,17 @@ TEST(fft, index_of_peak)
 
 	buf[5] = 10;
 	EXPECT_EQ(5, index_of_peak(buf, 8));
+}
+
+TEST(fft, indexToFrequency)
+{
+	int fs = 8000;
+	int fft_size = 256;
+
+	EXPECT_EQ(0, index_to_frequency(0, fs, fft_size) );
+	EXPECT_EQ(4000, index_to_frequency(128, fs, fft_size) );
+	EXPECT_EQ(500, index_to_frequency(16, fs, fft_size) );
+	EXPECT_EQ(468, index_to_frequency(15, fs, fft_size) );
 }
 
 TEST_F(fft_test, one_sine)

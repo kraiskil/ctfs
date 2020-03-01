@@ -40,3 +40,9 @@ int index_of_peak(int16_t *buf, int N)
 	return maxidx;
 }
 
+int index_to_frequency(int idx, int fs, int fft_size)
+{
+	/* TODO: define fft size as its log2 value, and shift */
+	return (float)idx * fs / fft_size;
+}
+
