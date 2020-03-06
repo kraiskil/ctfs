@@ -1,28 +1,70 @@
 #include "fft.h"
+#define MAX_FFT_SIZE 2048
+
+#include <cassert>
 
 /* placeholder floating point implementation */
 #include <cmath>
-extern "C" {
-#include <fftw3.h>
+#include <complex>
+#include <iostream>
+typedef std::complex<double> complex_t;
+
+/* Stockham autosort FFT by okojisan from
+ * http://wwwa.pikara.ne.jp/okojisan/otfft-en/stockham2.html
+ * Original uses doubles and <cmath>. Fixpoint conversion by me.
+ */
+void fft0(int n, int s, bool eo, complex_t *x, complex_t *y)
+// n  : sequence length
+// s  : stride
+// eo : x is output if eo == 0, y is output if eo == 1
+// x  : input sequence(or output sequence if eo == 0)
+// y  : work area(or output sequence if eo == 1)
+{
+	const int    m = n / 2;
+	const double theta0 = 2 * M_PI / n;
+
+	if (n == 1) {
+		if (eo) for (int q = 0; q < s; q++) y[q] = x[q];
+	}
+	else {
+		for (int p = 0; p < m; p++) {
+			const complex_t wp = complex_t(cos(p * theta0), -sin(p * theta0));
+			for (int q = 0; q < s; q++) {
+				const complex_t a = x[q + s * (p + 0)];
+				const complex_t b = x[q + s * (p + m)];
+				y[q + s * (2 * p + 0)] =  a + b;
+				y[q + s * (2 * p + 1)] = (a - b) * wp;
+			}
+		}
+		fft0(n / 2, 2 * s, !eo, y, x);
+	}
 }
+void fft_sa(int n, complex_t *x) // Fourier transform
+// n : sequence length
+// x : input/output sequence
+{
+	complex_t *y = new complex_t[n];
+	fft0(n, 1, 0, x, y);
+	delete[] y;
+	for (int k = 0; k < n; k++) x[k] /= n;
+}
+
+
+
 void frog_fft(const int16_t *in, int16_t *out, int fft_size)
 {
 
-	fftw_complex *fc_out;
-	fftw_complex *fc_in;
-	fc_out = (fftw_complex*)fftw_malloc(sizeof(fftw_complex) * fft_size);
-	fc_in = (fftw_complex*)fftw_malloc(sizeof(fftw_complex) * fft_size);
+	complex_t data[fft_size];
 
 	for (int i = 0; i < fft_size; i++) {
-		fc_in[i][0] = in[i];
-		fc_in[i][1] = 0;
+		data[i].real(in[i]);
+		data[i].imag(0);
 	}
-	fftw_plan p = fftw_plan_dft_1d(fft_size, fc_in, fc_out, FFTW_FORWARD, FFTW_ESTIMATE);
-	fftw_execute(p);
+
+	fft_sa(fft_size, data);
 
 	for (int i = 0; i < fft_size; i++) {
-		double o = sqrt(fc_out[i][0] * fc_out[i][0]
-		        + fc_out[i][1] * fc_out[i][1]);
+		double o = std::abs(data[i]);
 		out[i] = o;
 	}
 }
