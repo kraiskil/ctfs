@@ -75,13 +75,14 @@ void frog_fft(const int16_t *in, int16_t *out, int fft_size)
 // TODO: make sin_table of size MAX_FFT_SIZE/4, and
 // do the logic in twiddle_*() functions
 // also replace init_sin_table() with values computed offline
-double sin_table[5 * MAX_FFT_SIZE / 4];
+int16_t sin_table[5 * MAX_FFT_SIZE / 4];
+#define TRIG_SCALE 32767
 __attribute__((__constructor__))
 void init_sin_table(void)
 {
 	const double theta0 = 2 * M_PI / MAX_FFT_SIZE;
 	for (int i = 0; i < 5 * MAX_FFT_SIZE / 4; i++)
-		sin_table[i] = sin(i * theta0);
+		sin_table[i] = sin(i * theta0) * TRIG_SCALE;
 }
 double twiddle_re(int p, int n)
 {
@@ -89,7 +90,7 @@ double twiddle_re(int p, int n)
 	// sanity check - N must be 2^x, x integer
 	assert(__builtin_popcount(n) == 1);
 	//return cos(p*theta0);
-	return sin_table[MAX_FFT_SIZE / 4 + p * stride];
+	return (double)sin_table[MAX_FFT_SIZE / 4 + p * stride] / TRIG_SCALE;
 }
 double twiddle_im(int p, int n)
 {
@@ -97,7 +98,7 @@ double twiddle_im(int p, int n)
 	// sanity check - N must be 2^x, x integer
 	assert(__builtin_popcount(n) == 1);
 	//return -sin(p*theta0);
-	return -sin_table[p * stride];
+	return (double)-sin_table[p * stride] / TRIG_SCALE;
 }
 complex_t multiply(complex_t a, double b_re, double b_im)
 {
