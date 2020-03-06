@@ -25,9 +25,15 @@ public:
 			fft_size = 1024;
 		in = (int16_t*)calloc(fft_size, sizeof(int16_t));
 		out = (int16_t*)calloc(fft_size, sizeof(int16_t));
-
+		ASSERT_NE(in, nullptr);
+		ASSERT_NE(out, nullptr);
 		/* Width of a bin, in Hz */
 		bin_accuracy = ((float)fs) / fft_size;
+	}
+	void TearDown(void) override
+	{
+		free(in);
+		free(out);
 	}
 
 	void add_sine(int peak, int f_input)
@@ -37,10 +43,6 @@ public:
 		}
 	}
 
-	auto magnitude(auto d)
-	{
-		return std::abs(d);
-	}
 	// biggest value first
 	void sort_by_value(std::vector<bin_value>& values)
 	{
@@ -83,7 +85,7 @@ public:
 	 * it spreads over several bins.
 	 * This joins such bins into one (the one with highest value of the group) and gives
 	 * the new bin_value a value that is the sum of its neighbours */
-	std::vector<bin_value> merge_neighbours(const auto& data)
+	std::vector<bin_value> merge_neighbours(const std::vector<bin_value>& data)
 	{
 		std::vector<bin_value> input = data;
 		std::vector<bin_value> output;
@@ -202,6 +204,6 @@ TEST_P(fftTest, manySines)
 		index_to_frequency(max_bins[2].bin, fs, fft_size),
 		bin_accuracy);
 }
-INSTANTIATE_TEST_CASE_P(Random_fs_values, fftTest, testing::Range(6000, 48000, 6100));
-INSTANTIATE_TEST_CASE_P(Probable_fs_values, fftTest, testing::Values(8000, 16000, 24000, 44100, 48000));
+INSTANTIATE_TEST_SUITE_P(Random_fs_values, fftTest, testing::Range(6000, 48000, 6100));
+INSTANTIATE_TEST_SUITE_P(Probable_fs_values, fftTest, testing::Values(8000, 16000, 24000, 44100, 48000));
 
