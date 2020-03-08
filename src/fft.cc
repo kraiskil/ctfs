@@ -1,5 +1,5 @@
+#include "datatype.h"
 #include "fft.h"
-#define MAX_FFT_SIZE 2048
 
 #include <cassert>
 
@@ -7,11 +7,14 @@
 #include <cmath>
 #include <complex>
 #include <iostream>
-typedef std::complex<double> complex_t;
 
-double twiddle_re(int phase, int lenght);
-double twiddle_im(int phase, int lenght);
-complex_t multiply(complex_t a, double b_re, double b_im);
+/* Complex is an internal (to this file) format,
+ * so waste a bit of space, and have it as "accu" type all the time */
+typedef std::complex<int32_t> complex_t;
+
+fixp twiddle_re(int phase, int lenght);
+fixp twiddle_im(int phase, int lenght);
+complex_t multiply(complex_t a, fixp b_re, fixp b_im);
 
 /* Stockham autosort FFT by okojisan from
  * http://wwwa.pikara.ne.jp/okojisan/otfft-en/stockham2.html
@@ -45,9 +48,9 @@ void fft_sa(int n, complex_t *x) // Fourier transform
 // n : sequence length
 // x : input/output sequence
 {
-	complex_t *y = new complex_t[n];
+	complex_t y[MAX_FFT_SIZE]; // complex_t is not "POD", so
+	                           // clang won't allocate variable length stack
 	fft0(n, 1, 0, x, y);
-	delete[] y;
 	for (int k = 0; k < n; k++) x[k] /= n;
 }
 
@@ -55,8 +58,7 @@ void fft_sa(int n, complex_t *x) // Fourier transform
 
 void frog_fft(const int16_t *in, int16_t *out, int fft_size)
 {
-
-	complex_t data[fft_size];
+	complex_t data[MAX_FFT_SIZE];
 
 	for (int i = 0; i < fft_size; i++) {
 		data[i].real(in[i]);
@@ -71,40 +73,29 @@ void frog_fft(const int16_t *in, int16_t *out, int fft_size)
 	}
 }
 
-/* Twiddle factor computation for FFT */
-// TODO: make sin_table of size MAX_FFT_SIZE/4, and
-// do the logic in twiddle_*() functions
-// also replace init_sin_table() with values computed offline
-int16_t sin_table[5 * MAX_FFT_SIZE / 4];
-#define TRIG_SCALE 32767
-__attribute__((__constructor__))
-void init_sin_table(void)
-{
-	const double theta0 = 2 * M_PI / MAX_FFT_SIZE;
-	for (int i = 0; i < 5 * MAX_FFT_SIZE / 4; i++)
-		sin_table[i] = sin(i * theta0) * TRIG_SCALE;
-}
-double twiddle_re(int p, int n)
+/* Twiddle factor, i.e. sin/cos( p*theta) values
+ * used in the FFT */
+fixp twiddle_re(int p, int n)
 {
 	int stride = MAX_FFT_SIZE / n;
 	// sanity check - N must be 2^x, x integer
 	assert(__builtin_popcount(n) == 1);
-	//return cos(p*theta0);
-	return (double)sin_table[MAX_FFT_SIZE / 4 + p * stride] / TRIG_SCALE;
+	//return cos(p*theta);
+	return sin_table[MAX_FFT_SIZE / 4 + p * stride];
 }
-double twiddle_im(int p, int n)
+fixp twiddle_im(int p, int n)
 {
 	int stride = MAX_FFT_SIZE / n;
 	// sanity check - N must be 2^x, x integer
 	assert(__builtin_popcount(n) == 1);
-	//return -sin(p*theta0);
-	return (double)-sin_table[p * stride] / TRIG_SCALE;
+	//return -sin(p*theta);
+	return -sin_table[p * stride];
 }
-complex_t multiply(complex_t a, double b_re, double b_im)
+complex_t multiply(complex_t a, fixp b_re, fixp b_im)
 {
 	complex_t rv;
-	rv.real(a.real() * b_re - a.imag() * b_im);
-	rv.imag(a.real() * b_im + b_re * a.imag());
+	rv.real((a.real() * b_re - a.imag() * b_im) / FIXP_SCALE);
+	rv.imag((a.real() * b_im + b_re * a.imag()) / FIXP_SCALE);
 	return rv;
 }
 
