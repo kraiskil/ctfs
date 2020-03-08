@@ -173,7 +173,7 @@ TEST_P(fftTest, oneSine)
 TEST_P(fftTest, manySines)
 {
 	add_sine(
-		10,   //amplitude
+		12,   //amplitude
 		200); //frequency
 	add_sine(
 		20,   //amplitude
