@@ -15,9 +15,15 @@ target_compile_options(treefrog
 		-DSTM32F0
 		-I/home/kraiskil/stuff/libopencm3/include
 	)
+if( ${CMAKE_BUILD_TYPE} STREQUAL Debug)
+	set(LINKERFILE debugtarget.ld)
+else()
+	set(LINKERFILE stm32f0-discovery.ld)
+endif()
+
 target_link_options(treefrog
 	PRIVATE 
-		-T${CMAKE_CURRENT_SOURCE_DIR}/stm32f0-discovery.ld
+		-T${CMAKE_CURRENT_SOURCE_DIR}/${LINKERFILE}
 		-L${CMAKE_CURRENT_SOURCE_DIR}
 		-L${OPENCM3_DIR}/lib
 		-nostartfiles

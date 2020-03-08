@@ -6,7 +6,6 @@
 /* placeholder floating point implementation */
 #include <cmath>
 #include <complex>
-#include <iostream>
 
 /* Complex is an internal (to this file) format,
  * so waste a bit of space, and have it as "accu" type all the time */
@@ -68,7 +67,8 @@ void frog_fft(const int16_t *in, int16_t *out, int fft_size)
 	fft_sa(fft_size, data);
 
 	for (int i = 0; i < fft_size; i++) {
-		double o = std::abs(data[i]);
+		uint32_t o = data[i].real() * data[i].real() + data[i].imag() * data[i].imag();
+		if (o > 0x7FFFF) o = 0x7FFF;
 		out[i] = o;
 	}
 }

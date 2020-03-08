@@ -1,13 +1,13 @@
 #include "treefrog.h"
+#include "fft.h"
 
 void treefrog(void)
 {
-	while(true)
-	{
+	while (true) {
 		int16_t buffer[croak_buffer_size_samples];
 		listen_for_croaks(buffer);
 
-		if( should_I_croak(buffer) )
+		if (should_I_croak(buffer) )
 			croak();
 		else
 			sleep_a_bit();
@@ -16,15 +16,16 @@ void treefrog(void)
 
 bool should_I_croak(int16_t *buffer)
 {
-	(void) buffer;
-	static bool rv=true;
+	int16_t out[croak_buffer_size_samples];
+	frog_fft(buffer, out, croak_buffer_size_samples);
+	static bool rv = true;
 	rv = !rv;
 	return rv;
 }
 
 void croak(void)
 {
-	// probably could do some generic 
+	// probably could do some generic
 	// croaking selection
 
 	play_croak(/*TODO: select which croak */);
