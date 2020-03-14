@@ -1,9 +1,12 @@
 #include <cstdint>
+#include "datatype.h"
 #include "sin_table.h"
 
 /* Maximum FFT size code is prepared for. Probably also
  * the only one used. */
-const int MAX_FFT_SIZE = SIN_TABLE_RESOLUTION;
+constexpr int MAX_FFT_SIZE = croak_buffer_size;
+static_assert(MAX_FFT_SIZE <= SIN_TABLE_RESOLUTION,
+    "sin table is not accurate enough");
 
 /* A version of FFT that calculates a real to real FFT,
  * ignoring the phase of the result. Also, since frogs

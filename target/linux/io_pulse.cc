@@ -1,5 +1,5 @@
+#include "datatype.h"
 #include <iostream>
-#include <cstdint>
 
 extern "C" {
 #include <pulse/simple.h>
@@ -30,6 +30,6 @@ void io_init(void)
 	}
 }
 
-void listen_for_croaks(int16_t *buffer)
+void listen_for_croaks(croak_buf_t& buffer)
 {}
 

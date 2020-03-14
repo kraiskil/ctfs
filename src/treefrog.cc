@@ -1,23 +1,24 @@
+#include "datatype.h"
 #include "treefrog.h"
 #include "fft.h"
 
 void treefrog(void)
 {
 	while (true) {
-		int16_t buffer[croak_buffer_size_samples];
+		croak_buf_t buffer;
 		listen_for_croaks(buffer);
 
-		if (should_I_croak(buffer) )
+		if (should_I_croak(buffer))
 			croak();
 		else
 			sleep_a_bit();
 	}
 }
 
-bool should_I_croak(int16_t *buffer)
+bool should_I_croak(croak_buf_t& buffer)
 {
-	int16_t out[croak_buffer_size_samples];
-	frog_fft(buffer, out, croak_buffer_size_samples);
+	croak_buf_t out;
+	frog_fft(buffer.data(), out.data(), croak_buffer_size_samples);
 	static bool rv = true;
 	rv = !rv;
 	return rv;

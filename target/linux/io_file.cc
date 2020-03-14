@@ -4,6 +4,8 @@
 #include <iostream>
 #include <string>
 
+#include "datatype.h"
+
 extern "C" {
 #include <sndfile.h>
 }
@@ -53,8 +55,9 @@ void io_init(void)
 	read_data_file(dd + "1kHzsine_2s_fades.wav", snd_pure_1kHz_fadein);
 }
 
-void listen_for_croaks(int16_t *buffer)
+void listen_for_croaks(croak_buf_t& buf)
 {
+	int16_t *buffer = buf.data();
 	std::cout << "what am I hearing?" << std::endl;
 	std::cout << "1) 1kHz sine" << std::endl;
 	std::cout << "2) 1kHz sine fade in" << std::endl;
