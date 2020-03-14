@@ -29,13 +29,14 @@ int main(void)
 
 void sleep_for(void)
 {
-	volatile int i=1000000;//1M ~ 1Hz
-	while(--i > 0)
+	volatile int i = 1000000; //1M ~ 1Hz
+	while (--i > 0) {
 		;
+	}
 }
 
 void play_croak(void)
 {
-	gpio_toggle(PORT_LED, PIN_LED);	/* LED on/off */
+	gpio_toggle(PORT_LED, PIN_LED); /* LED on/off */
 }
 
