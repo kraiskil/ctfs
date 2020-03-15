@@ -18,7 +18,7 @@ void treefrog(void)
 bool should_I_croak(croak_buf_t& buffer)
 {
 	croak_buf_t out;
-	frog_fft(buffer.data(), out.data(), croak_buffer_size_samples);
+	frog_fft(buffer, out);
 	static bool rv = true;
 	rv = !rv;
 	return rv;

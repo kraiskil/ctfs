@@ -52,11 +52,22 @@ void fft_sa(int n, complex_t *x) // Fourier transform
 	fft0(n, 1, 0, x, y);
 	for (int k = 0; k < n; k++) x[k] /= n;
 }
+/* End of code from okojisan */
 
 
-
-void frog_fft(const int16_t *in, int16_t *out, int fft_size)
+/* Frogs are only interested in the magnitude, not phase of result data */
+void fft_calc_abs(complex_t *data, croak_buf_t& out)
 {
+	for (unsigned i = 0; i < out.size(); i++) {
+		uint32_t o = data[i].real() * data[i].real() + data[i].imag() * data[i].imag();
+		if (o > 0x7FFFF) o = 0x7FFF;
+		out[i] = o;
+	}
+}
+
+void frog_fft(croak_buf_t& in, croak_buf_t& out)
+{
+	int       fft_size = in.size();
 	complex_t data[MAX_FFT_SIZE];
 
 	for (int i = 0; i < fft_size; i++) {
@@ -65,12 +76,7 @@ void frog_fft(const int16_t *in, int16_t *out, int fft_size)
 	}
 
 	fft_sa(fft_size, data);
-
-	for (int i = 0; i < fft_size; i++) {
-		uint32_t o = data[i].real() * data[i].real() + data[i].imag() * data[i].imag();
-		if (o > 0x7FFFF) o = 0x7FFF;
-		out[i] = o;
-	}
+	fft_calc_abs(data, out);
 }
 
 /* Twiddle factor, i.e. sin/cos( p*theta) values

@@ -1,9 +1,18 @@
 #include "gtest/gtest.h"
 #include <algorithm>
 #include <cmath>
+#include <complex>
 
 #include "fft.h"
 
+/* Internal FFT implementation - not the
+ * "frog api" used in libtreefrog
+ * complex_t is an internal formet to fft.cc so needs
+ * redefinition here
+ */
+typedef std::complex<int32_t> complex_t;
+extern void fft_sa(int n, complex_t *x);
+extern void fft_calc_abs(complex_t *data, croak_buf_t& out);
 
 struct bin_value
 {
@@ -23,18 +32,13 @@ public:
 			fft_size = 512;
 		if (fs > 44100)
 			fft_size = 1024;
-		in = (int16_t*)calloc(fft_size, sizeof(int16_t));
-		out = (int16_t*)calloc(fft_size, sizeof(int16_t));
-		ASSERT_NE(in, nullptr);
-		ASSERT_NE(out, nullptr);
+		in.fill(0);
+		out.fill(0);
 		/* Width of a bin, in Hz */
 		bin_accuracy = ((float)fs) / fft_size;
 	}
 	void TearDown(void) override
-	{
-		free(in);
-		free(out);
-	}
+	{}
 
 	void add_sine(int peak, int f_input)
 	{
@@ -127,8 +131,8 @@ public:
 
 	int fs;
 	int fft_size;
-	int16_t *in;
-	int16_t *out;
+	std::array<complex_t, MAX_FFT_SIZE> in;
+	croak_buf_t out;
 	float bin_accuracy;
 };
 
@@ -161,9 +165,10 @@ TEST_P(fftTest, oneSine)
 		8,    //amplitude
 		500); //frequency
 
-	frog_fft(in, out, fft_size);
+	fft_sa(fft_size, in.data());
+	fft_calc_abs(in.data(), out);
 
-	int max_i = index_of_peak(out, fft_size / 2);
+	int max_i = index_of_peak(out.data(), fft_size / 2);
 	ASSERT_NEAR(
 		500,
 		index_to_frequency(max_i, fs, fft_size),
@@ -182,9 +187,10 @@ TEST_P(fftTest, manySines)
 		30,    //amplitude
 		1400); //frequency
 
-	frog_fft(in, out, fft_size);
+	fft_sa(fft_size, in.data());
+	fft_calc_abs(in.data(), out);
 
-	std::vector<bin_value> raw_bins = max_values(out, 6);
+	std::vector<bin_value> raw_bins = max_values(out.data(), 6);
 	std::vector<bin_value> max_bins = merge_neighbours(raw_bins);
 	sort_by_value(max_bins);
 
