@@ -5,6 +5,9 @@ extern "C" {
 #include <pulse/simple.h>
 }
 
+
+static pa_simple *s = NULL;
+
 void io_init(void)
 {
 	static const pa_sample_spec ss = {
@@ -12,7 +15,6 @@ void io_init(void)
 		.rate = 44100,
 		.channels = 2
 	};
-	pa_simple                   *s = NULL;
 	int                         error;
 	s = pa_simple_new(
 		NULL, //?
@@ -31,5 +33,24 @@ void io_init(void)
 }
 
 void listen_for_croaks(croak_buf_t &buffer)
-{}
+{
+	int     rv;
+	int     err;
+	ssize_t bytes = buffer.size() * sizeof(int16_t);
+
+	rv = pa_simple_read(s, buffer.data(), bytes, &err);
+
+	if (rv) {
+		std::cerr << "pa_simple_read() failed with " << err << std::endl;
+		exit(1);
+	}
+
+	/* TODO: make this Q&D "volume control" ... more robust.
+	 * the FFT doesn't like values much over ~200, or the
+	 * calculations saturate. This scales down the input.
+	 */
+	for (int i = 0; i < buffer.size(); i++) {
+		buffer[i] >>= 6;
+	}
+}
 
