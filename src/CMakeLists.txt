@@ -1,5 +1,6 @@
 add_library(libtreefrog STATIC
 	fft.cc
+	harmonics.cc
 	treefrog.cc
 	sin_table.cc
 	)

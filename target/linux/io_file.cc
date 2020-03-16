@@ -20,9 +20,9 @@ int16_t snd_zero[LISTEN_BUFFER_LEN_SAMPLES];
 int16_t snd_noise[LISTEN_BUFFER_LEN_SAMPLES];
 int16_t snd_noise_loud[LISTEN_BUFFER_LEN_SAMPLES];
 
-void read_data_file(const std::string& file, int16_t *buffer)
+void read_data_file(const std::string &file, int16_t *buffer)
 {
-	SF_INFO  sf_info;
+	SF_INFO sf_info;
 	SNDFILE *sf = sf_open(file.c_str(), SFM_READ, &sf_info);
 
 	if (sf == NULL) {
@@ -55,7 +55,7 @@ void io_init(void)
 	read_data_file(dd + "1kHzsine_2s_fades.wav", snd_pure_1kHz_fadein);
 }
 
-void listen_for_croaks(croak_buf_t& buf)
+void listen_for_croaks(croak_buf_t &buf)
 {
 	int16_t *buffer = buf.data();
 	std::cout << "what am I hearing?" << std::endl;

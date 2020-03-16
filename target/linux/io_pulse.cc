@@ -12,7 +12,7 @@ void io_init(void)
 		.rate = 44100,
 		.channels = 2
 	};
-	pa_simple *                 s = NULL;
+	pa_simple                   *s = NULL;
 	int                         error;
 	s = pa_simple_new(
 		NULL, //?
@@ -30,6 +30,6 @@ void io_init(void)
 	}
 }
 
-void listen_for_croaks(croak_buf_t& buffer)
+void listen_for_croaks(croak_buf_t &buffer)
 {}
 
