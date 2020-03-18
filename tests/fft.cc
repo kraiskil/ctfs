@@ -12,7 +12,7 @@
  */
 typedef std::complex<int32_t> complex_t;
 extern void fft_sa(int n, complex_t *x);
-extern void fft_calc_abs(complex_t *data, croak_buf_t& out);
+extern void fft_calc_abs(complex_t *data, croak_buf_t &out);
 
 struct bin_value
 {
@@ -20,47 +20,35 @@ struct bin_value
 	int16_t value;
 };
 
-class fftTest :
-	public testing::TestWithParam<int32_t>
+class fftTestBase
 {
 public:
-	void SetUp(void) override
+	fftTestBase()
 	{
-		fs = GetParam();
-		fft_size = 256;
-		if (fs > 16000)
-			fft_size = 512;
-		if (fs > 44100)
-			fft_size = 1024;
-		in.fill(0);
-		out.fill(0);
-		/* Width of a bin, in Hz */
-		bin_accuracy = ((float)fs) / fft_size;
+		phase = 0.2;
 	}
-	void TearDown(void) override
-	{}
 
 	void add_sine(int peak, int f_input)
 	{
 		for (int i = 0; i < fft_size; i++) {
-			in[i] += peak * sin(2 * M_PI * i * f_input / fs);
+			in[i] += peak * sin((2 * M_PI * i * f_input / fs) + phase);
 		}
 	}
 
 	// biggest value first
-	void sort_by_value(std::vector<bin_value>& values)
+	void sort_by_value(std::vector<bin_value> &values)
 	{
 		std::sort(values.begin(), values.end(),
-		    [] (struct bin_value& a, struct bin_value& b)
+		    [] (struct bin_value &a, struct bin_value &b)
 		    {
 			    return a.value > b.value;
 		    }
 		    );
 	}
-	void sort_by_bin(std::vector<bin_value>& values)
+	void sort_by_bin(std::vector<bin_value> &values)
 	{
 		std::sort(values.begin(), values.end(),
-		    [] (struct bin_value& a, struct bin_value& b)
+		    [] (struct bin_value &a, struct bin_value &b)
 		    {
 			    return a.bin < b.bin;
 		    }
@@ -89,7 +77,7 @@ public:
 	 * it spreads over several bins.
 	 * This joins such bins into one (the one with highest value of the group) and gives
 	 * the new bin_value a value that is the sum of its neighbours */
-	std::vector<bin_value> merge_neighbours(const std::vector<bin_value>& data)
+	std::vector<bin_value> merge_neighbours(const std::vector<bin_value> &data)
 	{
 		std::vector<bin_value> input = data;
 		std::vector<bin_value> output;
@@ -131,9 +119,32 @@ public:
 
 	int fs;
 	int fft_size;
+	float phase;
 	std::array<complex_t, MAX_FFT_SIZE> in;
 	croak_buf_t out;
 	float bin_accuracy;
+};
+
+class fftTest :
+	public fftTestBase,
+	public testing::TestWithParam<int32_t>
+{
+public:
+	void SetUp(void) override
+	{
+		fs = GetParam();
+		fft_size = 256;
+		if (fs > 16000)
+			fft_size = 512;
+		if (fs > 44100)
+			fft_size = 1024;
+		in.fill(0);
+		out.fill(0);
+		/* Width of a bin, in Hz */
+		bin_accuracy = ((float)fs) / fft_size;
+	}
+	void TearDown(void) override
+	{}
 };
 
 TEST(fft, index_of_peak)
@@ -212,4 +223,33 @@ TEST_P(fftTest, manySines)
 }
 INSTANTIATE_TEST_SUITE_P(Random_fs_values, fftTest, testing::Range(6000, 48000, 6100));
 INSTANTIATE_TEST_SUITE_P(Probable_fs_values, fftTest, testing::Values(8000, 16000, 24000, 44100, 48000));
+
+
+class specificFFTTest :
+	public fftTestBase,
+	public ::testing::Test
+{
+	void SetUp(void) override
+	{}
+};
+
+TEST_F(specificFFTTest, saturatingFixedPoint)
+{
+	fs = 8000;
+	fft_size = 2048;
+	bin_accuracy = ((float)fs) / fft_size;
+
+	add_sine(
+		256,   //amplitude
+		1000); //frequency
+
+	fft_sa(fft_size, in.data());
+	fft_calc_abs(in.data(), out);
+
+	int max_i = index_of_peak(out.data(), fft_size / 2);
+	ASSERT_NEAR(
+		1000,
+		index_to_frequency(max_i, fs, fft_size),
+		bin_accuracy);
+}
 
