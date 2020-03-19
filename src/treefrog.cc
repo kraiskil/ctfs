@@ -21,12 +21,12 @@ bool should_I_croak(croak_buf_t &buffer)
 {
 	croak_buf_t out;
 	uint16_t    tones[3];
+
+
 	frog_fft(buffer, out);
 	find_tones(out, tones);
 
-	static bool rv = true;
-	rv = !rv;
-	return rv;
+	return true;
 }
 
 void croak(void)

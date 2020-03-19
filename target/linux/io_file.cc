@@ -1,9 +1,15 @@
+/* Perform IO (i.e. sound input/output)
+ * via audio files and sndlib
+ */
+
+#include <algorithm>
 #include <cstdint>
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
 #include <string>
 
+#include "config.h"
 #include "datatype.h"
 
 extern "C" {
@@ -11,8 +17,7 @@ extern "C" {
 }
 
 // TODO make more toplevel variables
-static constexpr unsigned LISTEN_BUFFER_LEN_SAMPLES = 1024;
-static constexpr unsigned LISTEN_FREQ = 8000;
+static constexpr unsigned LISTEN_BUFFER_LEN_SAMPLES = croak_buffer_size;
 
 int16_t snd_pure_1kHz[LISTEN_BUFFER_LEN_SAMPLES];
 int16_t snd_pure_1kHz_fadein[LISTEN_BUFFER_LEN_SAMPLES];
@@ -29,8 +34,8 @@ void read_data_file(const std::string &file, int16_t *buffer)
 		std::cerr << "Error reading sound file " << file << std::endl;
 		exit(1);
 	}
-	if (sf_info.samplerate != LISTEN_FREQ) {
-		std::cerr << "Input data is at " << sf_info.samplerate << "Hz, expect " << LISTEN_FREQ << std::endl;
+	if (sf_info.samplerate != config_fs) {
+		std::cerr << "Input data is at " << sf_info.samplerate << "Hz, expect " << config_fs << std::endl;
 		exit(1);
 	}
 	if (sf_info.channels != 1) {
@@ -53,6 +58,13 @@ void io_init(void)
 
 	read_data_file(dd + "1kHzsine_2s.wav", snd_pure_1kHz);
 	read_data_file(dd + "1kHzsine_2s_fades.wav", snd_pure_1kHz_fadein);
+
+	memset(snd_zero, 0, sizeof(snd_zero));
+	for (int i = 0; i < LISTEN_BUFFER_LEN_SAMPLES; i++) {
+		int r = rand() & 0xff;
+		snd_noise_loud[i] = r;
+		snd_noise[i] = r >> 2;
+	}
 }
 
 void listen_for_croaks(croak_buf_t &buf)

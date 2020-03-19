@@ -1,3 +1,4 @@
+#include "config.h"
 #include "datatype.h"
 #include <iostream>
 
@@ -12,7 +13,7 @@ void io_init(void)
 {
 	static const pa_sample_spec ss = {
 		.format = PA_SAMPLE_S16LE,
-		.rate = 44100,
+		.rate = config_fs,
 		.channels = 2
 	};
 	int                         error;
