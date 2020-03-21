@@ -18,10 +18,13 @@
  * along with this library.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/* Linker script for ST STM32F4-Discovery (MB1115) with STM32F411VET6U. */
+
+/* Define memory regions. */
 MEMORY
 {
-	rom (rx) : ORIGIN = 0x08000000, LENGTH = 64K
-	ram (rwx) : ORIGIN = 0x20000000, LENGTH = 8K
+	rom (rx) : ORIGIN = 0x08000000, LENGTH = 512K
+	ram (rwx) : ORIGIN = 0x20000000, LENGTH = 128K
 }
 
 /* Include the common ld script. */
