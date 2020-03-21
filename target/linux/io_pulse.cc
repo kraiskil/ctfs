@@ -1,5 +1,7 @@
 #include "config.h"
 #include "datatype.h"
+#include "sin_table.h"
+#include "treefrog.h"
 #include <iostream>
 
 extern "C" {
@@ -53,5 +55,35 @@ void listen_for_croaks(croak_buf_t &buffer)
 	for (int i = 0; i < buffer.size(); i++) {
 		buffer[i] >>= 6;
 	}
+}
+
+void play_croak(void)
+{
+	int     croak_samples = config_fs * 1.5 /*seconds*/;
+	int16_t croak_sound[croak_samples];
+
+	static const pa_sample_spec ss = {
+		.format = PA_SAMPLE_S16LE,
+		.rate = config_fs,
+		.channels = 1
+	};
+	int                         error;
+	static pa_simple            *pas = pa_simple_new(
+		NULL, //?
+		"treefrog",
+		PA_STREAM_PLAYBACK,
+		NULL,       // select default device
+		"croaking", // stream name
+		&ss,
+		NULL, // channel map - default
+		NULL, // buffering opts - default
+		&error);
+
+
+	for (int i = 0; i < croak_samples; i++) {
+		croak_sound[i] = get_croak_data(i);
+	}
+
+	pa_simple_write(pas, croak_sound, sizeof(croak_sound), NULL);
 }
 

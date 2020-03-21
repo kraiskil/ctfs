@@ -101,3 +101,8 @@ void listen_for_croaks(croak_buf_t &buf)
 	memcpy(buffer, rdptr, sizeof(int16_t) * LISTEN_BUFFER_LEN_SAMPLES);
 }
 
+void play_croak(void)
+{
+	std::cout << "croak!" << std::endl;
+}
+

@@ -26,7 +26,9 @@ bool should_I_croak(croak_buf_t &buffer)
 	frog_fft(buffer, out);
 	find_tones(out, tones);
 
-	return true;
+	static bool rv = true;
+	rv = !rv;
+	return rv;
 }
 
 void croak(void)
