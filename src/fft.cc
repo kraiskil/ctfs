@@ -9,7 +9,7 @@
 
 /* Complex is an internal (to this file) format,
  * so waste a bit of space, and have it as "accu" type all the time */
-typedef std::complex<int32_t> complex_t;
+typedef std::complex<fft_internal_datatype> complex_t;
 
 fixp twiddle_re(int phase, int lenght);
 fixp twiddle_im(int phase, int lenght);

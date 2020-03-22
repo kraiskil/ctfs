@@ -1,4 +1,5 @@
 #include "gtest/gtest.h"
+#include "datatype.h"
 #include <algorithm>
 #include <cmath>
 #include <complex>
@@ -10,7 +11,7 @@
  * complex_t is an internal formet to fft.cc so needs
  * redefinition here
  */
-typedef std::complex<int32_t> complex_t;
+typedef std::complex<fft_internal_datatype> complex_t;
 extern void fft_sa(int n, complex_t *x);
 extern void fft_calc_abs(complex_t *data, listen_buf_t &out);
 
