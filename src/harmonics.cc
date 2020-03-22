@@ -28,7 +28,13 @@ void find_tones(listen_buf_t &in, uint16_t *tones)
 {
 	tone_array_t res;
 	res.fill({ 0, 0 });
-	for (unsigned i = 0; i < in.size(); i++) {
+	/* "lowpass filter" the input to get rid of DC and noise.
+	 * Even with the exteme values of 8kHz sample, 256 lenght
+	 * FFT, bin 8 is still 250 Hz - a harmonic that is not used
+	 * by frogs.
+	 * Since the input to this function is a FFT spectrum of a real
+	 * signal, only the first half contains information. */
+	for (unsigned i = 8; i < in.size() / 2; i++) {
 		if (in[i] > res[2].val) {
 			res[2].bin = i;
 			res[2].val = in[i];
