@@ -8,6 +8,7 @@ if( ${CMAKE_OPENCM3_TARGET} STREQUAL stm32f4)
 	set(OPENCM3_TARGET "STM32F4")
 	set(OPENCM3_LIB "opencm3_stm32f4")
 	set(LINKERFILE stm32f4-discovery.ld)
+	set(OPENOCD_OPTIONS -f interface/stlink-v2.cfg -f target/stm32f4x.cfg)
 elseif( ${CMAKE_OPENCM3_TARGET} STREQUAL stm32f0)
 	set(OPENCM3_TARGET "STM32F0")
 	set(OPENCM3_LIB "opencm3_stm32f0")
@@ -46,4 +47,9 @@ add_custom_command(
 	TARGET treefrog
 	POST_BUILD
 	COMMAND arm-none-eabi-readelf -l $<TARGET_FILE:treefrog>
+	)
+
+add_custom_target(
+	flash
+	COMMAND openocd ${OPENOCD_OPTIONS} -c \"program treefrog verify reset exit\"
 	)
