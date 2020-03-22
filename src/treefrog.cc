@@ -7,7 +7,7 @@
 void treefrog(void)
 {
 	while (true) {
-		croak_buf_t buffer;
+		listen_buf_t buffer;
 		listen_for_croaks(buffer);
 
 		if (should_I_croak(buffer))
@@ -17,10 +17,10 @@ void treefrog(void)
 	}
 }
 
-bool should_I_croak(croak_buf_t &buffer)
+bool should_I_croak(listen_buf_t &buffer)
 {
-	croak_buf_t out;
-	uint16_t    tones[3];
+	listen_buf_t out;
+	uint16_t     tones[3];
 
 
 	frog_fft(buffer, out);

@@ -12,7 +12,7 @@
  */
 typedef std::complex<int32_t> complex_t;
 extern void fft_sa(int n, complex_t *x);
-extern void fft_calc_abs(complex_t *data, croak_buf_t &out);
+extern void fft_calc_abs(complex_t *data, listen_buf_t &out);
 
 struct bin_value
 {
@@ -121,7 +121,7 @@ public:
 	int fft_size;
 	float phase;
 	std::array<complex_t, MAX_FFT_SIZE> in;
-	croak_buf_t out;
+	listen_buf_t out;
 	float bin_accuracy;
 };
 

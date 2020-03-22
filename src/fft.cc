@@ -56,7 +56,7 @@ void fft_sa(int n, complex_t *x) // Fourier transform
 
 
 /* Frogs are only interested in the magnitude, not phase of result data */
-void fft_calc_abs(complex_t *data, croak_buf_t& out)
+void fft_calc_abs(complex_t *data, listen_buf_t &out)
 {
 	for (unsigned i = 0; i < out.size(); i++) {
 		uint32_t o = data[i].real() * data[i].real() + data[i].imag() * data[i].imag();
@@ -65,7 +65,7 @@ void fft_calc_abs(complex_t *data, croak_buf_t& out)
 	}
 }
 
-void frog_fft(croak_buf_t& in, croak_buf_t& out)
+void frog_fft(listen_buf_t &in, listen_buf_t &out)
 {
 	int       fft_size = in.size();
 	complex_t data[MAX_FFT_SIZE];

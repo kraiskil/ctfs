@@ -35,7 +35,7 @@ void io_init(void)
 	}
 }
 
-void listen_for_croaks(croak_buf_t &buffer)
+void listen_for_croaks(listen_buf_t &buffer)
 {
 	int     rv;
 	int     err;

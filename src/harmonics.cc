@@ -24,7 +24,7 @@ static inline void mysort(tone_array_t &a)
 	}
 }
 
-void find_tones(croak_buf_t &in, uint16_t *tones)
+void find_tones(listen_buf_t &in, uint16_t *tones)
 {
 	tone_array_t res;
 	res.fill({ 0, 0 });

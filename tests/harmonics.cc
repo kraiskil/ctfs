@@ -5,7 +5,7 @@ class HarmonicsTest :
 	public testing::Test
 {
 public:
-	croak_buf_t in;
+	listen_buf_t in;
 	std::array<uint16_t, 3> tones;
 
 	void SetUp(void) override

@@ -7,6 +7,6 @@ typedef int16_t fixp;
 // cause overflows. Perhaps 0x4000?
 #define FIXP_SCALE 0x4000
 
-constexpr unsigned croak_buffer_size = 2048;
-typedef std::array<int16_t, croak_buffer_size> croak_buf_t;
+constexpr unsigned listen_buffer_samples = 2048;
+typedef std::array<int16_t, listen_buffer_samples> listen_buf_t;
 

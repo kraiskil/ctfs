@@ -16,14 +16,11 @@ extern "C" {
 #include <sndfile.h>
 }
 
-// TODO make more toplevel variables
-static constexpr unsigned LISTEN_BUFFER_LEN_SAMPLES = croak_buffer_size;
-
-int16_t snd_pure_1kHz[LISTEN_BUFFER_LEN_SAMPLES];
-int16_t snd_pure_1kHz_fadein[LISTEN_BUFFER_LEN_SAMPLES];
-int16_t snd_zero[LISTEN_BUFFER_LEN_SAMPLES];
-int16_t snd_noise[LISTEN_BUFFER_LEN_SAMPLES];
-int16_t snd_noise_loud[LISTEN_BUFFER_LEN_SAMPLES];
+int16_t snd_pure_1kHz[listen_buffer_samples];
+int16_t snd_pure_1kHz_fadein[listen_buffer_samples];
+int16_t snd_zero[listen_buffer_samples];
+int16_t snd_noise[listen_buffer_samples];
+int16_t snd_noise_loud[listen_buffer_samples];
 
 void read_data_file(const std::string &file, int16_t *buffer)
 {
@@ -43,7 +40,7 @@ void read_data_file(const std::string &file, int16_t *buffer)
 		exit(1);
 	}
 
-	sf_read_short(sf, buffer, LISTEN_BUFFER_LEN_SAMPLES);
+	sf_read_short(sf, buffer, listen_buffer_samples);
 }
 
 void io_init(void)
@@ -60,14 +57,14 @@ void io_init(void)
 	read_data_file(dd + "1kHzsine_2s_fades.wav", snd_pure_1kHz_fadein);
 
 	memset(snd_zero, 0, sizeof(snd_zero));
-	for (int i = 0; i < LISTEN_BUFFER_LEN_SAMPLES; i++) {
+	for (int i = 0; i < listen_buffer_samples; i++) {
 		int r = rand() & 0xff;
 		snd_noise_loud[i] = r;
 		snd_noise[i] = r >> 2;
 	}
 }
 
-void listen_for_croaks(croak_buf_t &buf)
+void listen_for_croaks(listen_buf_t &buf)
 {
 	int16_t *buffer = buf.data();
 	std::cout << "what am I hearing?" << std::endl;
@@ -98,7 +95,7 @@ void listen_for_croaks(croak_buf_t &buf)
 		break;
 	}
 
-	memcpy(buffer, rdptr, sizeof(int16_t) * LISTEN_BUFFER_LEN_SAMPLES);
+	memcpy(buffer, rdptr, sizeof(int16_t) * listen_buffer_samples);
 }
 
 void play_croak(void)
