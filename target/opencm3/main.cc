@@ -3,7 +3,9 @@
 #include "treefrog.h"
 #include <cstring>
 
+
 extern "C" {
+int _write(int file, char *buf, int len);
 #include <libopencm3/cm3/nvic.h>
 #include <libopencm3/stm32/dma.h>
 #include <libopencm3/stm32/i2c.h>
@@ -81,6 +83,16 @@ static void debuggig_usart_setup(void)
 	usart_set_parity(USART2, USART_PARITY_NONE);
 	usart_set_flow_control(USART2, USART_FLOWCONTROL_NONE);
 	usart_enable(USART2);
+}
+/* Callback from the libc when using printf */
+extern "C" {
+int _write(int file, char *buf, int len)
+{
+	int i;
+	for (i = 0; i < len; i++)
+		usart_send_blocking(USART2, buf[i]);
+	return i;
+}
 }
 
 static void write_i2c_to_audiochip(uint8_t reg, uint8_t contents)
@@ -186,6 +198,7 @@ void play_croak(void)
 	gpio_set(PORT_HEARTBEAT_LED, PIN_HEARTBEAT_LED);
 	audioDAC_setup();
 
+	printf("croak?\r\n");
 	usart_send_blocking(USART2, 'c');
 	usart_send_blocking(USART2, 'r');
 	usart_send_blocking(USART2, 'o');
