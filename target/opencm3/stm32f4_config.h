@@ -6,3 +6,15 @@
 #define PORT_HEARTBEAT_LED GPIOD
 #define PIN_HEARTBEAT_LED GPIO13
 
+
+#define I2S_MICROPHONE I2S2_EXT_BASE
+#define I2S_SPEAKER    I2S3_EXT_BASE
+#define I2C_SPEAKER    I2C1
+
+
+static inline void board_setup_clock(void)
+{
+	rcc_clock_setup_pll(&rcc_hsi_configs[RCC_CLOCK_3V3_84MHZ]);
+
+}
+
