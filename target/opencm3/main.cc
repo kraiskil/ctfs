@@ -29,20 +29,6 @@ static constexpr int croak_samples = config_fs * 1.5 /*seconds*/;
 /* TODO: move these functions to dedicated board config files */
 static void gpio_setup(void)
 {
-	/* PortA is used for:
-	 *  USART
-	 * PortB:
-	 *  DAC I2C
-	 * PortC is used for:
-	 *  Digital audio out
-	 * PortD is used for:
-	 *  Heartbeat LED
-	 */
-	rcc_periph_clock_enable(RCC_GPIOA);
-	rcc_periph_clock_enable(RCC_GPIOB);
-	rcc_periph_clock_enable(RCC_GPIOC);
-	rcc_periph_clock_enable(RCC_GPIOD);
-
 	gpio_mode_setup(PORT_HEARTBEAT_LED, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, PIN_HEARTBEAT_LED);
 	gpio_mode_setup(PORT_HEARTBEAT_LED, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, GPIO12);
 
@@ -107,9 +93,8 @@ static void write_i2c_to_audiochip(uint8_t reg, uint8_t contents)
 	i2c_transfer7(I2C1, address, packet, 2, NULL, 0);
 }
 
-static void i2s_setup(void)
+static void i2s_playback_setup(void)
 {
-
 	/* I2S pins:
 	 * Master clock: PC7
 	 * Bit clock: PC10
@@ -153,6 +138,55 @@ static void i2s_setup(void)
 	i2s_enable(SPI3);
 }
 
+static void i2s_input_setup(void)
+{
+	/* I2S pins:
+	 * Master clock: PA3
+	 * Bit clock: PB13
+	 * Data in: PB15 / PC3
+	 * L/R clock: PB12
+	 */
+	gpio_mode_setup(GPIOA, GPIO_MODE_AF, GPIO_PUPD_NONE, GPIO3);
+	gpio_set_af(GPIOA, GPIO_AF5, GPIO3);
+	gpio_mode_setup(GPIOB, GPIO_MODE_AF, GPIO_PUPD_NONE, GPIO13);
+	gpio_set_af(GPIOB, GPIO_AF5, GPIO13);
+
+/*	gpio_mode_setup(GPIOB, GPIO_MODE_INPUT, GPIO_PUPD_PULLDOWN, GPIO15);
+        gpio_mode_setup(GPIOB, GPIO_MODE_INPUT, GPIO_PUPD_NONE, GPIO15);
+        gpio_set_af(GPIOB, GPIO_AF5, GPIO15);
+*/
+	gpio_mode_setup(GPIOC, GPIO_MODE_AF, GPIO_PUPD_PULLDOWN, GPIO3);
+	gpio_set_af(GPIOC, GPIO_AF5, GPIO3);
+
+	gpio_mode_setup(GPIOB, GPIO_MODE_AF, GPIO_PUPD_NONE, GPIO12);
+	gpio_set_af(GPIOB, GPIO_AF5, GPIO12);
+
+	/* I2S is implemented as a HW mode of the SPI peripheral.
+	* Since this is a STM32F411, there is a separate I2S PLL
+	* that needs to be enabled.
+	*/
+	i2s_disable(SPI2);
+	i2s_set_standard(SPI2, i2s_standard_philips);
+	// TODO: these settings fixed for the SPH0645
+	i2s_set_dataformat(SPI2, i2s_dataframe_ch32_data24);
+	i2s_set_mode(SPI2, i2s_mode_master_receive);
+	/* RCC_PLLI2SCFGR configured values are:
+	 * 0x24003010 i.e.
+	 * PLLR = 2
+	 * PLLI2SN = 192
+	 * PLLI2SM = 16
+	 * And since the input is PLL source (i.e. HSI = 16MHz)
+	 * The I2S clock = 16 / 16 * 192 / 2 = 96MHz
+	 * Calculate sampling frequency from equation given in
+	 * STM32F411 reference manual:
+	 * Fs = I2Sclk/ (32*2 * ((2*I2SDIV)+ODD))
+	 * I2SDIV = I2Sclk/(128*Fs)
+	 * Fs=48kHz => 15,624 so 15 + ODD bit set
+	 */
+	i2s_set_clockdiv(SPI2, 15, 1);
+	i2s_enable(SPI2);
+}
+
 static void audioDAC_shutdown(void)
 {
 	// TODO: does this clear all register settings?
@@ -180,7 +214,8 @@ int main(void)
 	gpio_setup();
 	debuggig_usart_setup();
 
-	i2s_setup();
+	i2s_playback_setup();
+	i2s_input_setup();
 
 	treefrog();
 }
@@ -193,20 +228,13 @@ void sleep_for(void)
 	}
 }
 
+
 void play_croak(void)
 {
 	gpio_set(PORT_HEARTBEAT_LED, PIN_HEARTBEAT_LED);
 	audioDAC_setup();
 
-	printf("croak?\r\n");
-	usart_send_blocking(USART2, 'c');
-	usart_send_blocking(USART2, 'r');
-	usart_send_blocking(USART2, 'o');
-	usart_send_blocking(USART2, 'a');
-	usart_send_blocking(USART2, 'k');
-	usart_send_blocking(USART2, '!');
-	usart_send_blocking(USART2, '\r');
-	usart_send_blocking(USART2, '\n');
+	printf("croak!\r\n");
 
 	for (int i = 0; i < croak_samples; i++) {
 		spi_send(SPI3, 0);                 // stereo: other channel is mute
