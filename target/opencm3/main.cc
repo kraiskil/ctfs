@@ -24,7 +24,7 @@ int _write(int file, char *buf, int len);
 #endif
 
 
-static constexpr int croak_samples = config_fs * 1.5 /*seconds*/;
+static constexpr int croak_samples = config_fs_output * 1.5 /*seconds*/;
 
 /* TODO: move these functions to dedicated board config files */
 static void gpio_setup(void)

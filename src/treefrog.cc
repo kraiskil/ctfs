@@ -18,10 +18,6 @@ void treefrog(void)
 	}
 }
 
-#if 0
-#include <iostream>
-#include <iomanip>
-#endif
 bool should_I_croak(listen_buf_t &buffer)
 {
 	frequency_buf_t out;

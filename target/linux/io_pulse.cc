@@ -33,7 +33,7 @@ void listen_for_croaks(listen_buf_t &buffer)
 
 	static const pa_sample_spec ss = {
 		.format = PA_SAMPLE_S16LE,
-		.rate = config_fs,
+		.rate = config_fs_input,
 		.channels = 1
 	};
 	int                         error;
@@ -82,14 +82,14 @@ void listen_for_croaks(listen_buf_t &buffer)
 
 void play_croak(void)
 {
-	int     croak_samples = config_fs * 1.5 /*seconds*/;
+	int     croak_samples = config_fs_output * 1.5 /*seconds*/;
 	int16_t croak_sound[croak_samples];
 
 	std::cout << "croaking" << std::endl;
 
 	static const pa_sample_spec ss = {
 		.format = PA_SAMPLE_S16LE,
-		.rate = config_fs,
+		.rate = config_fs_output,
 		.channels = 1
 	};
 	int                         error;

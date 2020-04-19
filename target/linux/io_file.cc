@@ -31,8 +31,8 @@ void read_data_file(const std::string &file, int16_t *buffer)
 		std::cerr << "Error reading sound file " << file << std::endl;
 		exit(1);
 	}
-	if (sf_info.samplerate != config_fs) {
-		std::cerr << "Input data is at " << sf_info.samplerate << "Hz, expect " << config_fs << std::endl;
+	if (sf_info.samplerate != config_fs_input) {
+		std::cerr << "Input data is at " << sf_info.samplerate << "Hz, expect " << config_fs_input << std::endl;
 		exit(1);
 	}
 	if (sf_info.channels != 1) {

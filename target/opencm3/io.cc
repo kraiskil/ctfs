@@ -29,6 +29,6 @@ void listen_for_croaks(listen_buf_t &buffer)
 			max =  buffer[i];
 	}
 	i2s_disable(SPI2);
-	printf("Max input sound: %x\r\n", max);
+//printf("Max input sound: %x\r\n", max);
 }
 
