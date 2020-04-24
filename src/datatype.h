@@ -8,8 +8,9 @@ typedef int16_t fixp;
 #define FIXP_SCALE 0x4000
 
 constexpr unsigned listen_buffer_samples = 2048;
+constexpr unsigned frequency_buffer_samples = listen_buffer_samples / 2;
 typedef std::array<int16_t, listen_buffer_samples> listen_buf_t;
-typedef std::array<uint16_t, listen_buffer_samples / 2> frequency_buf_t;
+typedef std::array<uint16_t, frequency_buffer_samples> frequency_buf_t;
 
 // For FFT internal use only (and unit tests)
 typedef int32_t fft_internal_datatype;

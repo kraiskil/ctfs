@@ -7,7 +7,7 @@ struct binval
 	uint16_t bin;
 	uint16_t val;
 };
-typedef std::array<struct binval, 3> tone_array_t;
+typedef std::array<struct binval, 3> fone_array_t;
 
 /* a is semi-sorted already, with the
  * newest value at the bottom. so use
