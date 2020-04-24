@@ -1,5 +1,5 @@
 #include "gtest/gtest.h"
-#include "harmonics.h"
+#include "frog_tones.h"
 
 class HarmonicsTest :
 	public testing::Test

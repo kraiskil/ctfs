@@ -1,7 +1,7 @@
 #include "config.h"
 #include "datatype.h"
 #include "fft.h"
-#include "harmonics.h"
+#include "frog_tones.h"
 #include "treefrog.h"
 
 
