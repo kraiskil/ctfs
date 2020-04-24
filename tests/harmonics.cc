@@ -25,45 +25,45 @@ TEST_F(HarmonicsTest, allZeroes)
 
 TEST_F(HarmonicsTest, OneNonZero)
 {
-	in[5] = 100;
+	in[50] = 100;
 	find_tones(in, tones.data());
-	EXPECT_EQ(tones[0], 5);
+	EXPECT_EQ(tones[0], 50);
 	EXPECT_EQ(tones[1], 0);
 	EXPECT_EQ(tones[2], 0);
 }
 
 TEST_F(HarmonicsTest, TwoNonZero)
 {
-	in[5] = 100;
-	in[8] = 80;
+	in[50] = 100;
+	in[80] = 80;
 	find_tones(in, tones.data());
-	EXPECT_EQ(tones[0], 5);
-	EXPECT_EQ(tones[1], 8);
+	EXPECT_EQ(tones[0], 50);
+	EXPECT_EQ(tones[1], 80);
 	EXPECT_EQ(tones[2], 0);
 }
 
 TEST_F(HarmonicsTest, ThreeNonZero)
 {
-	in[5] = 100;
-	in[8] = 80;
-	in[12] = 40;
+	in[50] = 100;
+	in[80] = 80;
+	in[120] = 40;
 	find_tones(in, tones.data());
-	EXPECT_EQ(tones[0], 5);
-	EXPECT_EQ(tones[1], 8);
-	EXPECT_EQ(tones[2], 12);
+	EXPECT_EQ(tones[0], 50);
+	EXPECT_EQ(tones[1], 80);
+	EXPECT_EQ(tones[2], 120);
 }
 
 TEST_F(HarmonicsTest, ManyNonZero)
 {
-	in[5] = 100;
-	in[8] = 80;
-	in[12] = 40;
-	in[15] = 60;
-	in[20] = 110;
+	in[50] = 100;
+	in[80] = 80;
+	in[120] = 40;
+	in[150] = 60;
+	in[200] = 110;
 	in[24] = 40;
 	find_tones(in, tones.data());
-	EXPECT_EQ(tones[0], 20);
-	EXPECT_EQ(tones[1], 5);
-	EXPECT_EQ(tones[2], 8);
+	EXPECT_EQ(tones[0], 200);
+	EXPECT_EQ(tones[1], 50);
+	EXPECT_EQ(tones[2], 80);
 }
 
