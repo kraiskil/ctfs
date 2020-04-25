@@ -2,14 +2,18 @@
 #include "fft.h"
 
 #include <cassert>
-
-/* placeholder floating point implementation */
 #include <cmath>
 #include <complex>
+#include <cstdint>
+#include <cstring>
+#include <limits>
+using std::numeric_limits;
+
 
 fixp twiddle_re(int phase, int lenght);
 fixp twiddle_im(int phase, int lenght);
 complex_t multiply(complex_t a, fixp b_re, fixp b_im);
+void normalize(complex_t *y);
 
 /* Stockham autosort FFT by okojisan from
  * http://wwwa.pikara.ne.jp/okojisan/otfft-en/stockham2.html
@@ -36,6 +40,7 @@ void fft0(int n, int s, bool eo, complex_t *x, complex_t *y)
 				y[q + s * (2 * p + 1)] = multiply((a - b), twiddle_re(p, n), twiddle_im(p, n));
 			}
 		}
+		normalize(y);
 		fft0(n / 2, 2 * s, !eo, y, x);
 	}
 }
@@ -45,10 +50,39 @@ void fft_sa(int n, complex_t *x) // Fourier transform
 {
 	complex_t y[MAX_FFT_SIZE]; // complex_t is not "POD", so
 	                           // clang won't allocate variable length stack
+	memset(y, 0, sizeof(y));
 	fft0(n, 1, 0, x, y);
 	for (int k = 0; k < n; k++) x[k] /= n;
 }
 /* End of code from okojisan */
+
+/* In the middle of the fft, there is a
+ * addition of complex values. For high volume input,
+ * that might saturate. (There also is a multiplication, but
+ * that is with twiddles -> abs(twiddles)==1).
+ * This makes the FFT even slower, but frogs are not in a hurry...
+ */
+void normalize(complex_t *y)
+{
+	bool normalize = false;
+	for (int i = 0; i < MAX_FFT_SIZE; i++) {
+		if (y[i].real() > numeric_limits<int16_t>::max()
+		    || y[i].real() < numeric_limits<int16_t>::min()
+		    || y[i].imag() > numeric_limits<int16_t>::max()
+		    || y[i].imag() < numeric_limits<int16_t>::min())
+		{
+			normalize = true;
+			break;
+		}
+	}
+
+	if (normalize == false)
+		return;
+	for (int i = 0; i < MAX_FFT_SIZE; i++) {
+		y[i].real(y[i].real() >> 1);
+		y[i].imag(y[i].imag() >> 1);
+	}
+}
 
 
 /* Frogs are only interested in the magnitude, not phase of result data */

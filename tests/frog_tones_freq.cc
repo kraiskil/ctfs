@@ -67,3 +67,24 @@ TEST_F(FrogTonesFreqTest, ManySineWithNoise)
 	EXPECT_EQ(ft->get_num_peaks(), 3);
 }
 
+TEST_F(FrogTonesFreqTest, LoudSinesWithNoise)
+{
+	add_audio_sine(1200, 1000);
+	add_audio_sine(1100, 1300);
+	add_audio_sine(1150, 2800);
+	add_audio_noise(30, 40);
+	ft->fft();
+	ft->find_peaks();
+	EXPECT_EQ(ft->get_num_peaks(), 3);
+}
+TEST_F(FrogTonesFreqTest, LoudSinesWithLoudNoise)
+{
+	add_audio_sine(1200, 1000);
+	add_audio_sine(1100, 1300);
+	add_audio_sine(1150, 2800);
+	add_audio_noise(100, 300);
+	ft->fft();
+	ft->find_peaks();
+	EXPECT_EQ(ft->get_num_peaks(), 3);
+}
+

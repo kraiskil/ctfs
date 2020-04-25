@@ -207,6 +207,49 @@ TEST_P(fftTest, saManySines)
 		index_to_frequency(max_bins[2].bin, fs, fft_size),
 		bin_accuracy);
 }
-INSTANTIATE_TEST_SUITE_P(Random_fs_values, fftTest, testing::Range(6000, 48000, 6100));
+
+/* Check that large input amplitudes don't saturate the FFT.
+ * It should scale down the numeric values in such cases */
+TEST_P(fftTest, saSaturating)
+{
+	add_sine(
+		2000,  //amplitude
+		1000); //frequency
+
+	fft_sa(fft_size, in.data());
+	fft_calc_abs(in.data(), out);
+
+	std::vector<bin_value> raw_bins = max_values(out.data(), 6);
+	std::vector<bin_value> max_bins = merge_neighbours(raw_bins);
+	sort_by_value(max_bins);
+
+	ASSERT_GE(max_bins.size(), 1);
+
+	EXPECT_NEAR(
+		1000,
+		index_to_frequency(max_bins[0].bin, fs, fft_size),
+		bin_accuracy);
+}
+/* REAL loud input! (remember that audio input is 16bit signed...) */
+TEST_P(fftTest, saDisasterAreaDoesNotSaturate)
+{
+	add_sine(
+		30000, //amplitude [sic!]
+		1000); //frequency
+
+	fft_sa(fft_size, in.data());
+	fft_calc_abs(in.data(), out);
+
+	std::vector<bin_value> raw_bins = max_values(out.data(), 6);
+	std::vector<bin_value> max_bins = merge_neighbours(raw_bins);
+	sort_by_value(max_bins);
+
+	ASSERT_GE(max_bins.size(), 1);
+
+	EXPECT_NEAR(
+		1000,
+		index_to_frequency(max_bins[0].bin, fs, fft_size),
+		bin_accuracy);
+} INSTANTIATE_TEST_SUITE_P(Random_fs_values, fftTest, testing::Range(6000, 48000, 6100));
 INSTANTIATE_TEST_SUITE_P(Probable_fs_values, fftTest, testing::Values(8000, 16000, 24000, 44100, 48000));
 
