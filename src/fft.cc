@@ -56,16 +56,18 @@ void fft_sa(int n, complex_t *x) // Fourier transform
 
 
 /* Frogs are only interested in the magnitude, not phase of result data */
-void fft_calc_abs(complex_t *data, listen_buf_t &out)
+void fft_calc_abs(complex_t *data, frequency_buf_t &out)
 {
 	for (unsigned i = 0; i < out.size(); i++) {
 		uint32_t o = data[i].real() * data[i].real() + data[i].imag() * data[i].imag();
+		static_assert(sizeof(out[0]) == 2, "output element type has been changed - change this code too");
+		// TODO: compile-time assert typeid(out[0]) == typeid(uint16_t), and use the final bit of accuracy :)
 		if (o > 0x7FFFF) o = 0x7FFF;
 		out[i] = o;
 	}
 }
 
-void frog_fft(listen_buf_t &in, listen_buf_t &out)
+void frog_fft(listen_buf_t &in, frequency_buf_t &out)
 {
 	int       fft_size = in.size();
 	complex_t data[MAX_FFT_SIZE];

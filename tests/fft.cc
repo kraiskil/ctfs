@@ -13,12 +13,12 @@
  */
 typedef std::complex<fft_internal_datatype> complex_t;
 extern void fft_sa(int n, complex_t *x);
-extern void fft_calc_abs(complex_t *data, listen_buf_t &out);
+extern void fft_calc_abs(complex_t *data, frequency_buf_t &out);
 
 struct bin_value
 {
-	int bin;
-	int16_t value;
+	uint16_t bin;
+	uint16_t value;
 };
 
 class fftTestBase
@@ -55,12 +55,12 @@ public:
 		    }
 		    );
 	}
-	std::vector<bin_value> max_values(int16_t *data, int n_ret)
+	std::vector<bin_value> max_values(uint16_t *data, int n_ret)
 	{
 		int                    max_i = -1;
 		double                 max_a = -1;
 		std::vector<bin_value> values;
-		for (int i = 0; i < fft_size / 2; i++) {
+		for (uint16_t i = 0; i < fft_size / 2; i++) {
 			struct bin_value b = { /*.bin=*/
 				i, /*.value =*/ data[i]
 			};
@@ -122,7 +122,7 @@ public:
 	int fft_size;
 	float phase;
 	std::array<complex_t, MAX_FFT_SIZE> in;
-	listen_buf_t out;
+	frequency_buf_t out;
 	float bin_accuracy;
 };
 
@@ -171,21 +171,6 @@ TEST(fft, indexToFrequency)
 	EXPECT_EQ(468, index_to_frequency(15, fs, fft_size) );
 }
 
-TEST_P(fftTest, oneSine)
-{
-	add_sine(
-		8,    //amplitude
-		500); //frequency
-
-	fft_sa(fft_size, in.data());
-	fft_calc_abs(in.data(), out);
-
-	int max_i = index_of_peak(out.data(), fft_size / 2);
-	ASSERT_NEAR(
-		500,
-		index_to_frequency(max_i, fs, fft_size),
-		bin_accuracy);
-}
 
 TEST_P(fftTest, manySines)
 {
@@ -224,33 +209,4 @@ TEST_P(fftTest, manySines)
 }
 INSTANTIATE_TEST_SUITE_P(Random_fs_values, fftTest, testing::Range(6000, 48000, 6100));
 INSTANTIATE_TEST_SUITE_P(Probable_fs_values, fftTest, testing::Values(8000, 16000, 24000, 44100, 48000));
-
-
-class specificFFTTest :
-	public fftTestBase,
-	public ::testing::Test
-{
-	void SetUp(void) override
-	{}
-};
-
-TEST_F(specificFFTTest, saturatingFixedPoint)
-{
-	fs = 8000;
-	fft_size = 2048;
-	bin_accuracy = ((float)fs) / fft_size;
-
-	add_sine(
-		256,   //amplitude
-		1000); //frequency
-
-	fft_sa(fft_size, in.data());
-	fft_calc_abs(in.data(), out);
-
-	int max_i = index_of_peak(out.data(), fft_size / 2);
-	ASSERT_NEAR(
-		1000,
-		index_to_frequency(max_i, fs, fft_size),
-		bin_accuracy);
-}
 

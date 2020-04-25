@@ -12,7 +12,7 @@ static_assert(MAX_FFT_SIZE <= SIN_TABLE_RESOLUTION,
  * ignoring the phase of the result. Also, since frogs
  * are more interested in the speed of calculations,
  * the square rooting of the result is omitted */
-void frog_fft(listen_buf_t & in, listen_buf_t & out);
+void frog_fft(listen_buf_t & in, frequency_buf_t & out);
 int index_of_peak(int16_t *buf, int N);
 int index_to_frequency(int idx, int fs, int fft_size);
 

@@ -24,29 +24,14 @@ void treefrog(void)
 #endif
 bool should_I_croak(listen_buf_t &buffer)
 {
-	listen_buf_t out;
-	uint16_t     tones[3];
+	frequency_buf_t out;
 
 	frog_fft(buffer, out);
-	find_tones(out, tones);
 
-#if 0
-	std::cout << "tones: " << std::endl;
-	for (int i = 0; i < 3; i++) {
-		std::cout << i;
-		std::cout <<  "\tbin: " << std::setfill(' ') << std::setw(4) << tones[i];
-		std::cout << "\tampl: " << std::setfill(' ') << std::setw(4) << out[tones[i]];
-		std::cout << "\tHz: " << index_to_frequency(tones[i], config_fs, buffer.size()) << std::endl;
-	}
-#endif
-	/* Greatest component is DC - should be no croak here */
-	if (tones[0] == 0)
-		return false;
-	/* TODO: heuristic limit on what is a croak */
-	if (out[tones[0]] < 3000)
-		return false;
+	frog_tones ft(out);
+	ft.find_peaks();
 
-	return true;
+	return ft.get_num_peaks() > 0;
 }
 
 void croak(void)

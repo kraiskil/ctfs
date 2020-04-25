@@ -2,7 +2,6 @@ add_library(libtreefrog STATIC
 	croak.cc
 	fft.cc
 	frog_tones.cc
-	harmonics.cc
 	treefrog.cc
 	sin_table.cc
 	)
