@@ -88,3 +88,14 @@ TEST_F(FrogTonesFreqTest, LoudSinesWithLoudNoise)
 	EXPECT_EQ(ft->get_num_peaks(), 3);
 }
 
+TEST_F(FrogTonesFreqTest, OnlyLoudNoise)
+{
+	add_audio_noise(0, 400);
+	ft->fft();
+	ft->find_peaks();
+	/* There *might* be a peak at DC, which is OK - we'd ignore that
+	 * anyways */
+	ASSERT_LT(ft->get_num_peaks(), 2);
+	EXPECT_EQ(ft->get_peak_by_val(0).bin, 0);
+}
+
