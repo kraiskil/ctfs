@@ -1,5 +1,6 @@
 #pragma once
 #include <array>
+#include <complex>
 #include <cstdint>
 
 typedef int16_t fixp;
@@ -14,4 +15,5 @@ typedef std::array<uint16_t, frequency_buffer_samples> frequency_buf_t;
 
 // For FFT internal use only (and unit tests)
 typedef int32_t fft_internal_datatype;
+typedef std::complex<fft_internal_datatype> complex_t;
 

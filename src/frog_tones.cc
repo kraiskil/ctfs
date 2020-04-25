@@ -1,6 +1,8 @@
 #include "frog_tones.h"
+#include "fft.h"
 #include <algorithm>
 #include <cmath>
+
 using std::max;
 using std::min;
 
@@ -45,11 +47,11 @@ void frog_tones::find_peaks(void)
 	frequency_buf_t a;
 	int             windowsize = 3;
 	for (unsigned i = 0; i < a.size(); i++) {
-		a[i] = s1(buffer, i, windowsize);
+		a[i] = s1(freq_buffer, i, windowsize);
 	}
 
 	// C++ can't check the typeof(buffer[0]) == typeof(uint16_t]) ??
-	static_assert(sizeof(buffer[0]) == sizeof(uint16_t), "Check that the following does not overflow");
+	static_assert(sizeof(freq_buffer[0]) == sizeof(uint16_t), "Check that the following does not overflow");
 	uint32_t mean = 0;
 	for (auto v : a)
 		mean += v;
@@ -123,5 +125,20 @@ struct bin_val frog_tones::get_peak_by_val(uint16_t peak_num)
 {
 	sort_tones_by_value();
 	return tones[peak_num];
+}
+
+
+void frog_tones::fft(void)
+{
+	int       fft_size = audio_buffer.size();
+	complex_t data[MAX_FFT_SIZE];
+
+	for (int i = 0; i < fft_size; i++) {
+		data[i].real(audio_buffer[i]);
+		data[i].imag(0);
+	}
+
+	fft_sa(fft_size, data);
+	fft_calc_abs(data, freq_buffer);
 }
 

@@ -25,10 +25,10 @@ void treefrog(void)
 bool should_I_croak(listen_buf_t &buffer)
 {
 	frequency_buf_t out;
+	frog_tones      ft(buffer, out);
 
-	frog_fft(buffer, out);
+	ft.fft();
 
-	frog_tones ft(out);
 	ft.find_peaks();
 
 	return ft.get_num_peaks() > 0;

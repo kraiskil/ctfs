@@ -7,10 +7,6 @@
 #include <cmath>
 #include <complex>
 
-/* Complex is an internal (to this file) format,
- * so waste a bit of space, and have it as "accu" type all the time */
-typedef std::complex<fft_internal_datatype> complex_t;
-
 fixp twiddle_re(int phase, int lenght);
 fixp twiddle_im(int phase, int lenght);
 complex_t multiply(complex_t a, fixp b_re, fixp b_im);
@@ -65,20 +61,6 @@ void fft_calc_abs(complex_t *data, frequency_buf_t &out)
 		if (o > 0x7FFFF) o = 0x7FFF;
 		out[i] = o;
 	}
-}
-
-void frog_fft(listen_buf_t &in, frequency_buf_t &out)
-{
-	int       fft_size = in.size();
-	complex_t data[MAX_FFT_SIZE];
-
-	for (int i = 0; i < fft_size; i++) {
-		data[i].real(in[i]);
-		data[i].imag(0);
-	}
-
-	fft_sa(fft_size, data);
-	fft_calc_abs(data, out);
 }
 
 /* Twiddle factor, i.e. sin/cos( p*theta) values

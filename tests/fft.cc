@@ -172,7 +172,7 @@ TEST(fft, indexToFrequency)
 }
 
 
-TEST_P(fftTest, manySines)
+TEST_P(fftTest, saManySines)
 {
 	add_sine(
 		12,   //amplitude
