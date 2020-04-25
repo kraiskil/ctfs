@@ -8,13 +8,12 @@ extern "C" {
 
 void listen_for_croaks(listen_buf_t &buffer)
 {
-	int16_t max = 0;
 	uint8_t channel;
 	i2s_enable(SPI2);
 
 	unsigned i;
 	/* Powerup is 50ms = 2400 dataframes */
-	for (i = 0; i < 4800; i++) {
+	for (i = 0; i < 48000; i++) {
 		uint32_t flushbuffer = i2s_read32(SPI2, &channel);
 		(void)flushbuffer;
 	}
@@ -25,10 +24,7 @@ void listen_for_croaks(listen_buf_t &buffer)
 		buffer[i] = data;
 		if (channel == SKIP_CHANNEL)
 			i--;
-		if (buffer[i] > max)
-			max =  buffer[i];
 	}
 	i2s_disable(SPI2);
-//printf("Max input sound: %x\r\n", max);
 }
 

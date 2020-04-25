@@ -54,3 +54,34 @@ add_custom_target(
 	flash
 	COMMAND openocd ${OPENOCD_OPTIONS} -c \"program treefrog verify reset exit\"
 	)
+
+function(build_target target_name)
+	add_executable( ${target_name}
+		${target_name}.cc
+		io.cc
+	)
+	target_link_libraries(${target_name} libtreefrog ${OPENCM3_LIB})
+	target_compile_options(${target_name}
+		PRIVATE
+			-D${OPENCM3_TARGET}
+			-I/home/kraiskil/stuff/libopencm3/include
+		)
+	target_link_options(${target_name}
+		PRIVATE 
+			-T${CMAKE_CURRENT_SOURCE_DIR}/${LINKERFILE}
+			-L${CMAKE_CURRENT_SOURCE_DIR}
+			-L${OPENCM3_DIR}/lib
+			-nostartfiles
+		)
+	add_custom_target(
+		flash_${target_name}
+		DEPENDS ${target_name}
+		COMMAND openocd ${OPENOCD_OPTIONS} -c \"program ${target_name} verify reset exit\"
+		)
+
+endfunction()
+
+build_target( mic_recorder )
+build_target( fft_record )
+
+
