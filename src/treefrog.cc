@@ -31,6 +31,9 @@ bool should_I_croak(listen_buf_t &buffer)
 
 	ft.find_peaks();
 
+	/* placeholder for more accurate harmonics detection */
+	if (ft.get_num_peaks() == 1 && ft.get_peak_by_val(0).bin == 0)
+		return false;
 	return ft.get_num_peaks() > 0;
 }
 
