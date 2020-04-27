@@ -1,4 +1,5 @@
 #include "frog_tones_test.h"
+#include "whistle_sine.h"
 
 #include <cmath>
 
@@ -97,5 +98,19 @@ TEST_F(FrogTonesFreqTest, OnlyLoudNoise)
 	 * anyways */
 	ASSERT_LT(ft->get_num_peaks(), 2);
 	EXPECT_EQ(ft->get_peak_by_val(0).bin, 0);
+}
+
+TEST_F(FrogTonesFreqTest, WhistleSine)
+{
+	// There HAS to be a C++ way of doing this, but even with this
+	// comment, this is quicker than figuring that way out :)
+	for (int i = 0; i < audio_buffer.size(); i++)
+		audio_buffer[i] = whistle_sine[i];
+	ft->fft();
+	ft->find_peaks();
+	ASSERT_EQ(ft->get_num_peaks(), 2);
+	EXPECT_EQ(ft->get_peak_by_val(0).bin, 0);
+	// TODO: this value is not verified by measuring the sound frequency
+	EXPECT_EQ(ft->get_peak_by_val(1).bin, 44);
 }
 
