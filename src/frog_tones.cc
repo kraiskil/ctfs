@@ -62,12 +62,12 @@ void frog_tones::find_peaks(void)
 	// tone_array is same as O in the algorithm description
 	// Just set those bins without statistically significant value to zero
 	for (unsigned i = 0; i < a.size(); i++) {
+		tones[i].bin = i;
 		// avoid unsigned underflow
 		if (a[i] < mean)
 			continue;
 
-		if ( (a[i] - mean) > (3 * stddev) ) {
-			tones[i].bin = i;
+		if ( (a[i] - mean) > (4 * stddev) ) {
 			tones[i].val = a[i];
 		}
 	}
@@ -126,7 +126,20 @@ struct bin_val frog_tones::get_peak_by_val(uint16_t peak_num)
 	sort_tones_by_value();
 	return tones[peak_num];
 }
-
+struct bin_val frog_tones::get_peak_by_bin(uint16_t peak_num)
+{
+	sort_tones_by_bin();
+	uint16_t cpn = 0;
+	for (unsigned i = 0; i < tones.size(); i++) {
+		if (tones[i].val == 0)
+			continue;
+		if (cpn == peak_num)
+			return tones[i];
+		cpn++;
+	}
+	// This should not happen - logically
+	return { 0, 0 };
+}
 
 void frog_tones::fft(void)
 {

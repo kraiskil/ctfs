@@ -1,3 +1,4 @@
+#include "fft.h"
 #include "frog_tones_test.h"
 #include "whistle_sine.h"
 
@@ -18,11 +19,11 @@ public:
 			audio_buffer[i] += peak * sin((2 * M_PI * i * f_input / fs) + phase);
 		}
 	}
-	void add_audio_noise(uint16_t min_ampl, uint16_t max_ampl)
+	void add_audio_noise(uint16_t max_ampl)
 	{
-		int range = max_ampl - min_ampl + 1; // limits are inclusive
 		for (auto &s : audio_buffer) {
-			uint16_t noise = rand() % range + min_ampl;
+			int16_t noise = rand() % (2 * max_ampl) - max_ampl;
+			;
 			s += noise;
 		}
 	}
@@ -51,7 +52,7 @@ TEST_F(FrogTonesFreqTest, TwoSines)
 TEST_F(FrogTonesFreqTest, SingleSineWithNoise)
 {
 	add_audio_sine(200, 1000);
-	add_audio_noise(30, 40);
+	add_audio_noise(40);
 	ft->fft();
 	ft->find_peaks();
 	EXPECT_EQ(ft->get_num_peaks(), 1);
@@ -62,7 +63,7 @@ TEST_F(FrogTonesFreqTest, ManySineWithNoise)
 	add_audio_sine(200, 1000);
 	add_audio_sine(100, 1300);
 	add_audio_sine(150, 2800);
-	add_audio_noise(30, 40);
+	add_audio_noise(40);
 	ft->fft();
 	ft->find_peaks();
 	EXPECT_EQ(ft->get_num_peaks(), 3);
@@ -73,7 +74,7 @@ TEST_F(FrogTonesFreqTest, LoudSinesWithNoise)
 	add_audio_sine(1200, 1000);
 	add_audio_sine(1100, 1300);
 	add_audio_sine(1150, 2800);
-	add_audio_noise(30, 40);
+	add_audio_noise(40);
 	ft->fft();
 	ft->find_peaks();
 	EXPECT_EQ(ft->get_num_peaks(), 3);
@@ -83,7 +84,7 @@ TEST_F(FrogTonesFreqTest, LoudSinesWithLoudNoise)
 	add_audio_sine(1200, 1000);
 	add_audio_sine(1100, 1300);
 	add_audio_sine(1150, 2800);
-	add_audio_noise(100, 300);
+	add_audio_noise(300);
 	ft->fft();
 	ft->find_peaks();
 	EXPECT_EQ(ft->get_num_peaks(), 3);
@@ -91,13 +92,15 @@ TEST_F(FrogTonesFreqTest, LoudSinesWithLoudNoise)
 
 TEST_F(FrogTonesFreqTest, OnlyLoudNoise)
 {
-	add_audio_noise(0, 400);
+	add_audio_noise(400);
 	ft->fft();
 	ft->find_peaks();
-	/* There *might* be a peak at DC, which is OK - we'd ignore that
-	 * anyways */
-	ASSERT_LT(ft->get_num_peaks(), 2);
-	EXPECT_EQ(ft->get_peak_by_val(0).bin, 0);
+	/* There might be peak detects at high frequencies, since
+	 * the amplitude shifts are so abrupt. */
+	EXPECT_LT(ft->get_num_peaks(), 10);
+	EXPECT_GT(
+		index_to_frequency(ft->get_peak_by_bin(0).bin, fs, audio_buffer.size()),
+		8000);
 }
 
 TEST_F(FrogTonesFreqTest, WhistleSine)

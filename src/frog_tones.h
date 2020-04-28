@@ -20,6 +20,8 @@ public:
 	void find_peaks(void);
 	unsigned get_num_peaks(void);
 	struct bin_val get_peak_by_val(uint16_t peak_num);
+	struct bin_val get_peak_by_bin(uint16_t peak_num);
+
 private:
 	void sort_tones_by_bin(void);
 	void sort_tones_by_value(void);
