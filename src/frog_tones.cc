@@ -13,7 +13,7 @@ using std::min;
 
 
 /* Assume unsigned input data!*/
-unsigned s1(frequency_buf_t &buffer, unsigned i, unsigned k)
+unsigned s1(const frequency_buf_t &buffer, const unsigned i, const unsigned k)
 {
 	int leftmax = 0;
 	for (unsigned j = max(0U, i - k); j < i; j++) {
@@ -46,6 +46,8 @@ void frog_tones::find_peaks(void)
 {
 	frequency_buf_t a;
 	int             windowsize = 3;
+	tones.fill({ 0, 0 });
+
 	for (unsigned i = 0; i < a.size(); i++) {
 		a[i] = s1(freq_buffer, i, windowsize);
 	}

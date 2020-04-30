@@ -117,3 +117,20 @@ TEST_F(FrogTonesFreqTest, WhistleSine)
 	EXPECT_EQ(ft->get_peak_by_val(1).bin, 44);
 }
 
+TEST_F(FrogTonesFreqTest, ResetBetweenRuns)
+{
+	add_audio_noise(50);
+	add_audio_sine(1200, 500);
+	ft->fft();
+	ft->find_peaks();
+	EXPECT_EQ(ft->get_num_peaks(), 1);
+
+	audio_buffer.fill(0);
+	srand(42);
+	add_audio_noise(50);
+	add_audio_sine(1200, 500);
+	ft->fft();
+	ft->find_peaks();
+	EXPECT_EQ(ft->get_num_peaks(), 1);
+}
+

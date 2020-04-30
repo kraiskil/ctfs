@@ -116,7 +116,7 @@ TEST_F(FrogTonesPeakTest, WidePeaksInNoise)
 
 
 
-extern unsigned s1(frequency_buf_t &freq_buffer, unsigned i, unsigned k);
+extern unsigned s1(const frequency_buf_t &freq_buffer, const unsigned i, const unsigned k);
 TEST_F(FrogTonesPeakTest, S1)
 {
 	freq_buffer[0] = 10;
