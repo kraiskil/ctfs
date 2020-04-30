@@ -1,3 +1,4 @@
+#include "config.h"
 #include "frog_tones.h"
 #include "fft.h"
 #include <algorithm>
@@ -155,5 +156,10 @@ void frog_tones::fft(void)
 
 	fft_sa(fft_size, data);
 	fft_calc_abs(data, freq_buffer);
+}
+
+int frog_tones::as_Hz(uint16_t frequency_bin)
+{
+	return (float)frequency_bin * config_fs_input / audio_buffer.size();
 }
 

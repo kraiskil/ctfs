@@ -12,6 +12,7 @@ public:
 		FrogTonesTest::SetUp();
 		fs = 48000;
 		srand(42);
+		bin_accuracy = ((float)fs) / audio_buffer.size();
 	}
 	void add_audio_sine(int peak, int f_input, float phase = 0.2)
 	{
@@ -28,6 +29,7 @@ public:
 		}
 	}
 
+	float bin_accuracy;
 	int fs;
 
 };
@@ -132,5 +134,14 @@ TEST_F(FrogTonesFreqTest, ResetBetweenRuns)
 	ft->fft();
 	ft->find_peaks();
 	EXPECT_EQ(ft->get_num_peaks(), 1);
+}
+
+TEST_F(FrogTonesFreqTest, asHz)
+{
+	add_audio_sine(500, 1200);
+	ft->fft();
+	ft->find_peaks();
+	EXPECT_EQ(ft->get_num_peaks(), 1);
+	EXPECT_NEAR(ft->as_Hz(ft->get_peak_by_bin(0).bin), 1200, bin_accuracy);
 }
 

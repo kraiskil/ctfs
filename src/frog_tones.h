@@ -21,6 +21,7 @@ public:
 	unsigned get_num_peaks(void);
 	struct bin_val get_peak_by_val(uint16_t peak_num);
 	struct bin_val get_peak_by_bin(uint16_t peak_num);
+	int as_Hz(uint16_t frequency_bin);
 
 private:
 	void sort_tones_by_bin(void);
