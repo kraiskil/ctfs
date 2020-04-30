@@ -16,6 +16,7 @@ public:
 	{
 		tones.fill({ 0, 0 });
 	}
+	void dc_blocker(void);
 	void fft(void);
 	void find_peaks(void);
 	unsigned get_num_peaks(void);

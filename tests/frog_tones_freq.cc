@@ -145,3 +145,62 @@ TEST_F(FrogTonesFreqTest, asHz)
 	EXPECT_NEAR(ft->as_Hz(ft->get_peak_by_bin(0).bin), 1200, bin_accuracy);
 }
 
+TEST_F(FrogTonesFreqTest, DcBlocker)
+{
+	add_audio_noise(50);
+	add_audio_sine(1200, 500);
+	for (auto &v: audio_buffer)
+		v += 800;
+
+	ft->fft();
+	ft->find_peaks();
+	EXPECT_EQ(ft->get_num_peaks(), 2);
+	int prev_peak = ft->get_peak_by_bin(1).bin;
+
+	ft->dc_blocker();
+	ft->fft();
+	ft->find_peaks();
+	EXPECT_EQ(ft->get_num_peaks(), 1);
+	EXPECT_EQ(ft->get_peak_by_val(0).bin, prev_peak);
+}
+
+TEST_F(FrogTonesFreqTest, NegativeDcBlocker)
+{
+	add_audio_noise(50);
+	add_audio_sine(1200, 500);
+	for (auto &v: audio_buffer)
+		v += -800;
+
+	ft->fft();
+	ft->find_peaks();
+	EXPECT_EQ(ft->get_num_peaks(), 2);
+	int prev_peak = ft->get_peak_by_bin(1).bin;
+
+	ft->dc_blocker();
+	ft->fft();
+	ft->find_peaks();
+	EXPECT_EQ(ft->get_num_peaks(), 1);
+	EXPECT_EQ(ft->get_peak_by_val(0).bin, prev_peak);
+}
+
+/* SPH0645 has a "huge" DC - larder than "normal" sound levels.
+ * These values approximate observed recordings */
+TEST_F(FrogTonesFreqTest, LargeNoisyDcIsBlocked)
+{
+	add_audio_noise(50);
+	add_audio_sine(3000, 1200);
+	for (auto &v: audio_buffer)
+		v += 1800;
+
+	ft->fft();
+	ft->find_peaks();
+	EXPECT_EQ(ft->get_num_peaks(), 2);
+	EXPECT_NEAR(ft->as_Hz(ft->get_peak_by_bin(1).bin), 1200, bin_accuracy);
+
+	ft->dc_blocker();
+	ft->fft();
+	ft->find_peaks();
+	EXPECT_EQ(ft->get_num_peaks(), 1);
+	EXPECT_NEAR(ft->as_Hz(ft->get_peak_by_val(0).bin), 1200, bin_accuracy);
+}
+

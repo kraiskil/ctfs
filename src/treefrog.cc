@@ -23,8 +23,8 @@ bool should_I_croak(listen_buf_t &buffer)
 	frequency_buf_t out;
 	frog_tones      ft(buffer, out);
 
+	ft.dc_blocker();
 	ft.fft();
-
 	ft.find_peaks();
 
 	/* placeholder for more accurate harmonics detection */

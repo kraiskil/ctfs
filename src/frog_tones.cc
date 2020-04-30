@@ -158,6 +158,23 @@ void frog_tones::fft(void)
 	fft_calc_abs(data, freq_buffer);
 }
 
+void frog_tones::dc_blocker(void)
+{
+	// values from previous round
+	audio_sample_t p_out = 0;
+	//TODO: this is the initialization coefficient for the particular
+	// SPH0645 that I have right now. Remember this from previous rounds
+	audio_sample_t p_in = -1900;
+
+
+	for (auto &in : audio_buffer) {
+		audio_sample_t out = in - p_in + 15 * (p_out >> 4);
+		p_in = in;
+		p_out = out;
+		in = out;
+	}
+}
+
 int frog_tones::as_Hz(uint16_t frequency_bin)
 {
 	return (float)frequency_bin * config_fs_input / audio_buffer.size();

@@ -8,12 +8,13 @@ typedef int16_t fixp;
 // cause overflows. Perhaps 0x4000?
 #define FIXP_SCALE 0x4000
 
+typedef int16_t audio_sample_t;
 constexpr unsigned listen_buffer_samples = 2048;
 constexpr unsigned frequency_buffer_samples = listen_buffer_samples / 2;
-typedef std::array<int16_t, listen_buffer_samples> listen_buf_t;
-typedef std::array<uint16_t, frequency_buffer_samples> frequency_buf_t;
+typedef std::array<audio_sample_t, listen_buffer_samples> listen_buf_t;
 
-// For FFT internal use only (and unit tests)
+typedef uint16_t fft_bin_t;
 typedef int32_t fft_internal_datatype;
 typedef std::complex<fft_internal_datatype> complex_t;
+typedef std::array<fft_bin_t, frequency_buffer_samples> frequency_buf_t;
 

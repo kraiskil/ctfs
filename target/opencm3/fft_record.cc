@@ -27,12 +27,13 @@ int main(void)
 
 	while (1) {
 		listen_for_croaks(abuf);
+		ft.dc_blocker();
 		ft.fft();
 
 		for (unsigned i = 0; i < fbuf.size(); i++) {
 			printf("%d ", fbuf[i]);
 		}
-		printf("\n");
+		printf("\n\n");
 	}
 
 	return 0;
