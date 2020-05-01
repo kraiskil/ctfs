@@ -20,7 +20,7 @@ void listen_for_croaks(listen_buf_t &buffer)
 
 	for (i = 0; i < buffer.size(); i++) {
 		int32_t data = i2s_read32(SPI2, &channel);
-		data >>= 8;
+		data >>= 16;
 		buffer[i] = data;
 		if (channel == SKIP_CHANNEL)
 			i--;

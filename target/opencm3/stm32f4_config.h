@@ -17,7 +17,7 @@
  *  Sound in (SPI2):
  *   PA3 - master clock
  *   PB13- bit clock
- *   PB15- data
+ *   PC3- data
  *   PB12- l/r clock
  *
  */
@@ -121,7 +121,7 @@ static void board_setup_i2s_in(void)
 	 * Data in: PC3
 	 * L/R clock: PB12
 	 */
-	gpio_mode_setup(GPIOA, GPIO_MODE_AF, GPIO_PUPD_NONE, GPIO3);
+	gpio_mode_setup(GPIOA, GPIO_MODE_AF, GPIO_PUPD_PULLDOWN, GPIO3);
 	gpio_set_af(GPIOA, GPIO_AF5, GPIO3);
 	gpio_mode_setup(GPIOB, GPIO_MODE_AF, GPIO_PUPD_NONE, GPIO13);
 	gpio_set_af(GPIOB, GPIO_AF5, GPIO13);
