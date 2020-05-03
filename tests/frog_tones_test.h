@@ -16,7 +16,7 @@ public:
 		ft = new frog_tones(audio_buffer, freq_buffer);
 		// TODO: for testing, should be the other way round:
 		// we set config_fs_input here, and frog_tones reads that.
-		fs = 48000; // =config_fs_input;
+		fs = 8000; // =config_fs_input;
 		bin_accuracy = ((float)fs) / audio_buffer.size();
 	}
 

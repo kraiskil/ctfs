@@ -93,3 +93,39 @@ TEST_F(FrogTonesHarmonicsTest, FourArtificailTreeFrogs)
 	EXPECT_NEAR(harmonics[2], 1200, bin_accuracy);
 }
 
+TEST_F(FrogTonesHarmonicsTest, FourTreeFrogs)
+{
+	// Four frogs with actual tunes
+	// This tests spatial resolution of the system
+	add_frog_sound(200, 440); //A4
+	add_frog_sound(200, 494); //B4
+	add_frog_sound(200, 523); //C5
+	add_frog_sound(200, 554); //C#5
+
+	ft->fft();
+	ft->find_peaks();
+	find_harmonics(*ft, harmonics);
+
+	EXPECT_NEAR(harmonics[0], 440, bin_accuracy);
+	EXPECT_NEAR(harmonics[1], 494, bin_accuracy);
+	EXPECT_NEAR(harmonics[2], 523, bin_accuracy);
+}
+
+TEST_F(FrogTonesHarmonicsTest, FourBassTreeFrogs)
+{
+	// Four frogs with actual tunes
+	// This tests spatial resolution of the system
+	add_frog_sound(200, 220); //A3
+	add_frog_sound(200, 233); //A#3
+	add_frog_sound(200, 245); //B3
+	add_frog_sound(200, 262); //C4
+
+	ft->fft();
+	ft->find_peaks();
+	find_harmonics(*ft, harmonics);
+
+	EXPECT_NEAR(harmonics[0], 220, bin_accuracy);
+	EXPECT_NEAR(harmonics[1], 233, bin_accuracy);
+	EXPECT_NEAR(harmonics[2], 245, bin_accuracy);
+}
+

@@ -46,7 +46,12 @@ float calculate_stddev(frequency_buf_t &a, uint32_t mean)
 void frog_tones::find_peaks(void)
 {
 	frequency_buf_t a;
-	int             windowsize = 3;
+	// The number of bins to look to the sides for mergeable peak-candidate bins
+	// Must be this low, because with low frequencies, the specral resolution
+	// is ~4Hz, and notes at A2-level are spaced ~7Hz.
+	// TODO: this should be a configuration parameter based on how low we must be
+	// able to go, and fft resolution.
+	int windowsize = 2;
 	tones.fill({ 0, 0 });
 
 	for (unsigned i = 0; i < a.size(); i++) {
@@ -80,6 +85,13 @@ void frog_tones::find_peaks(void)
 	// This implementation smells. There has to be
 	// a better one available - investigate *before*
 	// saturday evening coctails...
+	//
+	// One clear bug here is that this implementation
+	// is with wide peaks, spanning more than 2*windowsize bins.
+	// Smooth rises (when walking the tones in order of increasing
+	// frequency) of peaks to be detected as single
+	// peak, but a wide peak will be split into two on the
+	// descending slope.
 	for (unsigned i = windowsize; i < tones.size(); i++) {
 		if (tones[i].val == 0)
 			continue;

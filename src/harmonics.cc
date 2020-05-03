@@ -1,11 +1,11 @@
 #include "harmonics.h"
 
-bool has_harmonics(frog_tones &ft, int i)
+bool has_harmonics(frog_tones &ft, unsigned bin_no)
 {
-	uint16_t base_bin = ft.get_peak_by_bin(i).bin;
-	i++;
-	for (; i < ft.get_num_peaks(); i++) {
-		uint16_t comp_bin = ft.get_peak_by_bin(i).bin;
+	uint16_t base_bin = ft.get_peak_by_bin(bin_no).bin;
+	bin_no++;
+	for (; bin_no < ft.get_num_peaks(); bin_no++) {
+		uint16_t comp_bin = ft.get_peak_by_bin(bin_no).bin;
 
 		int peak_diff = comp_bin - base_bin * 2;
 		if (peak_diff <= 1 && peak_diff >= -1)
@@ -24,7 +24,7 @@ void find_harmonics(frog_tones &ft, uint16_t (&harmonics)[3])
 	harmonics[1] = 0;
 	harmonics[2] = 0;
 
-	for (int i = 0; i < np; i++) {
+	for (unsigned i = 0; i < np; i++) {
 		peak = ft.get_peak_by_bin(i).bin;
 
 		// search for a harmonic

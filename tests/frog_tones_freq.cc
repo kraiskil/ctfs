@@ -80,10 +80,13 @@ TEST_F(FrogTonesFreqTest, OnlyLoudNoise)
 	ft->find_peaks();
 	/* There might be peak detects at high frequencies, since
 	 * the amplitude shifts are so abrupt. */
+	/* TODO: Not sure if this test makes any sense, after input sampling
+	 * frequency was dropped from 48k to 8k. Not sure how natural this
+	 * kind of noise is...*/
 	EXPECT_LT(ft->get_num_peaks(), 10);
 	EXPECT_GT(
 		index_to_frequency(ft->get_peak_by_bin(0).bin, fs, audio_buffer.size()),
-		8000);
+		1333);
 }
 
 TEST_F(FrogTonesFreqTest, WhistleSine)
