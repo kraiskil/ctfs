@@ -10,3 +10,9 @@ add_executable(treefrog_file
 	)
 target_link_libraries(treefrog_file sndfile fftw3 libtreefrog)
 
+add_executable(deaf_frog
+	io_pulse.cc
+	deaf_frog.cc
+	)
+target_link_libraries(deaf_frog pulse-simple pulse libtreefrog)
+
