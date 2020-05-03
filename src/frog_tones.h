@@ -1,3 +1,4 @@
+#pragma once
 #include "datatype.h"
 
 struct bin_val
@@ -19,10 +20,10 @@ public:
 	void dc_blocker(void);
 	void fft(void);
 	void find_peaks(void);
-	unsigned get_num_peaks(void);
-	struct bin_val get_peak_by_val(uint16_t peak_num);
-	struct bin_val get_peak_by_bin(uint16_t peak_num);
-	int as_Hz(uint16_t frequency_bin);
+	virtual unsigned get_num_peaks(void);
+	virtual struct bin_val get_peak_by_val(uint16_t peak_num);
+	virtual struct bin_val get_peak_by_bin(uint16_t peak_num);
+	virtual int as_Hz(uint16_t frequency_bin) const;
 
 private:
 	void sort_tones_by_bin(void);

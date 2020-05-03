@@ -1,69 +1,103 @@
-#include "gtest/gtest.h"
-#include "frog_tones.h"
+#include "frog_tones_test.h"
+#include "harmonics.h"
+#include "mock_frog_tones.h"
 
-class HarmonicsTest :
-	public testing::Test
+using namespace testing;
+
+class HarmonicsTest : public testing::Test
 {
 public:
-	listen_buf_t in;
-	std::array<uint16_t, 3> tones;
-
 	void SetUp(void) override
+	{}
+
+	void add_num_results(int nr)
 	{
-		in.fill(0);
-		tones.fill(0);
+		EXPECT_CALL(mock_ft, get_peak_by_bin(Ge(nr)))
+		        .Times(0);
+		ON_CALL(mock_ft, get_num_peaks())
+		        .WillByDefault(Return(nr));
+
+		for (int i = 0; i < nr; i++) {
+			EXPECT_CALL(mock_ft, get_peak_by_bin(i))
+			        .WillRepeatedly(Return(retvals[i]));
+			EXPECT_CALL(mock_ft, as_Hz(retvals[i].bin)).
+			        WillRepeatedly(Return(retvals[i].bin * bin_to_hz));
+		}
 	}
+
+	const int bin_to_hz = 10; // converto bin to Hz by multiplying with this
+	struct bin_val retvals[10] =
+	{ {
+		  100, 10
+	  },           //1st frog base
+	  { 200, 10 }, //1st frog harmonic
+	  { 150, 10 }, //2nd frog base
+	  { 300, 10 }, //2nd frog harmonic
+	  { 180, 10 }, //3rd frog base
+	  { 360, 10 }, //3rd frog harmonic
+	  { 130, 10 }, //4th frog base
+	  { 260, 10 }, //4th frog harmonic
+	};
+	uint16_t harmonics[3] = { 42, 42, 42 };
+
+	NiceMock<MockFrogTones> mock_ft;
 };
 
-TEST_F(HarmonicsTest, allZeroes)
+TEST_F(HarmonicsTest, NoSounds)
 {
-	find_tones(in, tones.data());
-	EXPECT_EQ(tones[0], 0);
-	EXPECT_EQ(tones[1], 0);
-	EXPECT_EQ(tones[2], 0);
+	add_num_results(0);
+
+	find_harmonics(mock_ft, harmonics);
+
+	EXPECT_EQ(harmonics[0], 0);
+	EXPECT_EQ(harmonics[1], 0);
+	EXPECT_EQ(harmonics[2], 0);
 }
 
-TEST_F(HarmonicsTest, OneNonZero)
+
+TEST_F(HarmonicsTest, DetectFrogSound)
 {
-	in[50] = 100;
-	find_tones(in, tones.data());
-	EXPECT_EQ(tones[0], 50);
-	EXPECT_EQ(tones[1], 0);
-	EXPECT_EQ(tones[2], 0);
+	add_num_results(2);
+
+	find_harmonics(mock_ft, harmonics);
+
+	EXPECT_EQ(harmonics[0], 1000);
+	EXPECT_EQ(harmonics[1], 0);
+	EXPECT_EQ(harmonics[2], 0);
 }
 
-TEST_F(HarmonicsTest, TwoNonZero)
+TEST_F(HarmonicsTest, NoDetectFrogSound)
 {
-	in[50] = 100;
-	in[80] = 80;
-	find_tones(in, tones.data());
-	EXPECT_EQ(tones[0], 50);
-	EXPECT_EQ(tones[1], 80);
-	EXPECT_EQ(tones[2], 0);
+	// bins 10 & 25 - this is not how frogs sound!
+	retvals[1].bin = 25;
+	add_num_results(2);
+
+	find_harmonics(mock_ft, harmonics);
+
+	EXPECT_EQ(harmonics[0], 0);
+	EXPECT_EQ(harmonics[1], 0);
+	EXPECT_EQ(harmonics[2], 0);
 }
 
-TEST_F(HarmonicsTest, ThreeNonZero)
+TEST_F(HarmonicsTest, DetectTwoFrogSound)
 {
-	in[50] = 100;
-	in[80] = 80;
-	in[120] = 40;
-	find_tones(in, tones.data());
-	EXPECT_EQ(tones[0], 50);
-	EXPECT_EQ(tones[1], 80);
-	EXPECT_EQ(tones[2], 120);
+	add_num_results(4);
+
+	find_harmonics(mock_ft, harmonics);
+
+	EXPECT_EQ(harmonics[0], 1000);
+	EXPECT_EQ(harmonics[1], 1500);
+	EXPECT_EQ(harmonics[2], 0);
 }
 
-TEST_F(HarmonicsTest, ManyNonZero)
+TEST_F(HarmonicsTest, DetectFromFourFrogSounds)
 {
-	in[50] = 100;
-	in[80] = 80;
-	in[120] = 40;
-	in[150] = 60;
-	in[200] = 110;
-	in[24] = 40;
-	find_tones(in, tones.data());
-	EXPECT_EQ(tones[0], 200);
-	EXPECT_EQ(tones[1], 50);
-	EXPECT_EQ(tones[2], 80);
+	add_num_results(8);
+
+	find_harmonics(mock_ft, harmonics);
+
+	EXPECT_EQ(harmonics[0], 1000);
+	EXPECT_EQ(harmonics[1], 1500);
+	EXPECT_EQ(harmonics[2], 1800);
 }
 

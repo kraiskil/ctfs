@@ -168,7 +168,7 @@ void frog_tones::dc_blocker(void)
 		v -= accu;
 }
 
-int frog_tones::as_Hz(uint16_t frequency_bin)
+int frog_tones::as_Hz(uint16_t frequency_bin) const
 {
 	return (float)frequency_bin * config_fs_input / audio_buffer.size();
 }
