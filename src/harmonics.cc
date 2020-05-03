@@ -7,7 +7,8 @@ bool has_harmonics(frog_tones &ft, int i)
 	for (; i < ft.get_num_peaks(); i++) {
 		uint16_t comp_bin = ft.get_peak_by_bin(i).bin;
 
-		if (comp_bin == base_bin * 2)
+		int peak_diff = comp_bin - base_bin * 2;
+		if (peak_diff <= 1 && peak_diff >= -1)
 			return true;
 	}
 	return false;

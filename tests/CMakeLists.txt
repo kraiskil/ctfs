@@ -1,5 +1,6 @@
 add_executable(unittests
 	frog_tones_freq.cc
+	frog_tones_harmonics.cc
 	frog_tones_peak.cc
 	harmonics.cc
 	fft.cc
