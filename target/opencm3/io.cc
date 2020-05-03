@@ -33,19 +33,21 @@ static int16_t read_8k_sample(void)
 
 void listen_for_croaks(listen_buf_t &buffer)
 {
-	i2s_enable(SPI2);
 
 	unsigned i;
 	/* Powerup is 50ms = 2400 dataframes */
-	for (i = 0; i < 4800; i++) {
-		uint8_t  channel;
-		uint32_t flushbuffer = i2s_read32(SPI2, &channel);
-		(void)flushbuffer;
-	}
+	/* This is what the datasheet claims.
+	 * Empirical studies show we need to wait somewhere between
+	 * 100k-200k samples before the device's output
+	 * bias has flattened enough so it can be removed.
+	 * (and we do a post-processing bias removal by subtracting
+	 *  sample averages - so that part should be near ideal)
+	 * So just keep the I2S enabled - it will keep clock output
+	 * on, and let the data overflow.
+	 */
 
 	for (i = 0; i < buffer.size(); i++) {
 		buffer[i] = read_8k_sample();
 	}
-	i2s_disable(SPI2);
 }
 
