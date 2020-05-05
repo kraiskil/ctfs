@@ -2,6 +2,7 @@
 #include "datatype.h"
 #include "fft.h"
 #include "frog_tones.h"
+#include "harmonics.h"
 #include "treefrog.h"
 
 
@@ -27,10 +28,14 @@ bool should_I_croak(listen_buf_t &buffer)
 	ft.fft();
 	ft.find_peaks();
 
-	/* placeholder for more accurate harmonics detection */
-	if (ft.get_num_peaks() == 1 && ft.get_peak_by_val(0).bin == 0)
+	uint16_t harmonics[3];
+	find_harmonics(ft, harmonics);
+
+	if (harmonics[0] > 200)
+		return true;
+	else
 		return false;
-	return ft.get_num_peaks() > 0;
+
 }
 
 void croak(void)
