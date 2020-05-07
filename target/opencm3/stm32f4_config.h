@@ -19,9 +19,15 @@
  *   PB13- bit clock
  *   PC3- data
  *   PB12- l/r clock
+ * LEDS:
+ *   PB12- croak (green)
+ *   PB13- orange
+ *   PB14- sleep (red)
+ *   PB15- processing (blue)
  *
  */
 
+#pragma once
 extern "C" {
 #include <libopencm3/cm3/nvic.h>
 #include <libopencm3/stm32/dma.h>
@@ -31,9 +37,28 @@ extern "C" {
 #include <libopencm3/stm32/spi.h>
 #include <libopencm3/stm32/usart.h>
 }
+#include "treefrog.h"
 
-#define PORT_HEARTBEAT_LED GPIOD
-#define PIN_HEARTBEAT_LED GPIO13
+struct led
+{
+	unsigned port;
+	uint16_t pin;
+};
+struct led leds[LED_LAST] = {
+	{
+		GPIOD, GPIO12
+	},                 //croak
+	{ GPIOD, GPIO14 }, //sleep
+	{ GPIOD, GPIO15 }, //processing
+};
+void debug_led_on(enum led_ids i)
+{
+	gpio_set(leds[i].port, leds[i].pin);
+}
+void debug_led_off(enum led_ids i)
+{
+	gpio_clear(leds[i].port, leds[i].pin);
+}
 
 
 #define I2S_MICROPHONE I2S2_EXT_BASE
@@ -69,8 +94,10 @@ static inline void board_setup_gpio(void)
 	rcc_periph_clock_enable(RCC_GPIOC);
 	rcc_periph_clock_enable(RCC_GPIOD);
 
-	gpio_mode_setup(PORT_HEARTBEAT_LED, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, PIN_HEARTBEAT_LED);
-	gpio_mode_setup(PORT_HEARTBEAT_LED, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, GPIO12);
+	for (int id = 0; id < LED_LAST; id++) {
+		gpio_mode_setup(leds[id].port, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, leds[id].pin);
+		gpio_mode_setup(leds[id].port, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, leds[id].pin);
+	}
 
 	/* I2C to Audio chip */
 	gpio_mode_setup(GPIOB, GPIO_MODE_AF, GPIO_PUPD_PULLUP, GPIO6); //SCL

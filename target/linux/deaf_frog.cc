@@ -10,6 +10,8 @@ int main(int argc, char *argv[])
 	while (true) {
 		play_croak();
 		sleep_for();
+		sleep_for();
+		sleep_for();
 	}
 }
 

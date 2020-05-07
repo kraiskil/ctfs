@@ -123,16 +123,18 @@ int main(void)
 
 void sleep_for(void)
 {
+	debug_led_on(LED_SLEEP);
 	volatile int i = 1000000; //1M ~ 1Hz
 	while (--i > 0) {
 		;
 	}
+	debug_led_off(LED_SLEEP);
 }
 
 
 void play_croak(void)
 {
-	gpio_set(PORT_HEARTBEAT_LED, PIN_HEARTBEAT_LED);
+	debug_led_on(LED_CROAK);
 	audioDAC_setup();
 
 	printf("croak!\r\n");
@@ -144,6 +146,6 @@ void play_croak(void)
 
 	audioDAC_shutdown();
 
-	gpio_clear(PORT_HEARTBEAT_LED, PIN_HEARTBEAT_LED);
+	debug_led_off(LED_CROAK);
 }
 

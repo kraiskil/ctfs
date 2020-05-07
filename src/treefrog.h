@@ -1,3 +1,4 @@
+#pragma once
 #include "datatype.h"
 
 // entrypoint for treefrog
@@ -15,4 +16,14 @@ int16_t get_croak_data(int sample_num);
 void play_croak(void);
 void sleep_for(void);
 void listen_for_croaks(listen_buf_t &buffer);
+
+enum led_ids
+{
+	LED_CROAK      = 0,
+	LED_SLEEP      = 1,
+	LED_PROCESSING = 2,
+	LED_LAST       = 3
+};
+void debug_led_on(enum led_ids i);
+void debug_led_off(enum led_ids i);
 

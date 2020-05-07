@@ -21,6 +21,7 @@ void treefrog(void)
 
 bool should_I_croak(listen_buf_t &buffer)
 {
+	debug_led_on(LED_PROCESSING);
 	frequency_buf_t out;
 	frog_tones      ft(buffer, out);
 
@@ -31,6 +32,7 @@ bool should_I_croak(listen_buf_t &buffer)
 	uint16_t harmonics[3];
 	find_harmonics(ft, harmonics);
 
+	debug_led_off(LED_PROCESSING);
 	if (harmonics[0] > 200)
 		return true;
 	else

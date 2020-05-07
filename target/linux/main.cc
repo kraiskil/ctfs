@@ -17,3 +17,8 @@ void sleep_for(void)
 	std::this_thread::sleep_for(std::chrono::seconds(2));
 }
 
+void debug_led_on(enum led_ids)
+{}
+void debug_led_off(enum led_ids)
+{}
+
