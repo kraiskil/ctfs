@@ -18,43 +18,16 @@ else()
 	message( FATAL_ERROR "set CMAKE_OPENCM3_TARGET in your toolchain")
 endif()
 
-#
-#add_executable(treefrog 
-#	io.cc
-#	main.cc
-#	)
-#target_link_libraries(treefrog libtreefrog ${OPENCM3_LIB})
-#target_compile_options(treefrog
-#	PRIVATE
-#		-D${OPENCM3_TARGET}
-#		-I/home/kraiskil/stuff/libopencm3/include
-#	)
+
 #Custom target with insane memories. Just to make target link:
 # GCC produces much nicer statistics after linking on  e.g. why
 # it would not have linked with smaller memories
 if( "${CMAKE_BUILD_TYPE}" STREQUAL "LinkerDebug")
 	set(LINKERFILE debugtarget.ld)
 endif()
-#
-#target_link_options(treefrog
-#	PRIVATE 
-#		-T${CMAKE_CURRENT_SOURCE_DIR}/${LINKERFILE}
-#		-L${CMAKE_CURRENT_SOURCE_DIR}
-#		-L${OPENCM3_DIR}/lib
-#		-nostartfiles
-#	)
-## Print some memory usage statistics.
-#add_custom_command(
-#	TARGET treefrog
-#	POST_BUILD
-#	COMMAND arm-none-eabi-readelf -l $<TARGET_FILE:treefrog>
-#	)
-#
-#add_custom_target(
-#	flash
-#	COMMAND openocd ${OPENOCD_OPTIONS} -c \"program treefrog verify reset exit\"
-#	)
 
+
+# Main building rules - common for all the targets.
 function(build_target target_name)
 	add_executable( ${target_name}
 		${target_name}.cc
@@ -86,4 +59,10 @@ build_target( mic_recorder )
 build_target( fft_record )
 build_target( peak_detect )
 
+## Print some memory usage statistics.
+add_custom_command(
+	TARGET main
+	POST_BUILD
+	COMMAND arm-none-eabi-readelf -l $<TARGET_FILE:main>
+	)
 
