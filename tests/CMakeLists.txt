@@ -5,6 +5,7 @@ add_executable(unittests
 	harmonics.cc
 	fft.cc
 	main.cc
+	tones.cc
 	)
 target_link_libraries(unittests libtreefrog gtest gtest_main gmock)
 include(GoogleTest)

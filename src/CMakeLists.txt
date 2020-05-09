@@ -6,6 +6,7 @@ add_library(libtreefrog STATIC
 	frog_tones.cc
 	harmonics.cc
 	treefrog.cc
+	tones.cc
 	sin_table.cc
 	sin_table_float.cc
 	)
