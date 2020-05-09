@@ -19,5 +19,5 @@ constexpr unsigned default_peak_stddev_limit = 7; // float-fft
  * some precision gets lost. Scale the fft result by this
  * value to avoid having all fft bins as zero.
  */
-constexpr float default_fft_scale = 128;
+constexpr float default_fft_scale = 1;
 

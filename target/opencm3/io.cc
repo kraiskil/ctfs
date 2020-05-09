@@ -19,7 +19,9 @@ static int16_t read_sample(void)
 	if (channel == SKIP_CHANNEL)
 		return read_sample();
 	else
-		return data >> 16;
+		// flush out the top '0's (since data is 24 bit)
+		// and expect that >> is an arithmetic shift :)
+		return (data << 8) >> 16;
 }
 
 static int16_t read_8k_sample(void)
