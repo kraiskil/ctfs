@@ -21,14 +21,22 @@ int main(void)
 	board_setup_gpio();
 	board_setup_usart();
 	board_setup_i2s_in();
+	board_setup_wallclock();
+
 	listen_buf_t    abuf;
 	frequency_buf_t fbuf;
 	frog_tones      ft(abuf, fbuf);
+	uint32_t        elapsed_time;
 
 	while (1) {
 		listen_for_croaks(abuf);
 		ft.dc_blocker();
+		wallclock_start();
+		debug_led_on(LED_PROCESSING);
 		ft.fft();
+		debug_led_off(LED_PROCESSING);
+		elapsed_time = wallclock_time_us();
+		printf("Calculated fft in %ldus\n", elapsed_time);
 
 		for (unsigned i = 0; i < fbuf.size(); i++) {
 			printf("%d ", fbuf[i]);

@@ -20,10 +20,10 @@
  *   PC3- data
  *   PB12- l/r clock
  * LEDS:
- *   PB12- croak (green)
- *   PB13- orange
- *   PB14- sleep (red)
- *   PB15- processing (blue)
+ *   PD12- croak (green)
+ *   PD13- orange
+ *   PD14- sleep (red)
+ *   PD15- processing (blue)
  *
  */
 
@@ -34,6 +34,7 @@ extern "C" {
 #include <libopencm3/stm32/i2c.h>
 #include <libopencm3/stm32/gpio.h>
 #include <libopencm3/stm32/rcc.h>
+#include <libopencm3/stm32/timer.h>
 #include <libopencm3/stm32/spi.h>
 #include <libopencm3/stm32/usart.h>
 }
@@ -182,5 +183,30 @@ static void board_setup_i2s_in(void)
 	 */
 	i2s_set_clockdiv(SPI2, 15, 1);
 	i2s_enable(SPI2);
+}
+
+void board_setup_wallclock(void)
+{
+	rcc_periph_clock_enable(RCC_TIM2);
+	rcc_periph_reset_pulse(RST_TIM2); //not "enable" or "disable"?
+	// 1us timer - measured to be accurate within 0.3% (w.r.t. my saleae)
+	// If APB1 prescaler is set to anything but 1 in RCC, TIM2 will get
+	// 2xAPB1 frequency input, hence the *2.
+	timer_set_prescaler(TIM2, ((rcc_apb1_frequency * 2) / 1000000));
+
+	timer_disable_preload(TIM2);
+	timer_continuous_mode(TIM2);
+	timer_set_period(TIM2, 0xffffffff);
+	timer_enable_counter(TIM2);
+}
+
+void wallclock_start(void)
+{
+	// generate "update event" - i.e. reset the timer to start from zero (todo: check!)
+	timer_generate_event(TIM2, TIM_EGR_UG);
+}
+uint32_t wallclock_time_us(void)
+{
+	return timer_get_counter(TIM2);
 }
 
