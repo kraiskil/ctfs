@@ -21,4 +21,10 @@ void debug_led_on(enum led_ids)
 {}
 void debug_led_off(enum led_ids)
 {}
+void wallclock_start(void)
+{}
+uint32_t wallclock_time_us(void)
+{
+	return 0;
+}
 

@@ -1,5 +1,6 @@
 #include "config.h"
 #include "datatype.h"
+#include "debug.h"
 #include "fft.h"
 #include "frog_tones.h"
 #include "harmonics.h"
@@ -8,14 +9,21 @@
 
 void treefrog(void)
 {
+	listen_buf_t buffer;
 	while (true) {
-		listen_buf_t buffer;
+		wallclock_start();
 		listen_for_croaks(buffer);
 
-		if (should_I_croak(buffer))
+		bool do_the_croak = should_I_croak(buffer);
+		#ifdef HAVE_DEBUG_MEASUREMENTS
+		total_execution_time = wallclock_time_us();
+		#endif
+
+		if (do_the_croak)
 			croak();
 		else
 			sleep_a_bit();
+		print_statistics();
 	}
 }
 
@@ -54,5 +62,18 @@ void sleep_a_bit(void)
 	// TODO: determine how long to sleep
 
 	sleep_for(/*TODO pass value */);
+}
+
+void print_statistics(void)
+{
+#ifdef HAVE_DEBUG_MEASUREMENTS
+	/* The trick with %jd and intmax_t is because %d is 16 bit on arm-eabi, and 32 on x86 -> compiler warnings */
+	printf("FFT execution time: %jd ms (%jd us)\n",
+	    (intmax_t)fft_execution_time / 1000, (intmax_t)fft_execution_time);
+	printf("peak detetct execution time: %jd ms (%jd us)\n",
+	    (intmax_t)peak_detect_execution_time / 1000, (intmax_t)peak_detect_execution_time);
+	printf("total execution time: %jd ms (%jd us)\n",
+	    (intmax_t)total_execution_time / 1000, (intmax_t)total_execution_time);
+#endif
 }
 

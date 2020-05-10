@@ -1,6 +1,8 @@
 #include "config.h"
+#include "debug.h"
 #include "frog_tones.h"
 #include "fft.h"
+#include "treefrog.h"
 #include <algorithm>
 #include <cmath>
 
@@ -45,6 +47,7 @@ float calculate_stddev(frequency_buf_t &a, uint32_t mean)
 
 void frog_tones::find_peaks(void)
 {
+	uint32_t        start_time = wallclock_time_us();
 	frequency_buf_t a;
 	// The number of bins to look to the sides for mergeable peak-candidate bins
 	// Must be this low, because with low frequencies, the specral resolution
@@ -103,6 +106,12 @@ void frog_tones::find_peaks(void)
 				tones[j].val = 0;
 		}
 	}
+	#ifdef HAVE_DEBUG_MEASUREMENTS
+	peak_detect_execution_time = wallclock_time_us() - start_time;
+	#else
+	(void)start_time;
+	#endif
+
 }
 
 void frog_tones::sort_tones_by_value(void)
@@ -158,6 +167,7 @@ struct bin_val frog_tones::get_peak_by_bin(uint16_t peak_num)
 
 void frog_tones::fft(void)
 {
+	uint32_t  start_time = wallclock_time_us();
 	int       fft_size = audio_buffer.size();
 	complex_t data[MAX_FFT_SIZE];
 
@@ -168,6 +178,11 @@ void frog_tones::fft(void)
 
 	fft_sa(fft_size, data);
 	fft_calc_abs(data, freq_buffer);
+	#ifdef HAVE_DEBUG_MEASUREMENTS
+	fft_execution_time = wallclock_time_us() - start_time;
+	#else
+	(void)start_time;
+	#endif
 }
 
 void frog_tones::dc_blocker(void)

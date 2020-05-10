@@ -1,5 +1,6 @@
 add_library(libtreefrog STATIC
 	croak.cc
+	debug.cc
 	fft.cc
 	frog_tones.cc
 	harmonics.cc
