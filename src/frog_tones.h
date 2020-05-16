@@ -1,5 +1,6 @@
 #pragma once
 #include "datatype.h"
+#include "fft.h"
 
 struct bin_val
 {
@@ -16,6 +17,8 @@ public:
 		: audio_buffer(input_buf), freq_buffer(freq_buf)
 	{
 		tones.fill({ 0, 0 });
+		the_fft.fs = config_fs_input;
+		the_fft.fft_size = input_buf.size();
 	}
 	void dc_blocker(void);
 	void fft(void);
@@ -31,6 +34,7 @@ private:
 	listen_buf_t &audio_buffer;
 	frequency_buf_t &freq_buffer;
 	tone_array_t tones;
+	::fft<fft_internal_datatype> the_fft;
 };
 
 void find_tones(listen_buf_t &fft_output, uint16_t *tones);

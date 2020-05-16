@@ -12,7 +12,11 @@ public:
 		FrogTonesTest::SetUp();
 		srand(42);
 	}
-
+	int index_to_frequency(int idx, int fs, int fft_size)
+	{
+		/* TODO: remove - use the fft one */
+		return (float)idx * fs / fft_size;
+	}
 };
 
 TEST_F(FrogTonesFreqTest, SingleSine)

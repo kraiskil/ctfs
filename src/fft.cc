@@ -9,6 +9,8 @@
 #include <limits>
 using std::numeric_limits;
 
+/* Local definition for this int32_t implementation of fft<int32_t> */
+typedef std::complex<int32_t> complex_t;
 
 fixp twiddle_re(int phase, int lenght);
 fixp twiddle_im(int phase, int lenght);
@@ -135,11 +137,5 @@ int index_of_peak(int16_t *buf, int N)
 		}
 	}
 	return maxidx;
-}
-
-int index_to_frequency(int idx, int fs, int fft_size)
-{
-	/* TODO: define fft size as its log2 value, and shift */
-	return (float)idx * fs / fft_size;
 }
 

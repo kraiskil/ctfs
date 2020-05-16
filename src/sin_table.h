@@ -1,3 +1,4 @@
+#pragma once
 #include <cstdint>
 /* The number of samples per one sine period in the table */
 const int SIN_TABLE_RESOLUTION = 2048;

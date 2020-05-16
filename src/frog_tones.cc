@@ -167,17 +167,10 @@ struct bin_val frog_tones::get_peak_by_bin(uint16_t peak_num)
 
 void frog_tones::fft(void)
 {
-	uint32_t  start_time = wallclock_time_us();
-	int       fft_size = audio_buffer.size();
-	complex_t data[MAX_FFT_SIZE];
+	uint32_t start_time = wallclock_time_us();
 
-	for (int i = 0; i < fft_size; i++) {
-		data[i].real(audio_buffer[i]);
-		data[i].imag(0);
-	}
+	the_fft.run(audio_buffer, freq_buffer);
 
-	fft_sa(fft_size, data);
-	fft_calc_abs(data, freq_buffer);
 	#ifdef HAVE_DEBUG_MEASUREMENTS
 	fft_execution_time = wallclock_time_us() - start_time;
 	#else
