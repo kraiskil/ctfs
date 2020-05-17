@@ -31,19 +31,25 @@ int main(void)
 		ft.fft();
 		ft.find_peaks();
 
-		printf("Frequency bins [0-100):\n");
-		for (unsigned j = 0; j < 100; j++) {
-			printf("%d ", fbuf[j]);
+		printf("Frequency bins [0-500):\n        ");
+		for (unsigned k = 0; k < 20; k++)
+			printf("%5d ", k);
+		printf("\n--------------------------------------------------------------------");
+		printf("--------------------------------------------------------------------\n");
+		printf("%5d | ", 0);
+		for (unsigned j = 0; j < 500; j++) {
+			printf("%5d ", fbuf[j]);
+			if (j % 20 == 19)
+				printf("\n%5d | ", 2 * (j / 20 + 1));
 		}
+		printf("\n");
 
-		printf("\nPEAKS (above ~200Hz): \n");
 		for (unsigned i = 0; i < ft.get_num_peaks(); i++) {
-			if (ft.as_Hz(ft.get_peak_by_val(i).bin) < 200)
-				continue;
 			if (ft.as_Hz(ft.get_peak_by_val(i).bin) > 5000)
 				continue;
-			printf("%d Hz - ampl: %d\n",
+			printf("%d Hz (bin %d) - ampl: %d\n",
 			    ft.as_Hz(ft.get_peak_by_val(i).bin),
+			    ft.get_peak_by_val(i).bin,
 			    ft.get_peak_by_val(i).val);
 		}
 		printf("\n================\n");
