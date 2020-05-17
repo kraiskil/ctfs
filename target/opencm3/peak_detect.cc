@@ -24,11 +24,15 @@ int main(void)
 	listen_buf_t    abuf;
 	frequency_buf_t fbuf;
 	frog_tones      ft(abuf, fbuf);
+	fft<float>      the_fft;
+
+	the_fft.fs = config_fs_input;
+	the_fft.fft_size = abuf.size();
 
 	while (1) {
 		listen_for_croaks(abuf);
-		ft.dc_blocker();
-		ft.fft();
+		the_fft.dc_blocker(abuf);
+		the_fft.run(abuf, fbuf);
 		ft.find_peaks();
 
 		printf("Frequency bins [0-500):\n        ");

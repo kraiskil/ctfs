@@ -27,13 +27,16 @@ int main(void)
 	frequency_buf_t fbuf;
 	frog_tones      ft(abuf, fbuf);
 	uint32_t        elapsed_time;
+	fft<float>      the_fft;
+	the_fft.fs = config_fs_input;
+	the_fft.fft_size = abuf.size();
 
 	while (1) {
 		listen_for_croaks(abuf);
-		ft.dc_blocker();
+		the_fft.dc_blocker(abuf);
 		wallclock_start();
 		debug_led_on(LED_PROCESSING);
-		ft.fft();
+		the_fft.run(abuf, fbuf);
 		debug_led_off(LED_PROCESSING);
 		elapsed_time = wallclock_time_us();
 		printf("Calculated fft in %ldus\n", elapsed_time);

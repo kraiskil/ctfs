@@ -47,10 +47,11 @@ int main(void)
 	listen_buf_t    buf;
 	frequency_buf_t fbuf;
 	frog_tones      ft(buf, fbuf);
+	fft<float>      the_fft;
 
 	while (1) {
 		listen_for_croaks(buf);
-		ft.dc_blocker();
+		the_fft.dc_blocker(buf);
 
 		print_for_serialfft(buf);
 	}
