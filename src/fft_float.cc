@@ -62,7 +62,8 @@ void fft_sa(int n, std::complex<float> *x)
 void fft_calc_abs(std::complex<float> *data, frequency_buf_t &out)
 {
 	for (unsigned i = 0; i < out.size(); i++) {
-		uint32_t o = data[i].real() * data[i].real() + data[i].imag() * data[i].imag();
+		// sqrt() here increases computation time by 10ms (currently 10%)
+		uint32_t o = sqrt(data[i].real() * data[i].real() + data[i].imag() * data[i].imag());
 		static_assert(sizeof(out[0]) == 2, "output element type has been changed - change this code too");
 		// TODO: compile-time assert typeid(out[0]) == typeid(uint16_t), and use the final bit of accuracy :)
 		if (o > 0x7FFFF) o = 0x7FFF;

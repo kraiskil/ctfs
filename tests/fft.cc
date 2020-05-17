@@ -39,7 +39,7 @@ TEST_P(TestFFT, StepInputFloat)
 	float_fft.run(input, output);
 
 	/* Output shape should be a sinc */
-	EXPECT_FLOAT_EQ(sqrt(output[0]), step_value / 2);
+	EXPECT_FLOAT_EQ(output[0], step_value / 2);
 	EXPECT_FLOAT_EQ(output[2], 0);
 	EXPECT_FLOAT_EQ(output[4], 0);
 	EXPECT_FLOAT_EQ(output[6], 0);
