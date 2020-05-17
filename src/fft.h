@@ -2,6 +2,8 @@
 #include <cstdint>
 #include "config.h"
 #include "datatype.h"
+#include "debug.h"
+#include "treefrog.h"
 #include "sin_table.h"
 
 /* Maximum FFT size code is prepared for. Probably also
@@ -28,9 +30,20 @@ public:
 	fft(unsigned fft_size = MAX_FFT_SIZE, unsigned fs = config_fs_input)
 		: fft_size(fft_size), fs(fs)
 	{}
+	void dc_blocker(listen_buf_t &audio_buffer)
+	{
+		int32_t accu = 0;
+		for (auto v : audio_buffer)
+			accu += v;
+		accu = accu >> listen_buffer_samples_log2;
+		for (auto &v: audio_buffer)
+			v -= accu;
+	}
+
 
 	void run(listen_buf_t &input, frequency_buf_t &output)
 	{
+		uint32_t  start_time = wallclock_time_us();
 		complex_t complex_input[MAX_FFT_SIZE];
 		for (unsigned i = 0; i < fft_size; i++) {
 			complex_input[i].real(input[i]);
@@ -38,7 +51,13 @@ public:
 		}
 		fft_sa(fft_size, complex_input);
 		fft_calc_abs(complex_input, output);
+		#ifdef HAVE_DEBUG_MEASUREMENTS
+		fft_execution_time = wallclock_time_us() - start_time;
+		#else
+		(void)start_time;
+		#endif
 	}
+
 	int index_to_frequency(int idx)
 	{
 		/* TODO: define fft size as its log2 value, and shift */

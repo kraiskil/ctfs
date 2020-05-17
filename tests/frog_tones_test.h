@@ -8,6 +8,8 @@ public:
 	frequency_buf_t freq_buffer;
 	listen_buf_t audio_buffer;
 	frog_tones *ft;
+	// TODO: maybe mock this. But so much effort is required to rewrite tests.
+	::fft<fft_internal_datatype> the_fft;
 
 	void SetUp(void) override
 	{
@@ -18,6 +20,8 @@ public:
 		// we set config_fs_input here, and frog_tones reads that.
 		fs = 8000; // =config_fs_input;
 		bin_accuracy = ((float)fs) / audio_buffer.size();
+		the_fft.fs = fs;
+		the_fft.fft_size = audio_buffer.size();
 	}
 
 	void add_audio_sine(int peak, int f_input, float phase = 0.2)

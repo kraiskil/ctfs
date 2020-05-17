@@ -165,29 +165,6 @@ struct bin_val frog_tones::get_peak_by_bin(uint16_t peak_num)
 	return { 0, 0 };
 }
 
-void frog_tones::fft(void)
-{
-	uint32_t start_time = wallclock_time_us();
-
-	the_fft.run(audio_buffer, freq_buffer);
-
-	#ifdef HAVE_DEBUG_MEASUREMENTS
-	fft_execution_time = wallclock_time_us() - start_time;
-	#else
-	(void)start_time;
-	#endif
-}
-
-void frog_tones::dc_blocker(void)
-{
-	int32_t accu = 0;
-	for (auto v : audio_buffer)
-		accu += v;
-	accu = accu >> listen_buffer_samples_log2;
-	for (auto &v: audio_buffer)
-		v -= accu;
-}
-
 int frog_tones::as_Hz(uint16_t frequency_bin) const
 {
 	return (float)frequency_bin * config_fs_input / audio_buffer.size();
