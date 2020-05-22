@@ -13,7 +13,6 @@ typedef std::array<struct bin_val, frequency_buffer_samples> tone_array_t;
 class frog_tones
 {
 public:
-	unsigned peak_stddev_limit;
 	frog_tones(listen_buf_t &input_buf,
 	    frequency_buf_t &freq_buf,
 	    unsigned peak_stddev_limit = default_peak_stddev_limit
@@ -36,6 +35,9 @@ private:
 	listen_buf_t &audio_buffer;
 	frequency_buf_t &freq_buffer;
 	tone_array_t tones;
+public:
+	unsigned peak_stddev_limit;
+
 };
 
 void find_tones(listen_buf_t &fft_output, uint16_t *tones);
