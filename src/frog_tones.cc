@@ -28,8 +28,6 @@ unsigned s1(const frequency_buf_t &buffer, const unsigned i, const unsigned k)
 		rightmax = max(val, rightmax);
 	}
 
-	/* The last + buffer[i] is not part of the algorithm in the paper,
-	 * but its lack seems rather a bug, IMHO */
 	return (leftmax + rightmax) / 2;
 }
 
@@ -77,7 +75,7 @@ void frog_tones::find_peaks(void)
 			continue;
 
 		if ( (a[i] - mean) > (peak_stddev_limit * stddev) ) {
-			tones[i].val = a[i];
+			tones[i].val = freq_buffer[i];
 		}
 	}
 
