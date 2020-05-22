@@ -1,5 +1,6 @@
 #pragma once
 #include <cstdint>
+#include <cstring>
 #include "config.h"
 #include "datatype.h"
 #include "debug.h"
@@ -13,10 +14,10 @@ static_assert(MAX_FFT_SIZE <= SIN_TABLE_RESOLUTION,
     "sin table is not accurate enough");
 
 // Stockham Autosort Fast Fourier Transform
-void fft_sa(int n, std::complex<int32_t> *x);
-void fft_sa(int n, std::complex<float> *x);
 void fft_calc_abs(std::complex<int32_t> *data, frequency_buf_t &out);
 void fft_calc_abs(std::complex<float> *data, frequency_buf_t &out);
+void fft0(int n, int s, bool eo, std::complex<float> *x, std::complex<float> *y);
+void fft0(int n, int s, bool eo, std::complex<int32_t> *x, std::complex<int32_t> *y);
 
 
 template <class internal_data_representation>
@@ -26,9 +27,13 @@ class fft
 public:
 	unsigned fft_size;
 	unsigned fs;
+	unsigned scale;
 
-	fft(unsigned fft_size = MAX_FFT_SIZE, unsigned fs = config_fs_input)
-		: fft_size(fft_size), fs(fs)
+	fft(
+		unsigned fft_size = MAX_FFT_SIZE,
+		unsigned fs = config_fs_input,
+		unsigned fft_scale = default_fft_scale)
+		: fft_size(fft_size), fs(fs), scale(fft_scale)
 	{}
 	void dc_blocker(listen_buf_t &audio_buffer)
 	{
@@ -62,6 +67,15 @@ public:
 	{
 		/* TODO: define fft size as its log2 value, and shift */
 		return (float)idx * fs / fft_size;
+	}
+
+private:
+	void fft_sa(int n, complex_t *x)
+	{
+		complex_t y[MAX_FFT_SIZE];
+		memset(y, 0, sizeof(y));
+		fft0(n, 1, 0, x, y); // this has overloaded implementations for both internal_data_representation options
+		for (int k = 0; k < n; k++) x[k] /= n / scale;
 	}
 };
 

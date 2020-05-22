@@ -18,7 +18,7 @@ static float twiddle_im(int phase, int lenght);
  * http://wwwa.pikara.ne.jp/okojisan/otfft-en/stockham2.html
  * Original uses doubles and <cmath>. Fixpoint conversion by me.
  */
-static void fft0(int n, int s, bool eo, std::complex<float> *x, std::complex<float> *y)
+void fft0(int n, int s, bool eo, std::complex<float> *x, std::complex<float> *y)
 // n  : sequence length
 // s  : stride
 // eo : x is output if eo == 0, y is output if eo == 1
@@ -45,15 +45,7 @@ static void fft0(int n, int s, bool eo, std::complex<float> *x, std::complex<flo
 	}
 }
 
-void fft_sa(int n, std::complex<float> *x)
-// n : sequence length
-// x : input/output sequence
-{
-	std::complex<float> y[MAX_FFT_SIZE];
-	memset(y, 0, sizeof(y));
-	fft0(n, 1, 0, x, y);
-	for (int k = 0; k < n; k++) x[k] /= n;
-}
+
 /* End of code from okojisan */
 
 

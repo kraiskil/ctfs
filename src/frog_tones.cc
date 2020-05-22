@@ -13,8 +13,6 @@ using std::min;
  * Simple Algorithms for Peak Detection in Time-Series
  * Girish Keshav Palshikar.
  * Read this paper to understand the implementations! */
-
-
 /* Assume unsigned input data!*/
 unsigned s1(const frequency_buf_t &buffer, const unsigned i, const unsigned k)
 {
@@ -78,7 +76,7 @@ void frog_tones::find_peaks(void)
 		if (a[i] < mean)
 			continue;
 
-		if ( (a[i] - mean) > (4 * stddev) ) {
+		if ( (a[i] - mean) > (peak_stddev_limit * stddev) ) {
 			tones[i].val = a[i];
 		}
 	}

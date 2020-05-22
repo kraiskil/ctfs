@@ -13,8 +13,14 @@ typedef std::array<struct bin_val, frequency_buffer_samples> tone_array_t;
 class frog_tones
 {
 public:
-	frog_tones(listen_buf_t &input_buf, frequency_buf_t &freq_buf)
-		: audio_buffer(input_buf), freq_buffer(freq_buf)
+	unsigned peak_stddev_limit;
+	frog_tones(listen_buf_t &input_buf,
+	    frequency_buf_t &freq_buf,
+	    unsigned peak_stddev_limit = default_peak_stddev_limit
+	    )
+		: audio_buffer(input_buf),
+		freq_buffer(freq_buf),
+		peak_stddev_limit(peak_stddev_limit)
 	{
 		tones.fill({ 0, 0 });
 	}

@@ -46,16 +46,6 @@ void fft0(int n, int s, bool eo, complex_t *x, complex_t *y)
 		fft0(n / 2, 2 * s, !eo, y, x);
 	}
 }
-void fft_sa(int n, complex_t *x) // Fourier transform
-// n : sequence length
-// x : input/output sequence
-{
-	complex_t y[MAX_FFT_SIZE]; // complex_t is not "POD", so
-	                           // clang won't allocate variable length stack
-	memset(y, 0, sizeof(y));
-	fft0(n, 1, 0, x, y);
-	for (int k = 0; k < n; k++) x[k] /= n;
-}
 /* End of code from okojisan */
 
 /* In the middle of the fft, there is a

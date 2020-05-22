@@ -11,6 +11,7 @@ class TestFFT : public testing::TestWithParam<int32_t>
 public:
 	unsigned fs;
 	unsigned fft_size;
+	unsigned fft_scale;
 	fft<int32_t> int32_fft;
 	fft<float> float_fft;
 	listen_buf_t input;
@@ -22,10 +23,14 @@ public:
 		output.fill(0);
 		fs = GetParam();
 		fft_size = input.size();
+		fft_scale = 1;
+
 		int32_fft.fs = fs;
 		int32_fft.fft_size = fft_size;
 		float_fft.fs = fs;
 		float_fft.fft_size = fft_size;
+		int32_fft.scale = fft_scale;
+		float_fft.scale = fft_scale;
 	}
 };
 
@@ -39,7 +44,7 @@ TEST_P(TestFFT, StepInputFloat)
 	float_fft.run(input, output);
 
 	/* Output shape should be a sinc */
-	EXPECT_FLOAT_EQ(output[0], step_value / 2);
+	EXPECT_FLOAT_EQ(output[0] / fft_scale, step_value / 2);
 	EXPECT_FLOAT_EQ(output[2], 0);
 	EXPECT_FLOAT_EQ(output[4], 0);
 	EXPECT_FLOAT_EQ(output[6], 0);
