@@ -50,7 +50,7 @@ void frog_tones::find_peaks(void)
 	// is ~4Hz, and notes at A2-level are spaced ~7Hz.
 	// TODO: this should be a configuration parameter based on how low we must be
 	// able to go, and fft resolution.
-	int windowsize = 2;
+	constexpr int windowsize = 2;
 	tones.fill({ 0, 0 });
 
 	for (unsigned i = 0; i < a.size(); i++) {
@@ -68,14 +68,24 @@ void frog_tones::find_peaks(void)
 
 	// tone_array is same as O in the algorithm description
 	// Just set those bins without statistically significant value to zero
-	for (unsigned i = 0; i < a.size(); i++) {
+	tones[0] = { 0, 0 };
+	tones[tones.size() - 1].bin = tones.size() - 1;
+	tones[tones.size() - 1].val = 0;
+	for (unsigned i = 1; i < a.size() - 1; i++) {
 		tones[i].bin = i;
 		// avoid unsigned underflow
 		if (a[i] < mean)
 			continue;
 
 		if ( (a[i] - mean) > (peak_stddev_limit * stddev) ) {
-			tones[i].val = freq_buffer[i];
+			// Original algorithm says to do
+			// tones[i].val = freq_buffer[i];
+			// here. But since input is a FFT output, lets
+			// do a real Q&D peak value approximation to combat
+			// the energy being spread across two adjacent bins.
+			// This is far from accurate (no sincs involved! :))
+			tones[i].val = max(freq_buffer[i - 1] + freq_buffer[i],
+			        freq_buffer[i] + freq_buffer[i + 1]);
 		}
 	}
 
@@ -91,7 +101,8 @@ void frog_tones::find_peaks(void)
 	// frequency) of peaks to be detected as single
 	// peak, but a wide peak will be split into two on the
 	// descending slope.
-	for (unsigned i = windowsize; i < tones.size(); i++) {
+	static_assert(windowsize > 0, "bad indexing ensues");
+	for (unsigned i = windowsize; i < tones.size() - 1; i++) {
 		if (tones[i].val == 0)
 			continue;
 

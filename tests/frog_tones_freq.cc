@@ -101,10 +101,9 @@ TEST_F(FrogTonesFreqTest, WhistleSine)
 		audio_buffer[i] = whistle_sine[i];
 	the_fft.run(audio_buffer, freq_buffer);
 	ft->find_peaks();
-	ASSERT_EQ(ft->get_num_peaks(), 2);
-	EXPECT_EQ(ft->get_peak_by_val(0).bin, 0);
+	ASSERT_EQ(ft->get_num_peaks(), 1);
 	// TODO: this value is not verified by measuring the sound frequency
-	EXPECT_EQ(ft->get_peak_by_val(1).bin, 44);
+	EXPECT_EQ(ft->get_peak_by_val(0).bin, 44);
 }
 
 TEST_F(FrogTonesFreqTest, ResetBetweenRuns)
@@ -142,11 +141,13 @@ TEST_F(FrogTonesFreqTest, DcBlocker)
 
 	the_fft.run(audio_buffer, freq_buffer);
 	ft->find_peaks();
-	EXPECT_EQ(ft->get_num_peaks(), 2);
-	int prev_peak = ft->get_peak_by_bin(1).bin;
+	EXPECT_GT(freq_buffer[0], 790); // almost 800
+	// peak find does not find the DC peak -> get the bin of the 500Hz signal
+	int prev_peak = ft->get_peak_by_bin(0).bin;
 
 	the_fft.dc_blocker(audio_buffer);
 	the_fft.run(audio_buffer, freq_buffer);
+	EXPECT_EQ(freq_buffer[0], 0);
 	ft->find_peaks();
 	EXPECT_EQ(ft->get_num_peaks(), 1);
 	EXPECT_EQ(ft->get_peak_by_val(0).bin, prev_peak);
@@ -161,11 +162,13 @@ TEST_F(FrogTonesFreqTest, NegativeDcBlocker)
 
 	the_fft.run(audio_buffer, freq_buffer);
 	ft->find_peaks();
-	EXPECT_EQ(ft->get_num_peaks(), 2);
-	int prev_peak = ft->get_peak_by_bin(1).bin;
+	EXPECT_GT(freq_buffer[0], 790); // almost 800
+	// peak find does not find the DC peak -> get the bin of the 500Hz signal
+	int prev_peak = ft->get_peak_by_bin(0).bin;
 
 	the_fft.dc_blocker(audio_buffer);
 	the_fft.run(audio_buffer, freq_buffer);
+	EXPECT_EQ(freq_buffer[0], 0);
 	ft->find_peaks();
 	EXPECT_EQ(ft->get_num_peaks(), 1);
 	EXPECT_EQ(ft->get_peak_by_val(0).bin, prev_peak);
@@ -182,11 +185,13 @@ TEST_F(FrogTonesFreqTest, LargeNoisyDcIsBlocked)
 
 	the_fft.run(audio_buffer, freq_buffer);
 	ft->find_peaks();
-	EXPECT_EQ(ft->get_num_peaks(), 2);
-	EXPECT_NEAR(ft->as_Hz(ft->get_peak_by_bin(1).bin), 1200, bin_accuracy);
+	EXPECT_GT(freq_buffer[0], 1790); // almost 1800
+	// peak detection ignores DC bin internally - there is only one peak visible here
+	EXPECT_NEAR(ft->as_Hz(ft->get_peak_by_bin(0).bin), 1200, bin_accuracy);
 
 	the_fft.dc_blocker(audio_buffer);
 	the_fft.run(audio_buffer, freq_buffer);
+	EXPECT_EQ(freq_buffer[0], 0);
 	ft->find_peaks();
 	EXPECT_EQ(ft->get_num_peaks(), 1);
 	EXPECT_NEAR(ft->as_Hz(ft->get_peak_by_val(0).bin), 1200, bin_accuracy);
