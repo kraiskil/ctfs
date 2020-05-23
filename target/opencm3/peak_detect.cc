@@ -33,6 +33,7 @@ int main(void)
 		listen_for_croaks(abuf);
 		the_fft.dc_blocker(abuf);
 		the_fft.run(abuf, fbuf);
+		the_fft.noise_filter(fbuf, 100); // 100Hz seems to be a good choice for Spanish towns.
 		ft.find_peaks();
 
 		printf("Frequency bins [0-500):\n        ");

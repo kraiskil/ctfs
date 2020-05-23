@@ -20,6 +20,8 @@ void fft0(int n, int s, bool eo, std::complex<float> *x, std::complex<float> *y)
 void fft0(int n, int s, bool eo, std::complex<int32_t> *x, std::complex<int32_t> *y);
 
 
+/* TODO: this class is not really a 'fft'. More like
+ * audio signal processing. I.e. everything up to tone detection */
 template <class internal_data_representation>
 class fft
 {
@@ -63,10 +65,24 @@ public:
 		#endif
 	}
 
-	int index_to_frequency(int idx)
+	/* Filter out noise.
+	 * Crude version: noise is everything under cutoff_freq Hz */
+	void noise_filter(frequency_buf_t &freq_buf, const int cutoff_freq)
+	{
+		for (int i = 0; i < frequency_to_index(cutoff_freq); i++) {
+			freq_buf[i] = 0;
+		}
+	}
+
+	int index_to_frequency(int idx) const
 	{
 		/* TODO: define fft size as its log2 value, and shift */
 		return (float)idx * fs / fft_size;
+	}
+
+	int frequency_to_index(int freq) const
+	{
+		return (float)freq * fft_size / fs;
 	}
 
 private:
