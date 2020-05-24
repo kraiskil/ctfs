@@ -58,6 +58,7 @@ build_target( main )
 build_target( mic_recorder )
 build_target( fft_record )
 build_target( peak_detect )
+build_target( tone_detect )
 
 ## Print some memory usage statistics.
 add_custom_command(
