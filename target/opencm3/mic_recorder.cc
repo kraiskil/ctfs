@@ -29,7 +29,7 @@ void print_as_c_header(listen_buf_t &buf)
 	printf("/* Recorded from mic */\n");
 	printf("int16_t mic_data[%d] = {\n", buf.size());
 	for (unsigned i = 0; i < buf.size(); i++) {
-		printf("%08x, ", buf[i]);
+		printf("% 8d, ", buf[i]);
 		if (i % 16 == 15)
 			printf("\n");
 	}
@@ -53,7 +53,8 @@ int main(void)
 		listen_for_croaks(buf);
 		the_fft.dc_blocker(buf);
 
-		print_for_serialfft(buf);
+		//print_for_serialfft(buf);
+		print_as_c_header(buf);
 	}
 
 	return 0;

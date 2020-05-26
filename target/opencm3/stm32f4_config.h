@@ -40,6 +40,9 @@ extern "C" {
 }
 #include "treefrog.h"
 
+/* Correction term for the audio clock running a bit slow */
+float frequency_correction = 1.024;
+
 struct led
 {
 	unsigned port;

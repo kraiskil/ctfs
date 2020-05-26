@@ -174,6 +174,9 @@ struct bin_val frog_tones::get_peak_by_bin(uint16_t peak_num)
 
 int frog_tones::as_Hz(uint16_t frequency_bin) const
 {
-	return (float)frequency_bin * config_fs_input / audio_buffer.size();
+	float rv = (float)frequency_bin * config_fs_input / audio_buffer.size();
+	/* Correct systematic bad clock */
+	rv *= frequency_correction;
+	return rv;
 }
 

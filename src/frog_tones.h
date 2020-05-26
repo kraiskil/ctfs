@@ -19,7 +19,8 @@ public:
 	    )
 		: audio_buffer(input_buf),
 		freq_buffer(freq_buf),
-		peak_stddev_limit(peak_stddev_limit)
+		peak_stddev_limit(peak_stddev_limit),
+		frequency_correction(1)
 	{
 		tones.fill({ 0, 0 });
 	}
@@ -37,6 +38,7 @@ private:
 	tone_array_t tones;
 public:
 	unsigned peak_stddev_limit;
+	float frequency_correction;
 
 };
 

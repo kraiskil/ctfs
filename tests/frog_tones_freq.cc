@@ -1,6 +1,7 @@
 #include "fft.h"
 #include "frog_tones_test.h"
 #include "whistle_sine.h"
+#include "three_tones_sph0645.h"
 
 #include <cmath>
 
@@ -104,6 +105,35 @@ TEST_F(FrogTonesFreqTest, WhistleSine)
 	ASSERT_EQ(ft->get_num_peaks(), 1);
 	// TODO: this value is not verified by measuring the sound frequency
 	EXPECT_EQ(ft->get_peak_by_val(0).bin, 44);
+}
+
+TEST_F(FrogTonesFreqTest, ThreeTonesRecorded)
+{
+	for (int i = 0; i < audio_buffer.size(); i++)
+		audio_buffer[i] = three_tones_sph0645[i];
+	the_fft.run(audio_buffer, freq_buffer);
+	ft->peak_stddev_limit = 1;
+	ft->frequency_correction = 1.024;
+	ft->find_peaks();
+
+	unsigned num_peaks = ft->get_num_peaks();
+	ASSERT_GT(num_peaks, 3);
+	bool found_440 = false;
+	bool found_880 = false;
+	bool found_1760 = false;
+
+	for (unsigned i = 0; i < num_peaks; i++) {
+		struct bin_val bv = ft->get_peak_by_bin(i);
+		if (ft->as_Hz(bv.bin) == 440)
+			found_440 = true;
+		if (ft->as_Hz(bv.bin) == 880)
+			found_880 = true;
+		if (ft->as_Hz(bv.bin) == 1760)
+			found_1760 = true;
+	}
+	EXPECT_TRUE(found_440);
+	EXPECT_TRUE(found_880);
+	EXPECT_TRUE(found_1760);
 }
 
 TEST_F(FrogTonesFreqTest, ResetBetweenRuns)
