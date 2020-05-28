@@ -37,6 +37,7 @@ public:
 		return freq[idx];
 	}
 };
+static constexpr tone_frequencies tone_freqs;
 
 enum tones find_tone(uint16_t frequency);
 
