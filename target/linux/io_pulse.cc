@@ -82,7 +82,7 @@ void listen_for_croaks(listen_buf_t &buffer)
 
 void play_croak(void)
 {
-	int     croak_samples = config_fs_output * 1.5 /*seconds*/;
+	int     croak_samples = croak_len;
 	int16_t croak_sound[croak_samples];
 
 	std::cout << "croaking" << std::endl;

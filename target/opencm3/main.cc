@@ -17,8 +17,6 @@ int _write(int file, char *buf, int len);
 
 #include "board_config.h"
 
-static constexpr int croak_samples = config_fs_output * 1.5 /*seconds*/;
-
 
 /* Callback from the libc when using printf */
 extern "C" {
@@ -140,7 +138,7 @@ void play_croak(void)
 
 	printf("croak!\r\n");
 
-	for (int i = 0; i < croak_samples; i++) {
+	for (int i = 0; i < croak_len; i++) {
 		spi_send(SPI3, 0);                 // stereo: other channel is mute
 		spi_send(SPI3, get_croak_data(i)); // stereo: other channel is mute
 	}
