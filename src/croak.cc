@@ -1,61 +1,70 @@
 #include "config.h"
+#include "croak_sound.h"
 #include "sin_table_float.h"
 #include "tones.h"
 #include <cassert>
 #include <cmath>
 #include <cstdio>
 
-static inline int calc_index(int i, float freq)
+static inline float calc_sine(int i, float freq)
 {
 	float is_per_cycle = config_fs_output / freq;
 	float phase = i / is_per_cycle - floor(i / is_per_cycle);
 	assert(phase >= 0 && phase <= 1);
 	int idx = phase * SIN_TABLE_RESOLUTION;
 
-	return idx;
+	return sin_table_float[idx];
+}
+static inline float calc_croak(int i, float freq)
+{
+	float is_per_cycle = config_fs_output / freq;
+	float phase = i / is_per_cycle - floor(i / is_per_cycle);
+	assert(phase >= 0 && phase <= 1);
+	int idx = phase * SIN_TABLE_RESOLUTION;
+
+	return croak_sound[idx];
 }
 
-static float rnd(void)
+
+static inline float calc_triangle(int i, float freq)
 {
-	static float r = 0;
-	r += 0.001;
-	if (r > 0.1) r = 0;
-	return r;
+	float is_per_cycle = config_fs_output / freq;
+	float phase = i / is_per_cycle - floor(i / is_per_cycle);
+	assert(phase >= 0 && phase <= 1);
+	if (phase < 0.5)
+		return -1 + 4 * phase;
+	else
+		return 1 - 4 * (phase - 0.5);
+}
+
+static inline float calc_saw(int i, float freq)
+{
+	float is_per_cycle = config_fs_output / freq;
+	float phase = i / is_per_cycle - floor(i / is_per_cycle);
+	assert(phase >= 0 && phase <= 1);
+	return 2 * phase - 1;
 }
 
 int16_t get_croak_data(int i)
 {
-	enum tones tone = C5; // TODO: this is a parameter
+	enum tones tone = C4; // TODO: this is a parameter
 	int16_t    d = 0;
 	int16_t    uv = 2000; //unit volume
 	static_assert(SIN_TABLE_RESOLUTION <= SIN_TABLE_N_ELEM, "Need better algorithm now");
 
 	float base = tone_freqs.get_freq(tone);
 
-	int idx = calc_index(i, base);
-	d = (rnd() + sin_table_float[idx]) * uv / 2;
 
-	idx = calc_index(i, 2 * base);
-	d += (rnd() + sin_table_float[idx]) * uv;
+	float vibrato = calc_sine(i, 10) * 0.0001 + 1;
+	d = calc_croak(i, base * vibrato) * uv;
+	//d += calc_sine(i, base * base ) * uv;
+	// 2nd voice
+	//d += calc_croak(i, (base +0.1)*vibrato) * uv;
+	// echo
+	//d += calc_croak(i-300, base) * uv;
 
-	idx = calc_index(i, 3 * base);
-	d += (rnd() + sin_table_float[idx]) * uv / 4;
-
-#if 0
-	idx = calc_index(i, 2);
-	d *= (sin_table_float[idx] * 0.5 + 0.4);
-
-	idx = calc_index(i, 2.3 * base);
-	d += sin_table_float[idx] * uv / 8;
-
-//	idx = calc_index(i, 4.3*base);
-//	d += sin_table_float[idx] * uv / 16;
-
-	idx = calc_index(i, 3.3 * base);
-	d += sin_table_float[idx] * uv / 8;
-#endif
-
-
+	float tremolo = calc_sine(i, 22) * 0.01 + 1;
+	d *= tremolo;
 
 	/* Run the ADSR filter */
 	float amp;
