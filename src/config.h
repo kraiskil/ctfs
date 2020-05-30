@@ -24,11 +24,11 @@ constexpr float default_fft_scale = 1;
 
 /* Output ADSR filter coefficients.
  * Lenghths in samples. */
-constexpr float attack_level = 1.5;
+constexpr float attack_level = 2;
 constexpr float sustain_level = 1.0;
-constexpr int   attack_len = 300.0 /*ms*/ * config_fs_output / 1000;
-constexpr int   decay_len = 800.0 /*ms*/ * config_fs_output / 1000;
-constexpr int   sustain_len = 300.0 /*ms*/ * config_fs_output / 1000;
-constexpr int   release_len = 400.0 /*ms*/ * config_fs_output / 1000;
+constexpr int   attack_len = 600.0 /*ms*/ * config_fs_output / 1000;
+constexpr int   decay_len = 1000.0 /*ms*/ * config_fs_output / 1000;
+constexpr int   sustain_len = 600.0 /*ms*/ * config_fs_output / 1000;
+constexpr int   release_len = 1000.0 /*ms*/ * config_fs_output / 1000;
 constexpr int   croak_len = attack_len + decay_len + sustain_len + release_len;
 

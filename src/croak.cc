@@ -6,6 +6,38 @@
 #include <cmath>
 #include <cstdio>
 
+constexpr int N = 8;
+constexpr int nfb = 5;
+float         b[nfb][N] = {
+/* 500 */ { 0.023002, 0.092000, 0.232851, 0.304294, 0.232851, 0.092000, 0.023002 },
+/* 500 */ { 0.023002, 0.092000, 0.232851, 0.304294, 0.232851, 0.092000, 0.023002 },
+// /* 1000 */{0.019768, 0.087736, 0.235581, 0.313830, 0.235581, 0.087736, 0.019768},
+///* 1250 */ {0.017451, 0.084478, 0.237536, 0.321071, 0.237536, 0.084478, 0.017451},
+/* 1500 */ { 0.014756, 0.080439, 0.239806, 0.329999, 0.239806, 0.080439, 0.014756 },
+// /*1750 */{0.011767, 0.075600, 0.242310, 0.340647, 0.242310, 0.075600, 0.011767},
+// /*2000*/ {0.0085872, 0.0699454, 0.2449476, 0.3530395, 0.2449476, 0.0699454, 0.0085872},
+/* 3000 */ { -0.0035679, 0.0394313, 0.2540534, 0.4201664, 0.2540534, 0.0394313  - 0.0035679 },
+/* 3000 */ { -0.0035679, 0.0394313, 0.2540534, 0.4201664, 0.2540534, 0.0394313  - 0.0035679 },
+};
+// phase-angle of the output wave
+static inline float calc_phase(int i, float freq)
+{
+	float is_per_cycle = config_fs_output / freq;
+	float phase = i / is_per_cycle - floor(i / is_per_cycle);
+	assert(phase >= 0 && phase <= 1);
+
+	return phase;
+}
+
+static inline float calc_square(int i, float freq)
+{
+	float phase = calc_phase(i, freq);
+	if (phase < 0.5)
+		return 1;
+	else
+		return 0;
+}
+
 static inline float calc_sine(int i, float freq)
 {
 	float is_per_cycle = config_fs_output / freq;
@@ -15,6 +47,15 @@ static inline float calc_sine(int i, float freq)
 
 	return sin_table_float[idx];
 }
+
+static inline float calc_rectsine(int i, float freq)
+{
+	float phase = calc_phase(i, freq);
+	int   idx = phase * SIN_TABLE_RESOLUTION;
+
+	return fabs(sin_table_float[idx]);
+}
+
 static inline float calc_croak(int i, float freq)
 {
 	float is_per_cycle = config_fs_output / freq;
@@ -45,35 +86,64 @@ static inline float calc_saw(int i, float freq)
 	return 2 * phase - 1;
 }
 
+float filter(float in, float b[N])
+{
+	static uint_fast8_t idx = 0;
+	static float        x[N] = { 0 };
+	// cutoff at 1500/8000
+
+	x[idx] = in;
+	float accu = 0;
+	for (uint_fast8_t k = 0; k < N; k++) {
+		// create the n-k idx
+		// n==idx
+		uint_fast8_t xidx = (idx - k + N) % N; // TODO: check the assembly
+		assert(xidx >= 0);
+		assert(xidx < N);
+		accu += b[k] * x[xidx];
+	}
+
+	idx++;
+	idx = idx % N; // TODO; check the compiler does a mask here.
+	return accu;
+}
+
 int16_t get_croak_data(int i)
 {
 	enum tones tone = C4; // TODO: this is a parameter
-	int16_t    d = 0;
-	int16_t    uv = 2000; //unit volume
+	float      d = 0;
+	int16_t    uv = 800; //unit volume
 	static_assert(SIN_TABLE_RESOLUTION <= SIN_TABLE_N_ELEM, "Need better algorithm now");
 
 	float base = tone_freqs.get_freq(tone);
 
 
-	float vibrato = calc_sine(i, 10) * 0.0001 + 1;
-	d = calc_croak(i, base * vibrato) * uv;
-	//d += calc_sine(i, base * base ) * uv;
+	float vibrato = calc_sine(i, 10) * 0.00001 + 1;
+	d = calc_square(i, base * vibrato) * uv;
+	//d += calc_sine(i, base * base+0.5 ) * uv/2;
 	// 2nd voice
 	//d += calc_croak(i, (base +0.1)*vibrato) * uv;
 	// echo
-	//d += calc_croak(i-300, base) * uv;
+	//d += calc_triangle(i-30, base) * uv/2;
 
-	float tremolo = calc_sine(i, 22) * 0.01 + 1;
+	float tremolo = calc_sine(i, 12) * 0.15 * (i - croak_len) / croak_len + 1;
 	d *= tremolo;
+
+	float filter_lfo = calc_sine(i, 2) / 2 + 1 * nfb - 1;
+	int   filter_idx = filter_lfo;
+	assert(filter_idx > 0 && filter_idx < nfb);
+	d = filter(d, b[filter_idx]);
 
 	/* Run the ADSR filter */
 	float amp;
 	if (i < attack_len) {
 		amp = attack_level * i / attack_len;
+		amp *= amp;
 	}
 	else if (i < (attack_len + decay_len) ) {
 		int dec_i_left = decay_len - (i - attack_len);
 		amp = sustain_level + (attack_level - sustain_level) * (dec_i_left) / decay_len;
+		amp *= amp;
 	}
 	else if (i < (attack_len + decay_len + sustain_len) ) {
 		amp = sustain_level;

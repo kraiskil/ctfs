@@ -53,8 +53,8 @@ int main(void)
 		listen_for_croaks(buf);
 		the_fft.dc_blocker(buf);
 
-		//print_for_serialfft(buf);
-		print_as_c_header(buf);
+		print_for_serialfft(buf);
+		//print_as_c_header(buf);
 	}
 
 	return 0;
