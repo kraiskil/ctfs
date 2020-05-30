@@ -180,3 +180,22 @@ int frog_tones::as_Hz(uint16_t frequency_bin) const
 	return rv;
 }
 
+bool frog_tones::has_peak_at(uint16_t tone_f)
+{
+	sort_tones_by_bin();
+	for (auto &v: tones) {
+		if (v.val == 0)
+			continue;
+		// TODO: don't use as_Hz here, rather write a new function
+		//  peak_at(bin) that calculates the sought after peak bin
+		// (as opposed to a centered bin's value in Hz)
+		// https://dspguru.com/dsp/howtos/how-to-interpolate-fft-peak/
+		// And when that is done, use it here, and reduce the comparison error
+		// margin below.
+		float ratio = (float)tone_f / as_Hz(v.bin);
+		if (ratio > 0.98 && ratio < 1.02)
+			return true;
+	}
+	return false;
+}
+

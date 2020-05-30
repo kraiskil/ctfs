@@ -3,7 +3,9 @@
 
 using namespace testing;
 
-class FrogTonesHarmonicsTest : public FrogTonesTest
+class FrogTonesHarmonicsTest :
+	public FrogTonesTest,
+	public testing::Test
 {
 public:
 	void add_frog_sound(uint16_t ampl, uint16_t base_freq)

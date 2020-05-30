@@ -139,8 +139,8 @@ void play_croak(void)
 	printf("croak!\r\n");
 
 	for (int i = 0; i < croak_len; i++) {
-		spi_send(SPI3, 0);                 // stereo: other channel is mute
-		spi_send(SPI3, get_croak_data(i)); // stereo: other channel is mute
+		spi_send(SPI3, 0);                     // stereo: other channel is mute
+		spi_send(SPI3, get_croak_data(i, A4)); // stereo: other channel is mute
 	}
 
 	audioDAC_shutdown();

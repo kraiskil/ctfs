@@ -29,6 +29,7 @@ public:
 	virtual struct bin_val get_peak_by_val(uint16_t peak_num);
 	virtual struct bin_val get_peak_by_bin(uint16_t peak_num);
 	virtual int as_Hz(uint16_t frequency_bin) const;
+	bool has_peak_at(uint16_t frequency);
 
 private:
 	void sort_tones_by_bin(void);

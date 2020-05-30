@@ -1,5 +1,6 @@
 #pragma once
 #include "datatype.h"
+#include "tones.h"
 
 // entrypoint for treefrog
 void treefrog(void);
@@ -10,7 +11,7 @@ void croak(void);
 void sleep_a_bit(void);
 
 // Get the sample_num'th data in one emitted croak
-int16_t get_croak_data(int sample_num);
+int16_t get_croak_data(int sample_num, enum tones);
 
 /* Platform-level interfaces */
 void play_croak(void);

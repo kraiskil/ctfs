@@ -1,8 +1,7 @@
 #include "gtest/gtest.h"
 #include "frog_tones.h"
 
-class FrogTonesTest :
-	public testing::Test
+class FrogTonesTest
 {
 public:
 	frequency_buf_t freq_buffer;
@@ -11,7 +10,7 @@ public:
 	// TODO: maybe mock this. But so much effort is required to rewrite tests.
 	::fft<fft_internal_datatype> the_fft;
 
-	void SetUp(void) override
+	FrogTonesTest()
 	{
 		freq_buffer.fill(0);
 		audio_buffer.fill(0);

@@ -1,11 +1,12 @@
 #include "frog_tones_test.h"
 
-class FrogTonesPeakTest : public FrogTonesTest
+class FrogTonesPeakTest :
+	public FrogTonesTest,
+	public testing::Test
 {
 public:
 	void SetUp(void) override
 	{
-		FrogTonesTest::SetUp();
 		srand(42);
 		audio_buffer.fill(1);
 	}
@@ -139,7 +140,7 @@ TEST_F(FrogTonesPeakTest, S1)
 }
 
 extern float calculate_stddev(frequency_buf_t&, uint32_t mean);
-TEST_F(FrogTonesTest, CalculateStddev)
+TEST_F(FrogTonesPeakTest, CalculateStddev)
 {
 	EXPECT_FLOAT_EQ(calculate_stddev(freq_buffer, 0), 0);
 
