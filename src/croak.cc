@@ -114,7 +114,7 @@ int16_t get_croak_data(int i, enum tones tone)
 	int16_t uv = 800; //unit volume
 	static_assert(SIN_TABLE_RESOLUTION <= SIN_TABLE_N_ELEM, "Need better algorithm now");
 
-	float base = tone_freqs.get_freq(tone);
+	frequency_t base = tone_freq[tone];
 
 
 	float vibrato = calc_sine(i, 10) * 0.00001 + 1;

@@ -29,23 +29,26 @@ class frequency_t
 public:
 	float f;
 	frequency_t(float f) : f(f){}
+	frequency_t(double f) : f(f){}
+	frequency_t(uint16_t f) : f(f){}
+	frequency_t(int f) : f(f){}
 	frequency_t& operator=(uint16_t f)
 	{
 		this->f = f;
 		return *this;
 	}
-	operator uint16_t()
+	operator uint16_t() const
 	{
 		return this->f;
 	}
 
-	bool operator==(const frequency_t &other)
+	bool operator==(const frequency_t &other) const
 	{
-		return fabs(this->f - other.f) > 0.01;
+		return fabs(this->f - other.f) < 0.01;
 	}
 	bool operator==(const int &other)
 	{
-		return fabs(this->f - other) > 0.01;
+		return fabs(this->f - other) < 0.01;
 	}
 };
 

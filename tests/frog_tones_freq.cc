@@ -247,7 +247,7 @@ TEST_P(FrogTonesCroakTest, PeaksFromCroak)
 	ft->find_peaks();
 
 	EXPECT_GT(ft->get_num_peaks(), 1);
-	EXPECT_TRUE(ft->has_peak_at(tone_freqs.get_freq(tone)));
+	EXPECT_TRUE(ft->has_peak_at(tone_freq[tone]));
 }
 INSTANTIATE_TEST_SUITE_P(AllTones,
     FrogTonesCroakTest,
