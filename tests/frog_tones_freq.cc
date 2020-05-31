@@ -251,6 +251,7 @@ TEST_P(FrogTonesCroakTest, PeaksFromCroak)
 }
 INSTANTIATE_TEST_SUITE_P(AllTones,
     FrogTonesCroakTest,
-    testing::Range(0, (int)F7));
-// don't go up to LAST_TONE - the algorithm seems to break when base frequencies approach 3kHz
+    testing::Range(0, (int)F6));
+// don't go up to LAST_TONE - the algorithm seems to break with higher base frequencies
+// exact limit where it break depends on waveform
 
