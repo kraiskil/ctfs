@@ -5,12 +5,12 @@ class FrogTonesCroakTest :
 	public testing::TestWithParam<int32_t>
 {
 public:
-	enum tones tone;
+	enum tone tone;
 	uint16_t harmonics[3] = { 42, 42, 42 };
 
 	void SetUp(void) override
 	{
-		tone = static_cast<enum tones>(GetParam());
+		tone = static_cast<enum tone>(GetParam());
 		for (int i = 0; i < audio_buffer.size(); i++)
 			audio_buffer[i] = get_croak_data(i, tone);
 	}

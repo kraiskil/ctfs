@@ -2,7 +2,7 @@
 #include "datatype.h"
 #include <cstdint>
 
-enum tones
+enum tone
 {
 	/* Lowest note & octave that FFT has currently enough resolution for */
 	A3         = 0, As3 = 1, Bf3 = 1, B3 = 2, C4 = 3, Cs4 = 4, Df4 = 4, D4 = 5,
@@ -78,5 +78,5 @@ const frequency_t tone_freq[LAST_TONE + 2] = {
 	0, // sentinel - NOT_A_TONE
 };
 
-enum tones find_tone(const frequency_t frequency);
+enum tone find_tone(const frequency_t frequency);
 
