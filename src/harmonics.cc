@@ -1,6 +1,6 @@
 #include "harmonics.h"
 
-bool has_harmonics(frog_tones &ft, unsigned bin_no)
+bool has_harmonics(peak_detect &ft, unsigned bin_no)
 {
 	uint16_t base_bin = ft.get_peak_by_bin(bin_no).bin;
 	bin_no++;
@@ -14,7 +14,7 @@ bool has_harmonics(frog_tones &ft, unsigned bin_no)
 	return false;
 }
 
-void find_harmonics(frog_tones &ft, uint16_t (&harmonics)[3])
+void find_harmonics(peak_detect &ft, uint16_t (&harmonics)[3])
 {
 	uint16_t peak;
 	int      n_harm = 0;

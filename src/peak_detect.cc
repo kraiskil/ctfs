@@ -1,6 +1,6 @@
 #include "config.h"
 #include "debug.h"
-#include "frog_tones.h"
+#include "peak_detect.h"
 #include "fft.h"
 #include "treefrog.h"
 #include <algorithm>
@@ -41,7 +41,7 @@ float calculate_stddev(frequency_buf_t &a, uint32_t mean)
 	return sqrt(var);
 }
 
-void frog_tones::find_peaks(void)
+void peak_detect::find_peaks(void)
 {
 	uint32_t        start_time = wallclock_time_us();
 	frequency_buf_t a;
@@ -121,7 +121,7 @@ void frog_tones::find_peaks(void)
 
 }
 
-void frog_tones::sort_tones_by_value(void)
+void peak_detect::sort_tones_by_value(void)
 {
 	std::sort(tones.begin(), tones.end(),
 	    [] (struct bin_val &a, struct bin_val &b)
@@ -130,7 +130,7 @@ void frog_tones::sort_tones_by_value(void)
 	    }
 	    );
 }
-void frog_tones::sort_tones_by_bin(void)
+void peak_detect::sort_tones_by_bin(void)
 {
 	std::sort(tones.begin(), tones.end(),
 	    [] (struct bin_val &a, struct bin_val &b)
@@ -140,7 +140,7 @@ void frog_tones::sort_tones_by_bin(void)
 	    );
 }
 
-unsigned frog_tones::get_num_peaks(void)
+unsigned peak_detect::get_num_peaks(void)
 {
 	sort_tones_by_value();
 	int numtones = 0;
@@ -152,12 +152,12 @@ unsigned frog_tones::get_num_peaks(void)
 	return numtones;
 }
 
-struct bin_val frog_tones::get_peak_by_val(uint16_t peak_num)
+struct bin_val peak_detect::get_peak_by_val(uint16_t peak_num)
 {
 	sort_tones_by_value();
 	return tones[peak_num];
 }
-struct bin_val frog_tones::get_peak_by_bin(uint16_t peak_num)
+struct bin_val peak_detect::get_peak_by_bin(uint16_t peak_num)
 {
 	sort_tones_by_bin();
 	uint16_t cpn = 0;
@@ -172,7 +172,7 @@ struct bin_val frog_tones::get_peak_by_bin(uint16_t peak_num)
 	return { 0, 0 };
 }
 
-int frog_tones::as_Hz(uint16_t frequency_bin) const
+int peak_detect::as_Hz(uint16_t frequency_bin) const
 {
 	float rv = (float)frequency_bin * config_fs_input / audio_buffer.size();
 	/* Correct systematic bad clock */
@@ -180,7 +180,7 @@ int frog_tones::as_Hz(uint16_t frequency_bin) const
 	return rv;
 }
 
-bool frog_tones::has_peak_at(uint16_t tone_f)
+bool peak_detect::has_peak_at(uint16_t tone_f)
 {
 	sort_tones_by_bin();
 	for (auto &v: tones) {

@@ -3,8 +3,8 @@ add_library(libtreefrog STATIC
 	debug.cc
 	fft.cc
 	fft_float.cc
-	frog_tones.cc
 	harmonics.cc
+	peak_detect.cc
 	treefrog.cc
 	tones.cc
 	sin_table.cc

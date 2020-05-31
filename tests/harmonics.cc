@@ -12,15 +12,15 @@ public:
 
 	void add_num_results(int nr)
 	{
-		EXPECT_CALL(mock_ft, get_peak_by_bin(Ge(nr)))
+		EXPECT_CALL(mock_pd, get_peak_by_bin(Ge(nr)))
 		        .Times(0);
-		ON_CALL(mock_ft, get_num_peaks())
+		ON_CALL(mock_pd, get_num_peaks())
 		        .WillByDefault(Return(nr));
 
 		for (int i = 0; i < nr; i++) {
-			EXPECT_CALL(mock_ft, get_peak_by_bin(i))
+			EXPECT_CALL(mock_pd, get_peak_by_bin(i))
 			        .WillRepeatedly(Return(retvals[i]));
-			EXPECT_CALL(mock_ft, as_Hz(retvals[i].bin)).
+			EXPECT_CALL(mock_pd, as_Hz(retvals[i].bin)).
 			        WillRepeatedly(Return(retvals[i].bin * bin_to_hz));
 		}
 	}
@@ -40,14 +40,14 @@ public:
 	};
 	uint16_t harmonics[3] = { 42, 42, 42 };
 
-	NiceMock<MockFrogTones> mock_ft;
+	NiceMock<MockPeakDetect> mock_pd;
 };
 
 TEST_F(HarmonicsTest, NoSounds)
 {
 	add_num_results(0);
 
-	find_harmonics(mock_ft, harmonics);
+	find_harmonics(mock_pd, harmonics);
 
 	EXPECT_EQ(harmonics[0], 0);
 	EXPECT_EQ(harmonics[1], 0);
@@ -59,7 +59,7 @@ TEST_F(HarmonicsTest, DetectFrogSound)
 {
 	add_num_results(2);
 
-	find_harmonics(mock_ft, harmonics);
+	find_harmonics(mock_pd, harmonics);
 
 	EXPECT_EQ(harmonics[0], 1000);
 	EXPECT_EQ(harmonics[1], 0);
@@ -72,7 +72,7 @@ TEST_F(HarmonicsTest, NoDetectFrogSound)
 	retvals[1].bin = 25;
 	add_num_results(2);
 
-	find_harmonics(mock_ft, harmonics);
+	find_harmonics(mock_pd, harmonics);
 
 	EXPECT_EQ(harmonics[0], 0);
 	EXPECT_EQ(harmonics[1], 0);
@@ -83,7 +83,7 @@ TEST_F(HarmonicsTest, DetectTwoFrogSound)
 {
 	add_num_results(4);
 
-	find_harmonics(mock_ft, harmonics);
+	find_harmonics(mock_pd, harmonics);
 
 	EXPECT_EQ(harmonics[0], 1000);
 	EXPECT_EQ(harmonics[1], 1500);
@@ -94,7 +94,7 @@ TEST_F(HarmonicsTest, DetectFromFourFrogSounds)
 {
 	add_num_results(8);
 
-	find_harmonics(mock_ft, harmonics);
+	find_harmonics(mock_pd, harmonics);
 
 	EXPECT_EQ(harmonics[0], 1000);
 	EXPECT_EQ(harmonics[1], 1500);

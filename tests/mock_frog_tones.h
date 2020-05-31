@@ -1,11 +1,11 @@
 #include "gmock/gmock.h"
-#include "frog_tones.h"
+#include "peak_detect.h"
 
-class MockFrogTones : public frog_tones
+class MockPeakDetect : public peak_detect
 {
 public:
-	MockFrogTones()
-		: frog_tones(abuf, fbuf)
+	MockPeakDetect()
+		: peak_detect(abuf, fbuf)
 	{}
 	MOCK_METHOD0(get_num_peaks, unsigned(void));
 	MOCK_METHOD1(get_peak_by_val, struct bin_val (uint16_t));

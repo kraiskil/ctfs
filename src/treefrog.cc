@@ -2,7 +2,7 @@
 #include "datatype.h"
 #include "debug.h"
 #include "fft.h"
-#include "frog_tones.h"
+#include "peak_detect.h"
 #include "harmonics.h"
 #include "treefrog.h"
 
@@ -32,7 +32,7 @@ bool should_I_croak(listen_buf_t &buffer)
 {
 	debug_led_on(LED_PROCESSING);
 	frequency_buf_t            out;
-	frog_tones                 ft(buffer, out);
+	peak_detect                ft(buffer, out);
 	fft<fft_internal_datatype> the_fft;
 	the_fft.fs = config_fs_input;
 	the_fft.fft_size = buffer.size();

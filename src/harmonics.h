@@ -1,5 +1,5 @@
-#include "frog_tones.h"
+#include "peak_detect.h"
 #include <cstdint>
 
-void find_harmonics(frog_tones & ft, uint16_t(&harmonics)[3]);
+void find_harmonics(peak_detect & ft, uint16_t(&harmonics)[3]);
 

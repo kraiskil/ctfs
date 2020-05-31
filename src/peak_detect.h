@@ -10,10 +10,10 @@ struct bin_val
 typedef std::array<struct bin_val, frequency_buffer_samples> tone_array_t;
 
 
-class frog_tones
+class peak_detect
 {
 public:
-	frog_tones(listen_buf_t &input_buf,
+	peak_detect(listen_buf_t &input_buf,
 	    frequency_buf_t &freq_buf,
 	    unsigned peak_stddev_limit = default_peak_stddev_limit
 	    )
