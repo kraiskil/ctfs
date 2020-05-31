@@ -13,6 +13,9 @@ constexpr int croak_num_samples = 2 * config_fs_output;
  * scaling changes.
  */
 constexpr unsigned default_peak_stddev_limit = 7; // float-fft
+/* Peak detection reports the this many strongest peaks,
+ * ignores the rest */
+constexpr unsigned max_detected_peaks = 20;
 
 /* FFT scale factor:
  * when casting float-results of the fft into uin16_t

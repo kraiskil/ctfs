@@ -118,7 +118,7 @@ int16_t get_croak_data(int i, enum tones tone)
 
 
 	float vibrato = calc_sine(i, 10) * 0.00001 + 1;
-	d = calc_croak(i, base * vibrato) * uv;
+	d = calc_croak(i, (float)base * vibrato) * uv;
 	//d += calc_sine(i, base * base+0.5 ) * uv/2;
 	// 2nd voice
 	//d += calc_croak(i, (base +0.1)*vibrato) * uv;

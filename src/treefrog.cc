@@ -32,7 +32,8 @@ bool should_I_croak(listen_buf_t &buffer)
 {
 	debug_led_on(LED_PROCESSING);
 	frequency_buf_t            out;
-	peak_detect                ft(buffer, out);
+	peak_array_t               peaks;
+	peak_detect                ft(buffer, out, peaks);
 	fft<fft_internal_datatype> the_fft;
 	the_fft.fs = config_fs_input;
 	the_fft.fft_size = buffer.size();

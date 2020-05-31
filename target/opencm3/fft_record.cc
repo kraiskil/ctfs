@@ -25,7 +25,8 @@ int main(void)
 
 	listen_buf_t    abuf;
 	frequency_buf_t fbuf;
-	peak_detect     ft(abuf, fbuf);
+	peak_array_t    pbuf;
+	peak_detect     ft(abuf, fbuf, pbuf);
 	uint32_t        elapsed_time;
 	fft<float>      the_fft;
 	the_fft.fs = config_fs_input;

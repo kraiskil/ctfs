@@ -1,4 +1,5 @@
 #pragma once
+#include "config.h"
 #include <array>
 #include <complex>
 #include <cstdint>
@@ -28,6 +29,7 @@ class frequency_t
 {
 public:
 	float f;
+	frequency_t() : f(0) {}
 	frequency_t(float f) : f(f){}
 	frequency_t(double f) : f(f){}
 	frequency_t(uint16_t f) : f(f){}
@@ -36,6 +38,16 @@ public:
 	{
 		this->f = f;
 		return *this;
+	}
+	frequency_t& operator=(float f)
+	{
+		this->f = f;
+		return *this;
+	}
+
+	operator float() const
+	{
+		return this->f;
 	}
 	operator uint16_t() const
 	{
@@ -46,9 +58,16 @@ public:
 	{
 		return fabs(this->f - other.f) < 0.01;
 	}
-	bool operator==(const int &other)
+	bool operator==(const int &other) const
 	{
 		return fabs(this->f - other) < 0.01;
 	}
 };
+
+struct peak
+{
+	frequency_t freq;
+	uint16_t ampl;
+};
+typedef std::array<struct peak, max_detected_peaks> peak_array_t;
 

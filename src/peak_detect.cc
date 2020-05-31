@@ -113,6 +113,14 @@ void peak_detect::find_peaks(void)
 				tones[j].val = 0;
 		}
 	}
+
+	sort_tones_by_value();
+	for (unsigned i = 0; i < peaks.size(); i++) {
+		if (tones[i].val == 0)
+			break;
+		peaks[i] = peak_at(tones[i].bin);
+	}
+
 	#ifdef HAVE_DEBUG_MEASUREMENTS
 	peak_detect_execution_time = wallclock_time_us() - start_time;
 	#else
@@ -179,10 +187,30 @@ frequency_t peak_detect::bin_frequency(uint16_t frequency_bin) const
 	rv *= frequency_correction;
 	return rv;
 }
-frequency_t peak_detect::peak_frequency(uint16_t frequency_bin) const
+
+struct peak peak_detect::peak_at(uint16_t bin) const
 {
-	// TODO...
-	return 0;
+	// return peak that has its maximum bin at frequency_bin
+	// Use first algorithm that ecosia throws: the 'barycentric method':
+	// https://dspguru.com/dsp/howtos/how-to-interpolate-fft-peak/
+	uint16_t l, c, r;
+	if (bin > 0)
+		l = freq_buffer[bin - 1];
+	else
+		l = 0;  //?
+	if (bin < freq_buffer.size() - 1)
+		r = freq_buffer[bin + 1];
+	else
+		r = 0;
+	c = freq_buffer[bin];
+
+	float d = (float)(r - l) / (l + c + r);
+
+	frequency_t f = bin_frequency(bin);
+	f = (float)f + d;
+	uint16_t peak_val = freq_buffer[bin]; // TODO: interpolate the amplitude too?
+
+	return { f, peak_val };
 }
 
 bool peak_detect::has_peak_at(uint16_t tone_f)
@@ -191,13 +219,8 @@ bool peak_detect::has_peak_at(uint16_t tone_f)
 	for (auto &v: tones) {
 		if (v.val == 0)
 			continue;
-		// TODO: don't use as_Hz here, rather write a new function
-		//  peak_at(bin) that calculates the sought after peak bin
-		// (as opposed to a centered bin's value in Hz)
-		// https://dspguru.com/dsp/howtos/how-to-interpolate-fft-peak/
-		// And when that is done, use it here, and reduce the comparison error
-		// margin below.
-		float ratio = (float)tone_f / bin_frequency(v.bin);
+		// TODO: take frequency_t as input,
+		float ratio = (float)tone_f / (float)bin_frequency(v.bin);
 		if (ratio > 0.98 && ratio < 1.02)
 			return true;
 	}

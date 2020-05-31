@@ -114,6 +114,31 @@ TEST_F(FrogTonesPeakTest, WidePeaksInNoise)
 	EXPECT_EQ(ft->get_num_peaks(), 4);
 }
 
+TEST_F(FrogTonesPeakTest, NoResultsInPeakArray)
+{
+	ft->find_peaks();
+	for (auto p : peaks) {
+		EXPECT_EQ(p.freq, 0);
+		EXPECT_EQ(p.ampl, 0);
+	}
+}
+
+TEST_F(FrogTonesPeakTest, HaveResultInPeakArray)
+{
+	freq_buffer[50] = 100;
+	ft->find_peaks();
+	EXPECT_EQ(peaks[0].freq, ft->bin_frequency(50));
+}
+
+TEST_F(FrogTonesPeakTest, HaveMidBinResultInPeakArray)
+{
+	freq_buffer[50] = 100;
+	freq_buffer[51] = 20;
+	ft->find_peaks();
+	EXPECT_GT((float)peaks[0].freq, (float)ft->bin_frequency(50));
+	EXPECT_LT((float)peaks[0].freq, (float)ft->bin_frequency(51));
+}
+
 
 
 

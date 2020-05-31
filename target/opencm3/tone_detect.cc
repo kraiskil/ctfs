@@ -23,7 +23,8 @@ int main(void)
 	board_setup_i2s_in();
 	listen_buf_t    abuf;
 	frequency_buf_t fbuf;
-	peak_detect     ft(abuf, fbuf);
+	peak_array_t    pbuf;
+	peak_detect     ft(abuf, fbuf, pbuf);
 	fft<float>      the_fft;
 
 	the_fft.fs = config_fs_input;
@@ -38,7 +39,7 @@ int main(void)
 
 		printf("Peaks:\n");
 		for (unsigned i = 0; i < ft.get_num_peaks(); i++) {
-			if (ft.bin_frequency(ft.get_peak_by_val(i).bin) > 5000)
+			if ((uint16_t)ft.bin_frequency(ft.get_peak_by_val(i).bin) > 5000)
 				continue;
 			printf("%f Hz (bin %d) - ampl: %d\n",
 			    (float)ft.bin_frequency(ft.get_peak_by_val(i).bin),
