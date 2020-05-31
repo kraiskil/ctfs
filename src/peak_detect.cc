@@ -172,12 +172,17 @@ struct bin_val peak_detect::get_peak_by_bin(uint16_t peak_num)
 	return { 0, 0 };
 }
 
-int peak_detect::as_Hz(uint16_t frequency_bin) const
+frequency_t peak_detect::bin_frequency(uint16_t frequency_bin) const
 {
 	float rv = (float)frequency_bin * config_fs_input / audio_buffer.size();
 	/* Correct systematic bad clock */
 	rv *= frequency_correction;
 	return rv;
+}
+frequency_t peak_detect::peak_frequency(uint16_t frequency_bin) const
+{
+	// TODO...
+	return 0;
 }
 
 bool peak_detect::has_peak_at(uint16_t tone_f)
@@ -192,7 +197,7 @@ bool peak_detect::has_peak_at(uint16_t tone_f)
 		// https://dspguru.com/dsp/howtos/how-to-interpolate-fft-peak/
 		// And when that is done, use it here, and reduce the comparison error
 		// margin below.
-		float ratio = (float)tone_f / as_Hz(v.bin);
+		float ratio = (float)tone_f / bin_frequency(v.bin);
 		if (ratio > 0.98 && ratio < 1.02)
 			return true;
 	}

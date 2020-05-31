@@ -20,7 +20,7 @@ public:
 		for (int i = 0; i < nr; i++) {
 			EXPECT_CALL(mock_pd, get_peak_by_bin(i))
 			        .WillRepeatedly(Return(retvals[i]));
-			EXPECT_CALL(mock_pd, as_Hz(retvals[i].bin)).
+			EXPECT_CALL(mock_pd, bin_frequency(retvals[i].bin)).
 			        WillRepeatedly(Return(retvals[i].bin * bin_to_hz));
 		}
 	}

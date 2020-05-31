@@ -133,11 +133,11 @@ TEST_F(FrogTonesFreqTest, ThreeTonesRecorded)
 
 	for (unsigned i = 0; i < num_peaks; i++) {
 		struct bin_val bv = ft->get_peak_by_bin(i);
-		if (ft->as_Hz(bv.bin) == 440)
+		if (ft->bin_frequency(bv.bin) == 440)
 			found_440 = true;
-		if (ft->as_Hz(bv.bin) == 880)
+		if (ft->bin_frequency(bv.bin) == 880)
 			found_880 = true;
-		if (ft->as_Hz(bv.bin) == 1760)
+		if (ft->bin_frequency(bv.bin) == 1760)
 			found_1760 = true;
 	}
 	EXPECT_TRUE(found_440);
@@ -168,7 +168,7 @@ TEST_F(FrogTonesFreqTest, asHz)
 	the_fft.run(audio_buffer, freq_buffer);
 	ft->find_peaks();
 	EXPECT_EQ(ft->get_num_peaks(), 1);
-	EXPECT_NEAR(ft->as_Hz(ft->get_peak_by_bin(0).bin), 1200, bin_accuracy);
+	EXPECT_NEAR(ft->bin_frequency(ft->get_peak_by_bin(0).bin), 1200, bin_accuracy);
 }
 
 TEST_F(FrogTonesFreqTest, DcBlocker)
@@ -226,14 +226,14 @@ TEST_F(FrogTonesFreqTest, LargeNoisyDcIsBlocked)
 	ft->find_peaks();
 	EXPECT_GT(freq_buffer[0], 1790); // almost 1800
 	// peak detection ignores DC bin internally - there is only one peak visible here
-	EXPECT_NEAR(ft->as_Hz(ft->get_peak_by_bin(0).bin), 1200, bin_accuracy);
+	EXPECT_NEAR(ft->bin_frequency(ft->get_peak_by_bin(0).bin), 1200, bin_accuracy);
 
 	the_fft.dc_blocker(audio_buffer);
 	the_fft.run(audio_buffer, freq_buffer);
 	EXPECT_EQ(freq_buffer[0], 0);
 	ft->find_peaks();
 	EXPECT_EQ(ft->get_num_peaks(), 1);
-	EXPECT_NEAR(ft->as_Hz(ft->get_peak_by_val(0).bin), 1200, bin_accuracy);
+	EXPECT_NEAR(ft->bin_frequency(ft->get_peak_by_val(0).bin), 1200, bin_accuracy);
 }
 
 TEST_P(FrogTonesCroakTest, PeaksFromCroak)

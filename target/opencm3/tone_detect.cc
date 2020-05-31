@@ -38,10 +38,10 @@ int main(void)
 
 		printf("Peaks:\n");
 		for (unsigned i = 0; i < ft.get_num_peaks(); i++) {
-			if (ft.as_Hz(ft.get_peak_by_val(i).bin) > 5000)
+			if (ft.bin_frequency(ft.get_peak_by_val(i).bin) > 5000)
 				continue;
-			printf("%d Hz (bin %d) - ampl: %d\n",
-			    ft.as_Hz(ft.get_peak_by_val(i).bin),
+			printf("%f Hz (bin %d) - ampl: %d\n",
+			    (float)ft.bin_frequency(ft.get_peak_by_val(i).bin),
 			    ft.get_peak_by_val(i).bin,
 			    ft.get_peak_by_val(i).val);
 		}

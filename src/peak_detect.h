@@ -28,7 +28,12 @@ public:
 	virtual unsigned get_num_peaks(void);
 	virtual struct bin_val get_peak_by_val(uint16_t peak_num);
 	virtual struct bin_val get_peak_by_bin(uint16_t peak_num);
-	virtual int as_Hz(uint16_t frequency_bin) const;
+	/* Get the center frequency of bin. NOT the center frequency
+	 * of a peak */
+	virtual frequency_t bin_frequency(uint16_t frequency_bin) const;
+	/* calculate the peak frequency of the peak with maximum at
+	 * the given bin. This does inerpolation. */
+	virtual frequency_t peak_frequency(uint16_t frequency_bin) const;
 	bool has_peak_at(uint16_t frequency);
 
 private:

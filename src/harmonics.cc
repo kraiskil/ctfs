@@ -32,7 +32,9 @@ void find_harmonics(peak_detect &ft, uint16_t (&harmonics)[3])
 
 		// if found, record as kth harmonic
 		if (found) {
-			harmonics[n_harm] = ft.as_Hz(peak);
+			// TODO: should this be peak-frequency, not
+			// bin center frequency?
+			harmonics[n_harm] = ft.bin_frequency(peak);
 			n_harm++;
 			if (n_harm > 2)
 				return;
