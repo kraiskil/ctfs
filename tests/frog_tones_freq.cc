@@ -236,22 +236,3 @@ TEST_F(FrogTonesFreqTest, LargeNoisyDcIsBlocked)
 	EXPECT_NEAR(ft->bin_frequency(ft->get_peak_by_val(0).bin), 1200, bin_accuracy);
 }
 
-TEST_P(FrogTonesCroakTest, PeaksFromCroak)
-{
-	enum tones tone = static_cast<enum tones>(GetParam());
-	for (int i = 0; i < audio_buffer.size(); i++)
-		audio_buffer[i] = get_croak_data(i, tone);
-
-	the_fft.dc_blocker(audio_buffer);
-	the_fft.run(audio_buffer, freq_buffer);
-	ft->find_peaks();
-
-	EXPECT_GT(ft->get_num_peaks(), 1);
-	EXPECT_TRUE(ft->has_peak_at(tone_freq[tone]));
-}
-INSTANTIATE_TEST_SUITE_P(AllTones,
-    FrogTonesCroakTest,
-    testing::Range(0, (int)F6));
-// don't go up to LAST_TONE - the algorithm seems to break with higher base frequencies
-// exact limit where it break depends on waveform
-

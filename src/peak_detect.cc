@@ -213,14 +213,13 @@ struct peak peak_detect::peak_at(uint16_t bin) const
 	return { f, peak_val };
 }
 
-bool peak_detect::has_peak_at(uint16_t tone_f)
+bool peak_detect::has_peak_at(frequency_t freq)
 {
 	sort_tones_by_bin();
 	for (auto &v: tones) {
 		if (v.val == 0)
 			continue;
-		// TODO: take frequency_t as input,
-		float ratio = (float)tone_f / (float)bin_frequency(v.bin);
+		float ratio = (float)freq / (float)peak_at(v.bin).freq;
 		if (ratio > 0.98 && ratio < 1.02)
 			return true;
 	}

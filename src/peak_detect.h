@@ -36,7 +36,7 @@ public:
 	/* calculate the peak frequency of the peak with maximum at
 	 * the given bin. This does inerpolation. */
 	virtual struct peak peak_at(uint16_t frequency_bin) const;
-	bool has_peak_at(uint16_t frequency);
+	bool has_peak_at(frequency_t frequency);
 
 private:
 	typedef std::array<struct bin_val, frequency_buffer_samples> tone_array_t;
