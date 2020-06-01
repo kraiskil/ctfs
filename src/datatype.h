@@ -44,6 +44,11 @@ public:
 		this->f = f;
 		return *this;
 	}
+	frequency_t& operator*(int i)
+	{
+		this->f *= i;
+		return *this;
+	}
 
 	operator float() const
 	{
@@ -62,6 +67,7 @@ public:
 	{
 		return fabs(this->f - other) < 0.01;
 	}
+
 };
 
 struct peak
