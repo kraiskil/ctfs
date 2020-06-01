@@ -22,7 +22,7 @@ public:
 	{
 		frequency_t f = tone_freq[base];
 		p[0] = { f, 100 };
-		p[1] = { (float)f * 2, 100 };
+		p[1] = { (float)f * 2 - 2.45, 100 };
 	}
 	void add_not_croak_peaks(enum tone base)
 	{

@@ -13,13 +13,14 @@ enum tone tones::find_tone(const frequency_t frequency)
 }
 
 /* check if peak at base is a croak:
- * currently it means it has a harmonic at twice the base frequency.
- * This probably needs to be changed */
+ * The fine-tuning parameters here depend on the croak
+ * wavelet used */
 bool tones::has_harmonics(struct peak &base)
 {
-	frequency_t comp_freq = base.freq * 2;
+	frequency_t comp_freq = (float)base.freq * 2 - 2.45;
 	for (auto p : peaks) {
-		if (p.freq == comp_freq)
+		float diff = (float)p.freq - (float)comp_freq;
+		if (fabs(diff) < 3)
 			return true;
 	}
 	return false;
