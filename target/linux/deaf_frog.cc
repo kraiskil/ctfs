@@ -8,7 +8,7 @@ int main(int argc, char *argv[])
 {
 	io_init();
 	while (true) {
-		play_croak();
+		play_croak(C4);
 		sleep_for();
 		sleep_for();
 		sleep_for();

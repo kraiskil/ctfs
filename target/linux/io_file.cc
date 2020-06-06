@@ -11,6 +11,7 @@
 
 #include "config.h"
 #include "datatype.h"
+#include "tones.h"
 
 extern "C" {
 #include <sndfile.h>
@@ -98,8 +99,8 @@ void listen_for_croaks(listen_buf_t &buf)
 	memcpy(buffer, rdptr, sizeof(int16_t) * listen_buffer_samples);
 }
 
-void play_croak(void)
+void play_croak(enum tone t)
 {
-	std::cout << "croak!" << std::endl;
+	std::cout << "croaking (enum tone) " << t << std::endl;
 }
 

@@ -80,7 +80,7 @@ void listen_for_croaks(listen_buf_t &buffer)
 	pa_simple_free(s);
 }
 
-void play_croak(void)
+void play_croak(enum tone tone_to_croak)
 {
 	int     croak_samples = croak_len;
 	int16_t croak_sound[croak_samples];
@@ -106,7 +106,7 @@ void play_croak(void)
 
 
 	for (int i = 0; i < croak_samples; i++) {
-		croak_sound[i] = get_croak_data(i, C4);
+		croak_sound[i] = get_croak_data(i, tone_to_croak);
 	}
 
 	pa_simple_write(pas, croak_sound, sizeof(croak_sound), NULL);

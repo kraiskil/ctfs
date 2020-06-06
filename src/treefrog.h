@@ -5,8 +5,6 @@
 // entrypoint for treefrog
 void treefrog(void);
 
-bool should_I_croak(listen_buf_t &buffer);
-void croak(void);
 // frog-level sleep, when there are no croaks to join
 void sleep_a_bit(void);
 
@@ -14,7 +12,7 @@ void sleep_a_bit(void);
 int16_t get_croak_data(int sample_num, enum tone);
 
 /* Platform-level interfaces */
-void play_croak(void);
+void play_croak(enum tone);
 void sleep_for(void);
 void listen_for_croaks(listen_buf_t &buffer);
 

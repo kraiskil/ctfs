@@ -7,6 +7,7 @@
 #include "treefrog.h"
 
 
+static enum tone what_to_croak(listen_buf_t &buffer);
 
 void treefrog(void)
 {
@@ -15,25 +16,26 @@ void treefrog(void)
 		wallclock_start();
 		listen_for_croaks(buffer);
 
-		bool do_the_croak = should_I_croak(buffer);
+		enum tone croak = what_to_croak(buffer);
 		#ifdef HAVE_DEBUG_MEASUREMENTS
 		total_execution_time = wallclock_time_us();
 		#endif
 
-		if (do_the_croak)
-			croak();
+		if (croak != NOT_A_TONE)
+			play_croak(croak);
 		else
 			sleep_a_bit();
 		print_statistics();
 	}
 }
 
-bool should_I_croak(listen_buf_t &buffer)
+static enum tone what_to_croak(listen_buf_t &buffer)
 {
 	debug_led_on(LED_PROCESSING);
 	frequency_buf_t            out;
 	peak_array_t               peaks;
 	peak_detect                pd(buffer, out, peaks);
+	tones                      t(peaks);
 	fft<fft_internal_datatype> the_fft;
 	the_fft.fs = config_fs_input;
 	the_fft.fft_size = buffer.size();
@@ -43,23 +45,11 @@ bool should_I_croak(listen_buf_t &buffer)
 	the_fft.run(buffer, out);
 	pd.find_peaks();
 
-	uint16_t harmonics[3];
-	find_harmonics(pd, harmonics);
 
-	debug_led_off(LED_PROCESSING);
-	if (harmonics[0] > 200)
-		return true;
+	if (t.has_croak() == false)
+		return NOT_A_TONE;
 	else
-		return false;
-
-}
-
-void croak(void)
-{
-	// probably could do some generic
-	// croaking selection
-
-	play_croak(/*TODO: select which croak */);
+		return t.what_to_croak();
 }
 
 // frog-level sleep, when there are no croaks to join
