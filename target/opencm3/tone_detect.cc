@@ -48,6 +48,10 @@ int main(void)
 		}
 		printf("================\n\n");
 
+		tones t(pbuf);
+		if (t.has_croak() ) {
+			printf("--- CROAK found! should reply with (enum tones)%d\n\n", t.what_to_croak());
+		}
 	}
 
 	return 0;

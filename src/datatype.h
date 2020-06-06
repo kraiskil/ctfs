@@ -68,6 +68,15 @@ public:
 		return fabs(this->f - other) < 0.01;
 	}
 
+	bool close_enough(const frequency_t &other) const
+	{
+		float ratio = this->f / other.f;
+		if (ratio > 0.995 && ratio < 1.005)
+			return true;
+		else
+			return false;
+	}
+
 };
 
 struct peak

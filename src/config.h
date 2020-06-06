@@ -16,6 +16,8 @@ constexpr unsigned default_peak_stddev_limit = 7; // float-fft
 /* Peak detection reports the this many strongest peaks,
  * ignores the rest */
 constexpr unsigned max_detected_peaks = 20;
+/* Currently a tone is defined only by two peaks. */
+constexpr unsigned max_detected_tones = max_detected_peaks / 2;
 
 /* FFT scale factor:
  * when casting float-results of the fft into uin16_t

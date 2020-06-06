@@ -84,8 +84,10 @@ void peak_detect::find_peaks(void)
 			// do a real Q&D peak value approximation to combat
 			// the energy being spread across two adjacent bins.
 			// This is far from accurate (no sincs involved! :))
-			tones[i].val = max(freq_buffer[i - 1] + freq_buffer[i],
-			        freq_buffer[i] + freq_buffer[i + 1]);
+			// Weigh the i'th bin a bit to avoid draws that shift
+			// the interpolated frequency later
+			tones[i].val = max(((freq_buffer[i - 1] * 3) >> 2) + freq_buffer[i],
+			        freq_buffer[i] + ((freq_buffer[i + 1] * 3) >> 2));
 		}
 	}
 
@@ -180,9 +182,18 @@ struct bin_val peak_detect::get_peak_by_bin(uint16_t peak_num)
 	return { 0, 0 };
 }
 
+
 frequency_t peak_detect::bin_frequency(uint16_t frequency_bin) const
 {
 	float rv = (float)frequency_bin * config_fs_input / audio_buffer.size();
+	/* Correct systematic bad clock */
+	rv *= frequency_correction;
+	return rv;
+}
+/* same thing, but allow fractional bins - results of peak interpolation */
+frequency_t peak_detect::bin_frequency(float frequency_bin) const
+{
+	float rv = frequency_bin * config_fs_input / audio_buffer.size();
 	/* Correct systematic bad clock */
 	rv *= frequency_correction;
 	return rv;
@@ -206,9 +217,8 @@ struct peak peak_detect::peak_at(uint16_t bin) const
 
 	float d = (float)(r - l) / (l + c + r);
 
-	frequency_t f = bin_frequency(bin);
-	f = (float)f + d;
-	uint16_t peak_val = freq_buffer[bin]; // TODO: interpolate the amplitude too?
+	frequency_t f = bin_frequency(d + bin);
+	uint16_t    peak_val = freq_buffer[bin]; // TODO: interpolate the amplitude too?
 
 	return { f, peak_val };
 }
@@ -219,8 +229,7 @@ bool peak_detect::has_peak_at(frequency_t freq)
 	for (auto &v: tones) {
 		if (v.val == 0)
 			continue;
-		float ratio = (float)freq / (float)peak_at(v.bin).freq;
-		if (ratio > 0.98 && ratio < 1.02)
+		if (freq.close_enough(peak_at(v.bin).freq))
 			return true;
 	}
 	return false;

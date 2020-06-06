@@ -6,7 +6,7 @@ enum tone
 {
 	/* Lowest note & octave that FFT has currently enough resolution for */
 	A3         = 0, As3 = 1, Bf3 = 1, B3 = 2, C4 = 3, Cs4 = 4, Df4 = 4, D4 = 5,
-	Ds4        = 6, E4  = 7, F4  = 8, Ff4 = 9, G4  = 10, Gf4 = 11,
+	Ds4        = 6, E4  = 7, F4  = 8, Fs4 = 9, G4  = 10, Gs4 = 11,
 	/* Next one */
 	A4         = 12, As4 = 13, B4  = 14, C5  = 15, Cs5 = 16, D5  = 17, Ds5 = 18,
 	E5         = 19, F5  = 20, Fs5 = 21, G5  = 22, Gs5 = 23,
@@ -39,14 +39,24 @@ class tones
 public:
 	tones(peak_array_t &peaks)
 		: peaks(peaks)
-	{}
+	{
+		detected_tones.fill(NOT_A_TONE);
+		detect_tones();
+	}
 
 	bool has_croak(void);
 	enum tone what_to_croak(void);
 	enum tone find_tone(const frequency_t frequency);
+	void detect_tones(void);
 
 private:
+	enum tone first_harmonic(void);
+	enum tone second_harmonic(void);
+
 	bool has_harmonics(struct peak &base);
+	// Array of frequencies and their amplitudes
 	peak_array_t &peaks;
+	// Array of detected tones.
+	std::array<enum tone, max_detected_tones> detected_tones;
 };
 

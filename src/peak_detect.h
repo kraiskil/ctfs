@@ -33,6 +33,7 @@ public:
 	/* Get the center frequency of bin. NOT the center frequency
 	 * of a peak */
 	virtual frequency_t bin_frequency(uint16_t frequency_bin) const;
+	virtual frequency_t bin_frequency(float frequency_bin) const;
 	/* calculate the peak frequency of the peak with maximum at
 	 * the given bin. This does inerpolation. */
 	virtual struct peak peak_at(uint16_t frequency_bin) const;
