@@ -32,3 +32,5 @@ uint32_t wallclock_time_us(void);
 
 void print_statistics(void);
 
+float get_input_frequency_correction(void);
+

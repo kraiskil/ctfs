@@ -28,3 +28,8 @@ uint32_t wallclock_time_us(void)
 	return 0;
 }
 
+float get_input_frequency_correction(void)
+{
+	return 1.0;
+}
+

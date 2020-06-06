@@ -29,7 +29,7 @@ int main(void)
 
 	the_fft.fs = config_fs_input;
 	the_fft.fft_size = abuf.size();
-	ft.frequency_correction = board_input_frequency_correction;
+	ft.frequency_correction = get_input_frequency_correction();
 
 	while (1) {
 		listen_for_croaks(abuf);

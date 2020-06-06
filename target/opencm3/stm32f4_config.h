@@ -41,7 +41,11 @@ extern "C" {
 #include "treefrog.h"
 
 /* Correction term for the audio clock running a bit slow */
-constexpr float board_input_frequency_correction = 1.024;
+constexpr float frequency_correction = 1.024;
+float get_input_frequency_correction(void)
+{
+	return frequency_correction;
+}
 
 struct led
 {

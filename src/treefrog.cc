@@ -33,17 +33,18 @@ bool should_I_croak(listen_buf_t &buffer)
 	debug_led_on(LED_PROCESSING);
 	frequency_buf_t            out;
 	peak_array_t               peaks;
-	peak_detect                ft(buffer, out, peaks);
+	peak_detect                pd(buffer, out, peaks);
 	fft<fft_internal_datatype> the_fft;
 	the_fft.fs = config_fs_input;
 	the_fft.fft_size = buffer.size();
+	pd.frequency_correction = get_input_frequency_correction();
 
 	the_fft.dc_blocker(buffer);
 	the_fft.run(buffer, out);
-	ft.find_peaks();
+	pd.find_peaks();
 
 	uint16_t harmonics[3];
-	find_harmonics(ft, harmonics);
+	find_harmonics(pd, harmonics);
 
 	debug_led_off(LED_PROCESSING);
 	if (harmonics[0] > 200)

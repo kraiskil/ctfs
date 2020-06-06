@@ -106,7 +106,7 @@ void play_croak(void)
 
 
 	for (int i = 0; i < croak_samples; i++) {
-		croak_sound[i] = get_croak_data(i, A3);
+		croak_sound[i] = get_croak_data(i, C4);
 	}
 
 	pa_simple_write(pas, croak_sound, sizeof(croak_sound), NULL);

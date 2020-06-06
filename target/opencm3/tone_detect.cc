@@ -24,27 +24,28 @@ int main(void)
 	listen_buf_t    abuf;
 	frequency_buf_t fbuf;
 	peak_array_t    pbuf;
-	peak_detect     ft(abuf, fbuf, pbuf);
+	peak_detect     pd(abuf, fbuf, pbuf);
 	fft<float>      the_fft;
 
 	the_fft.fs = config_fs_input;
 	the_fft.fft_size = abuf.size();
+	pd.frequency_correction = get_input_frequency_correction();
 
 	while (1) {
 		listen_for_croaks(abuf);
 		the_fft.dc_blocker(abuf);
 		the_fft.run(abuf, fbuf);
 		the_fft.noise_filter(fbuf, 100); // 100Hz seems to be a good choice for Spanish towns.
-		ft.find_peaks();
+		pd.find_peaks();
 
 		printf("Peaks:\n");
-		for (unsigned i = 0; i < ft.get_num_peaks(); i++) {
-			if ((uint16_t)ft.bin_frequency(ft.get_peak_by_val(i).bin) > 5000)
+		for (unsigned i = 0; i < pd.get_num_peaks(); i++) {
+			if ((uint16_t)pd.bin_frequency(pd.get_peak_by_val(i).bin) > 5000)
 				continue;
 			printf("%f Hz (bin %d) - ampl: %d\n",
-			    (float)ft.bin_frequency(ft.get_peak_by_val(i).bin),
-			    ft.get_peak_by_val(i).bin,
-			    ft.get_peak_by_val(i).val);
+			    (float)pd.bin_frequency(pd.get_peak_by_val(i).bin),
+			    pd.get_peak_by_val(i).bin,
+			    pd.get_peak_by_val(i).val);
 		}
 		printf("================\n\n");
 
