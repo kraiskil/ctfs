@@ -4,18 +4,17 @@ if( NOT OPENCM3_DIR )
  and point to the build/install directory of libopencm3")
 endif()
 
-if( ${CMAKE_OPENCM3_TARGET} STREQUAL stm32f4)
+if(${CMAKE_BOARD} STREQUAL stm32f4_disco)
 	set(OPENCM3_TARGET "STM32F4")
 	set(OPENCM3_LIB "opencm3_stm32f4")
 	set(LINKERFILE stm32f4-discovery.ld)
 	set(OPENOCD_OPTIONS -f interface/stlink-v2.cfg -f target/stm32f4x.cfg)
-elseif( ${CMAKE_OPENCM3_TARGET} STREQUAL stm32f0)
-	set(OPENCM3_TARGET "STM32F0")
-	set(OPENCM3_LIB "opencm3_stm32f0")
-	set(LINKERFILE stm32f0-discovery.ld)
-	set(OPENOCD_OPTIONS -f interface/stlink-v2.cfg -f target/stm32f0x.cfg)
+elseif(${CMAKE_BOARD} STREQUAL stm32f4_bluepill)
+	set(OPENCM3_TARGET "STM32F4")
+	set(OPENCM3_LIB "opencm3_stm32f4")
+	set(LINKERFILE stm32f4-bluepill.ld)
 else()
-	message( FATAL_ERROR "set CMAKE_OPENCM3_TARGET in your toolchain")
+	message( FATAL_ERROR "set CMAKE_BOARD in your toolchain")
 endif()
 
 
@@ -46,11 +45,23 @@ function(build_target target_name)
 			-L${OPENCM3_DIR}/lib
 			-nostartfiles
 		)
-	add_custom_target(
-		flash_${target_name}
-		DEPENDS ${target_name}
-		COMMAND openocd ${OPENOCD_OPTIONS} -c \"program ${target_name} verify reset exit\"
-		)
+	if("${CMAKE_FLASH}" STREQUAL "openocd")
+		add_custom_target(
+			flash_${target_name}
+			DEPENDS ${target_name}
+			COMMAND openocd ${OPENOCD_OPTIONS} -c \"program ${target_name} verify reset exit\"
+			)
+	elseif("${CMAKE_FLASH}" STREQUAL "dfu")
+		add_custom_target(
+			flash_${target_name}
+			DEPENDS ${target_name}
+			COMMAND arm-none-eabi-objcopy -O binary ${target_name} ${target_name}.bin
+			COMMAND dfu-tool convert raw ${target_name}.bin ${target_name}.dfu
+			COMMAND dfu-util -a 0 -s 0x08000000 -D ${target_name}.dfu
+			)
+	else()
+		message(FATAL_ERROR "Select flashing method by setting CMAKE_FLASH")
+	endif()
 
 endfunction()
 

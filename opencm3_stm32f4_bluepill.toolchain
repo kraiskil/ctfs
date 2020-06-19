@@ -10,5 +10,6 @@ set(CMAKE_CROSSCOMPILING 1)
 set(CMAKE_C_FLAGS "--specs=nosys.specs -Wall -Werror -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 -DNDEBUG")
 set(CMAKE_CXX_FLAGS "--specs=nosys.specs -Wall -Werror -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 -DNDEBUG")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-exceptions -fno-rtti")
-set(CMAKE_OPENCM3_TARGET "stm32f4")
+set(CMAKE_BOARD "stm32f4_bluepill")
+set(CMAKE_FLASH "dfu")
 
