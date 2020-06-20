@@ -5,16 +5,6 @@
 
 void listen_for_croaks(listen_buf_t &buffer);
 
-extern "C" {
-int _write(int file, char *buf, int len)
-{
-	int i;
-	for (i = 0; i < len; i++)
-		usart_send_blocking(USART2, buf[i]);
-	return i;
-}
-}
-
 int main(void)
 {
 	board_setup_clock();

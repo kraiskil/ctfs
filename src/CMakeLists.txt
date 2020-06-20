@@ -14,3 +14,7 @@ target_include_directories(libtreefrog
 	PUBLIC
 		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
 	)
+
+add_library(main_croak_only OBJECT
+	main_croak_only.cc)
+

@@ -31,6 +31,8 @@ function(build_target target_name)
 	add_executable( ${target_name}
 		${target_name}.cc
 		io.cc
+		opencm3.cc
+		stm32f4_discovery.cc
 	)
 	target_link_libraries(${target_name} libtreefrog ${OPENCM3_LIB})
 	target_compile_options(${target_name}
@@ -62,14 +64,57 @@ function(build_target target_name)
 	else()
 		message(FATAL_ERROR "Select flashing method by setting CMAKE_FLASH")
 	endif()
+endfunction()
+
+# Main building rules - common for all the targets.
+function(build_link_target target_name)
+	add_executable( ${target_name}
+		io.cc
+		opencm3.cc
+		stm32f4_discovery.cc
+	)
+	target_link_libraries(${target_name} libtreefrog ${OPENCM3_LIB} main_${target_name})
+	target_compile_options(${target_name}
+		PRIVATE
+			-D${OPENCM3_TARGET}
+			-I/home/kraiskil/stuff/libopencm3/include
+			-Wno-unused-function
+		)
+	target_link_options(${target_name}
+		PRIVATE 
+			-T${CMAKE_CURRENT_SOURCE_DIR}/${LINKERFILE}
+			-L${CMAKE_CURRENT_SOURCE_DIR}
+			-L${OPENCM3_DIR}/lib
+			-nostartfiles
+		)
+	if("${CMAKE_FLASH}" STREQUAL "openocd")
+		add_custom_target(
+			flash_${target_name}
+			DEPENDS ${target_name}
+			COMMAND openocd ${OPENOCD_OPTIONS} -c \"program ${target_name} verify reset exit\"
+			)
+	elseif("${CMAKE_FLASH}" STREQUAL "dfu")
+		add_custom_target(
+			flash_${target_name}
+			DEPENDS ${target_name}
+			COMMAND arm-none-eabi-objcopy -O binary ${target_name} ${target_name}.bin
+			COMMAND dfu-tool convert raw ${target_name}.bin ${target_name}.dfu
+			COMMAND dfu-util -a 0 -s 0x08000000 -D ${target_name}.dfu
+			)
+	else()
+		message(FATAL_ERROR "Select flashing method by setting CMAKE_FLASH")
+	endif()
 
 endfunction()
+
+
 
 build_target( main )
 build_target( mic_recorder )
 build_target( fft_record )
 build_target( peak_detect )
 build_target( tone_detect )
+build_link_target( croak_only )
 
 ## Print some memory usage statistics.
 add_custom_command(
