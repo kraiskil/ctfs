@@ -5,7 +5,7 @@ add_library(libtreefrog STATIC
 	fft_float.cc
 	harmonics.cc
 	peak_detect.cc
-	treefrog.cc
+	treefrog_lib.cc
 	tones.cc
 	sin_table.cc
 	sin_table_float.cc
@@ -18,3 +18,5 @@ target_include_directories(libtreefrog
 add_library(main_croak_only OBJECT
 	main_croak_only.cc)
 
+add_library(main_treefrog OBJECT
+	treefrog.cc)
