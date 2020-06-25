@@ -60,13 +60,11 @@ struct led leds[LED_LAST] = {
 
 void board_setup_clock(void)
 {
-#if 0
 	rcc_clock_setup_pll(&rcc_hsi_configs[RCC_CLOCK_3V3_84MHZ]);
 
 	rcc_osc_on(RCC_PLLI2S);
 	rcc_periph_clock_enable(RCC_SPI1); //input i2s
 	rcc_periph_clock_enable(RCC_SPI2); //output i2s
-#endif
 }
 
 void board_setup_gpio(void)
@@ -191,12 +189,12 @@ uint32_t wallclock_time_us(void)
 
 void audioDAC_shutdown(void)
 {
-	gpio_set(GPIOA, GPIO9);
+	gpio_clear(GPIOA, GPIO9);
 }
 void audioDAC_setup(void)
 {
 	// No setup needed. Except perhaps release softmute, if we end up using it
-	gpio_clear(GPIOA, GPIO9);
+	gpio_set(GPIOA, GPIO9);
 }
 
 void i2s_playback_setup(void)
