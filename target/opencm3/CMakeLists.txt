@@ -7,16 +7,19 @@ endif()
 if(${CMAKE_BOARD} STREQUAL stm32f4_disco)
 	set(OPENCM3_TARGET "STM32F4")
 	set(OPENCM3_LIB "opencm3_stm32f4")
+	set(BOARD_SUPPORT_FILE "stm32f4_discovery.cc")
 	set(LINKERFILE stm32f4-discovery.ld)
 	set(OPENOCD_OPTIONS -f interface/stlink-v2.cfg -f target/stm32f4x.cfg)
 elseif(${CMAKE_BOARD} STREQUAL stm32f4_bluepill)
 	set(OPENCM3_TARGET "STM32F4")
 	set(OPENCM3_LIB "opencm3_stm32f4")
+	set(BOARD_SUPPORT_FILE "stm32f4_bluepill.cc")
 	set(LINKERFILE stm32f4-bluepill.ld)
 else()
 	message( FATAL_ERROR "set CMAKE_BOARD in your toolchain")
 endif()
 
+add_definitions(-DBOARD="${CMAKE_BOARD}")
 
 #Custom target with insane memories. Just to make target link:
 # GCC produces much nicer statistics after linking on  e.g. why
@@ -32,7 +35,7 @@ function(build_target target_name)
 		${target_name}.cc
 		io.cc
 		opencm3.cc
-		stm32f4_discovery.cc
+		${BOARD_SUPPORT_FILE}
 	)
 	target_link_libraries(${target_name} libtreefrog ${OPENCM3_LIB})
 	common_build_target(${target_name})
@@ -43,7 +46,7 @@ function(build_link_target target_name)
 	add_executable( ${target_name}
 		io.cc
 		opencm3.cc
-		stm32f4_discovery.cc
+		${BOARD_SUPPORT_FILE}
 	)
 	target_link_libraries(${target_name} libtreefrog ${OPENCM3_LIB} main_${target_name})
 	common_build_target(${target_name})

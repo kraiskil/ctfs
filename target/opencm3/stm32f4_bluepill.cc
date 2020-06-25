@@ -1,29 +1,28 @@
 /* board configuration for
- * STM32F4 Discovery MB1115
- * (the one with a STM32F411VET6U)
- *
+ * a bluepill, bluepill2 or blackpill, with
+ * STM32F407CC. Yeah, I'm not quite sure what I've
+ * bought, but it was cheap, and the vendor swore the
+ * board has a genuine ST chip on it. Sure looks like it does.
+ * Some sources claim the board is open hardware, but documentation
+ * is limited to a .png with pin explanations. The board has pin
+ * names on the silk - and these can be matched with the MCU datasheet.
+
  * Connections:
- *  USART (USART1):
- *   PA2 - USART Rx (i.e. towards host)
  *  Sound out (SPI3):
- *   PC7 - master clock
- *   PC10- bit clock
- *   PC12- data
- *   PA4 - l/r clock
- *   PD4 - DAC reset
- *  I2C (I2C1):
- *   PB6 - SCL
- *   PB9 - SDA
- *  Sound in (SPI2):
- *   PA3 - master clock
- *   PB13- bit clock
- *   PC3- data
- *   PB12- l/r clock
+ *   ? - master clock
+ *   ?- bit clock
+ *   ?- data
+ *   ? - l/r clock
+ *   ? - DAC reset (leftover from disco - my bluepill will be connected to a PCM5102)
+ *  Sound in (SPI N):
+ *   ? - master clock
+ *   ?- bit clock
+ *   ?- data
+ *   ?- l/r clock
  * LEDS:
- *   PD12- croak (green)
- *   PD13- orange
- *   PD14- sleep (red)
- *   PD15- processing (blue)
+ *   ? - croak
+ *   ? - sleep
+ *   PC13- processing
  *
  */
 
@@ -39,7 +38,13 @@ extern "C" {
 }
 #include "treefrog.h"
 
+#define I2S_MICROPHONE I2S1_EXT_BASE
+#define I2S_OUT SPI2
+
+
+
 /* Correction term for the audio clock running a bit slow */
+/* TODO: Check - leftover from disco */
 constexpr float frequency_correction = 1.024;
 float get_input_frequency_correction(void)
 {
@@ -53,10 +58,10 @@ struct led
 };
 struct led leds[LED_LAST] = {
 	{
-		GPIOD, GPIO12
+		GPIOC, GPIO13
 	},                 //croak
-	{ GPIOD, GPIO14 }, //sleep
-	{ GPIOD, GPIO15 }, //processing
+	{ GPIOC, GPIO12 }, //sleep
+	{ GPIOC, GPIO11 }, //processing
 };
 void debug_led_on(enum led_ids i)
 {
@@ -68,33 +73,24 @@ void debug_led_off(enum led_ids i)
 }
 
 
-#define I2S_MICROPHONE I2S2_EXT_BASE
-#define I2S_SPEAKER    I2S3_EXT_BASE
-#define I2C_SPEAKER    I2C1
-
-
 void board_setup_clock(void)
 {
+#if 0
 	rcc_clock_setup_pll(&rcc_hsi_configs[RCC_CLOCK_3V3_84MHZ]);
 
 	rcc_osc_on(RCC_PLLI2S);
-	rcc_periph_clock_enable(RCC_SPI2); //input i2s
-	rcc_periph_clock_enable(RCC_SPI3); //output i2s
-
+	rcc_periph_clock_enable(RCC_SPI1); //input i2s
+	rcc_periph_clock_enable(RCC_SPI2); //output i2s
+#endif
 }
 
 void board_setup_gpio(void)
 {
 	/* PortA is used for:
-	 *  USART
-	 *  Digital audio in
 	 * PortB:
-	 *  DAC I2C
-	 *  Digital audio in
 	 * PortC is used for:
-	 *  Digital audio out
+	 *  LED
 	 * PortD is used for:
-	 *  Heartbeat LED
 	 */
 	rcc_periph_clock_enable(RCC_GPIOA);
 	rcc_periph_clock_enable(RCC_GPIOB);
@@ -106,36 +102,24 @@ void board_setup_gpio(void)
 		gpio_mode_setup(leds[id].port, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, leds[id].pin);
 	}
 
-	/* I2C to Audio chip */
-	gpio_mode_setup(GPIOB, GPIO_MODE_AF, GPIO_PUPD_PULLUP, GPIO6); //SCL
-	gpio_mode_setup(GPIOB, GPIO_MODE_AF, GPIO_PUPD_PULLUP, GPIO9); //SDA
-	gpio_set_af(GPIOB, GPIO_AF4, GPIO6);
-	gpio_set_af(GPIOB, GPIO_AF4, GPIO9);
-	gpio_set_output_options(GPIOB, GPIO_OTYPE_OD, GPIO_OSPEED_25MHZ, GPIO6);
-	gpio_set_output_options(GPIOB, GPIO_OTYPE_OD, GPIO_OSPEED_25MHZ, GPIO9);
-
+	debug_led_off(LED_CROAK);
+#if 0
 	/* Connects PA2 to USART2 TX */
 	gpio_mode_setup(GPIOA, GPIO_MODE_AF, GPIO_PUPD_NONE, GPIO2);
 	gpio_set_af(GPIOA, GPIO_AF7, GPIO2);
 
 	gpio_mode_setup(GPIOD, GPIO_MODE_OUTPUT, GPIO_PUPD_PULLDOWN, GPIO4); //Audio chip !RESET
+#endif
 }
 
 void board_setup_i2c(void)
 {
-	// CCR must be configured when device is disabled
-	rcc_periph_clock_enable(RCC_I2C1);
-	i2c_peripheral_disable(I2C1);
-	i2c_set_speed(I2C1, i2c_speed_sm_100k, 42);
-	i2c_set_own_7bit_slave_address(I2C1, 0); // For OAR1 bit 14
-	/* TODO: what is this?? */
-	int *addy = (int*)0x4000541c;
-	*addy = 0x834;
-	i2c_peripheral_enable(I2C1);
+	// No I2C: the bluepill is used with PCM5102A.
 }
 
 void board_setup_usart(void)
 {
+#if 0
 	rcc_periph_clock_enable(RCC_USART2);
 
 	usart_set_baudrate(USART2, 115200);
@@ -145,10 +129,13 @@ void board_setup_usart(void)
 	usart_set_parity(USART2, USART_PARITY_NONE);
 	usart_set_flow_control(USART2, USART_FLOWCONTROL_NONE);
 	usart_enable(USART2);
+#endif
 }
 
 void board_setup_i2s_in(void)
 {
+// Start with I2S communications to audio DAC
+#if 0
 	/* I2S pins:
 	 * Master clock: PA3
 	 * Bit clock: PB13
@@ -189,6 +176,7 @@ void board_setup_i2s_in(void)
 	 */
 	i2s_set_clockdiv(SPI2, 15, 1);
 	i2s_enable(SPI2);
+#endif
 }
 
 void board_setup_wallclock(void)
@@ -216,79 +204,68 @@ uint32_t wallclock_time_us(void)
 	return timer_get_counter(TIM2);
 }
 
-void write_i2c_to_audiochip(uint8_t reg, uint8_t contents)
-{
-	uint8_t packet[2];
-	packet[0] = reg;
-	packet[1] = contents;
-	/* STM32F411 gives device address with R/W bit,
-	 * libopencm wants it without it */
-	uint8_t address = (0x94) >> 1;
-
-	i2c_transfer7(I2C1, address, packet, 2, NULL, 0);
-}
-
 void audioDAC_shutdown(void)
 {
-	// TODO: does this clear all register settings?
-	// there is an alternative to power down the chip internally too
-	// this way audioDAC_setup() can be split into _init() and _start()
-	gpio_clear(GPIOD, GPIO4);
+	gpio_set(GPIOA, GPIO9);
 }
 void audioDAC_setup(void)
 {
-	// Set !RESET
-	gpio_set(GPIOD, GPIO4);
-
-	write_i2c_to_audiochip(0x20, 0xc0); // Master A volume
-	write_i2c_to_audiochip(0x21, 0xc0); // Master B volume
-
-	write_i2c_to_audiochip(0x06, 0x04); // interface control 1: set I2S dataformat
-	write_i2c_to_audiochip(0x02, 0x9e); // power control 1: Magic value to power up the chip
+	// No setup needed. Except perhaps release softmute, if we end up using it
+	gpio_clear(GPIOA, GPIO9);
 }
 
 void i2s_playback_setup(void)
 {
-	/* I2S pins:
-	 * Master clock: PC7
-	 * Bit clock: PC10
-	 * Data: PC12
-	 * L/R clock: PA4
+	/* I2S pins - using SPI2:
+	 * Master clock: PC6 - but this is not routed out on the bluepill board.
+	 * Bit clock: PB13
+	 * Data: PB15
+	 * L/R clock: PB12
+	 * FMT - PA8 (drive low for I2S)
+	 * XSMT- PA9 - soft mute (active low)
 	 */
-	gpio_mode_setup(GPIOC, GPIO_MODE_AF, GPIO_PUPD_NONE, GPIO7);
-	gpio_set_af(GPIOC, GPIO_AF6, GPIO7);
-	gpio_mode_setup(GPIOC, GPIO_MODE_AF, GPIO_PUPD_NONE, GPIO10);
-	gpio_set_af(GPIOC, GPIO_AF6, GPIO10);
-	gpio_mode_setup(GPIOC, GPIO_MODE_AF, GPIO_PUPD_NONE, GPIO12);
-	gpio_set_af(GPIOC, GPIO_AF6, GPIO12);
-	gpio_mode_setup(GPIOA, GPIO_MODE_AF, GPIO_PUPD_NONE, GPIO4);
-	gpio_set_af(GPIOA, GPIO_AF6, GPIO4);
+	gpio_mode_setup(GPIOB, GPIO_MODE_AF, GPIO_PUPD_NONE, GPIO13);
+	gpio_set_af(GPIOB, GPIO_AF5, GPIO13);
+	gpio_mode_setup(GPIOB, GPIO_MODE_AF, GPIO_PUPD_NONE, GPIO15);
+	gpio_set_af(GPIOB, GPIO_AF5, GPIO15);
+	gpio_mode_setup(GPIOB, GPIO_MODE_AF, GPIO_PUPD_NONE, GPIO12);
+	gpio_set_af(GPIOB, GPIO_AF5, GPIO12);
+
+	gpio_mode_setup(GPIOA, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, GPIO8);
+	gpio_mode_setup(GPIOA, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, GPIO9);
+	gpio_clear(GPIOA, GPIO8);
+	gpio_clear(GPIOA, GPIO9);
 
 	/* I2S is implemented as a HW mode of the SPI peripheral.
-	* Since this is a STM32F411, there is a separate I2S PLL
-	* that needs to be enabled.
+	* There is a separate I2S PLL that needs to be enabled - but
+	* contents are left at reset values.
 	*/
 	rcc_osc_on(RCC_PLLI2S);
-	rcc_periph_clock_enable(RCC_SPI3);
-	i2s_disable(SPI3);
-	i2s_set_standard(SPI3, i2s_standard_philips);
-	i2s_set_dataformat(SPI3, i2s_dataframe_ch16_data16);
-	i2s_set_mode(SPI3, i2s_mode_master_transmit);
-	i2s_masterclock_enable(SPI3);
+	rcc_periph_clock_enable(RCC_SPI2);
+	i2s_disable(SPI2);
+	i2s_set_standard(SPI2, i2s_standard_philips);
+	i2s_set_dataformat(SPI2, i2s_dataframe_ch32_data16);
+	i2s_set_mode(SPI2, i2s_mode_master_transmit);
+	//i2s_masterclock_enable(SPI2); Don't set this - not routed out
 	/* RCC_PLLI2SCFGR configured values are:
-	 * 0x24003010 i.e.
+	 * 0x24003010 i.e. TODO: CHECK!
 	 * PLLR = 2
 	 * PLLI2SN = 192
 	 * PLLI2SM = 16
-	 * And since the input is PLL source (i.e. HSI = 16MHz)
+	 * And since the input is PLL source (i.e. HSI = 16MHz) TODO: chekc!
 	 * The I2S clock = 16 / 16 * 192 / 2 = 96MHz
+	 *
 	 * Calculate sampling frequency from equation given in
-	 * STM32F411 reference manual:
-	 * Fs = I2Sclk/ (32*2 * ((2*I2SDIV)+ODD)*4)
-	 * I2SDIV = I2Sclk/(512*Fs)
-	 * I2SDIV=24 => 23,4 so 23 + ODD bit set
+	 * STM32F4xx reference manual RM0090:
+	 * (Channel must be 32bits and Fs 16kHz, minimum, for the PCM5102
+	 * to be able to generate clocks without master/system clock input
+	 * see datasheet table 11)
+	 * Fs = I2Sclk/ (32*2 * ((2*I2SDIV)+ODD))
+	 * I2SDIV = I2Sclk/(128*Fs)
+	 * I2SDIV=24 => 46,875 so 46 + ODD bit clear
 	 */
-	i2s_set_clockdiv(SPI3, 23, 1);
-	i2s_enable(SPI3);
+	static_assert(config_fs_output == 16000, "calculated I2S clock divisors with wrong values");
+	i2s_set_clockdiv(SPI2, 46, 0);
+	i2s_enable(SPI2);
 }
 
