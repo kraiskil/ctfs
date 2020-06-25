@@ -1,20 +1,12 @@
 #include "board_config.h"
+#include "opencm3.h"
 
 extern "C" {
+#include "libopencm3/stm32/gpio.h"
 #include "libopencm3/stm32/spi.h"
 #include "libopencm3/stm32/usart.h"
 }
 
-// Target configs that don't fit into the <board>.cc
-// Consider creating and moving these to a <board>.h
-
-#if CMAKE_BOARD == stm32f4_bluepill
-#define I2S_OUT SPI2
-#elif CMAKE_BOARD == stm32f4_discovery
-#define I2S_OUT SPI3
-#else
-#error unknown CMAKE_BOARD
-#endif
 
 
 /* Callback from printf() in libc */
@@ -58,6 +50,23 @@ void play_croak(enum tone t)
 
 	debug_led_off(LED_CROAK);
 }
+
+
+void debug_led_on(enum led_ids i)
+{
+	if (leds[i].reverted)
+		gpio_clear(leds[i].port, leds[i].pin);
+	else
+		gpio_set(leds[i].port, leds[i].pin);
+}
+void debug_led_off(enum led_ids i)
+{
+	if (leds[i].reverted)
+		gpio_set(leds[i].port, leds[i].pin);
+	else
+		gpio_clear(leds[i].port, leds[i].pin);
+}
+
 
 
 void board_init(void)

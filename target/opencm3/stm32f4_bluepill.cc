@@ -37,6 +37,7 @@ extern "C" {
 #include <libopencm3/stm32/usart.h>
 }
 #include "treefrog.h"
+#include "opencm3.h"
 
 #define I2S_MICROPHONE I2S1_EXT_BASE
 #define I2S_OUT SPI2
@@ -51,27 +52,11 @@ float get_input_frequency_correction(void)
 	return frequency_correction;
 }
 
-struct led
-{
-	unsigned port;
-	uint16_t pin;
-};
 struct led leds[LED_LAST] = {
-	{
-		GPIOC, GPIO13
-	},                 //croak
-	{ GPIOC, GPIO12 }, //sleep
-	{ GPIOC, GPIO11 }, //processing
+	{ GPIOC, GPIO13, true },  //croak
+	{ GPIOC, GPIO12, false }, //sleep
+	{ GPIOC, GPIO11, false }, //processing
 };
-void debug_led_on(enum led_ids i)
-{
-	gpio_set(leds[i].port, leds[i].pin);
-}
-void debug_led_off(enum led_ids i)
-{
-	gpio_clear(leds[i].port, leds[i].pin);
-}
-
 
 void board_setup_clock(void)
 {
