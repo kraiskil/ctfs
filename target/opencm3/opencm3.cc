@@ -54,14 +54,14 @@ void play_croak(enum tone t)
 
 void debug_led_on(enum led_ids i)
 {
-	if (leds[i].reverted)
+	if (leds[i].inverted)
 		gpio_clear(leds[i].port, leds[i].pin);
 	else
 		gpio_set(leds[i].port, leds[i].pin);
 }
 void debug_led_off(enum led_ids i)
 {
-	if (leds[i].reverted)
+	if (leds[i].inverted)
 		gpio_set(leds[i].port, leds[i].pin);
 	else
 		gpio_clear(leds[i].port, leds[i].pin);

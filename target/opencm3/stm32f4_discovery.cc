@@ -38,6 +38,7 @@ extern "C" {
 #include <libopencm3/stm32/usart.h>
 }
 #include "treefrog.h"
+#include "opencm3.h"
 
 /* Correction term for the audio clock running a bit slow */
 constexpr float frequency_correction = 1.024;
@@ -46,31 +47,11 @@ float get_input_frequency_correction(void)
 	return frequency_correction;
 }
 
-struct led
-{
-	unsigned port;
-	uint16_t pin;
-};
 struct led leds[LED_LAST] = {
-	{
-		GPIOD, GPIO12
-	},                 //croak
-	{ GPIOD, GPIO14 }, //sleep
-	{ GPIOD, GPIO15 }, //processing
+	{ GPIOD, GPIO12, not_inverted}, //croak
+	{ GPIOD, GPIO14, not_inverted}, //sleep
+	{ GPIOD, GPIO15, not_inverted}, //processing
 };
-void debug_led_on(enum led_ids i)
-{
-	gpio_set(leds[i].port, leds[i].pin);
-}
-void debug_led_off(enum led_ids i)
-{
-	gpio_clear(leds[i].port, leds[i].pin);
-}
-
-
-#define I2S_MICROPHONE I2S2_EXT_BASE
-#define I2S_SPEAKER    I2S3_EXT_BASE
-#define I2C_SPEAKER    I2C1
 
 
 void board_setup_clock(void)

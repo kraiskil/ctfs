@@ -53,9 +53,9 @@ float get_input_frequency_correction(void)
 }
 
 struct led leds[LED_LAST] = {
-	{ GPIOC, GPIO13, true },  //croak
-	{ GPIOC, GPIO12, false }, //sleep
-	{ GPIOC, GPIO11, false }, //processing
+	{ GPIOC, GPIO13, inverted },     //croak
+	{ GPIOC, GPIO12, not_inverted }, //sleep
+	{ GPIOC, GPIO11, not_inverted }, //processing
 };
 
 void board_setup_clock(void)
