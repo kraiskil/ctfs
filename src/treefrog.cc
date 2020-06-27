@@ -1,5 +1,5 @@
 #include "treefrog.h"
-#include "board_config.h"
+#include "target_adaptation_api.h"
 
 int main(void)
 {

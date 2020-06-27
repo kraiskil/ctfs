@@ -1,6 +1,5 @@
 #include "treefrog.h"
 
-
 /* Generic API */
 
 /* Correction term for the input audio clock.

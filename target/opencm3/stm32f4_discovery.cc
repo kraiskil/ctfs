@@ -221,8 +221,8 @@ void audioDAC_setup(void)
 	// Set !RESET
 	gpio_set(GPIOD, GPIO4);
 
-	write_i2c_to_audiochip(0x20, 0xc0); // Master A volume
-	write_i2c_to_audiochip(0x21, 0xc0); // Master B volume
+	write_i2c_to_audiochip(0x20, dac_volume); // Master A volume
+	write_i2c_to_audiochip(0x21, dac_volume); // Master B volume
 
 	write_i2c_to_audiochip(0x06, 0x04); // interface control 1: set I2S dataformat
 	write_i2c_to_audiochip(0x02, 0x9e); // power control 1: Magic value to power up the chip

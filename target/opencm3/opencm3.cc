@@ -1,4 +1,5 @@
 #include "board_config.h"
+#include "target_adaptation_api.h"
 #include "opencm3.h"
 
 extern "C" {

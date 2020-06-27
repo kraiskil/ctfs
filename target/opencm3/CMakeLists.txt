@@ -19,7 +19,7 @@ else()
 	message( FATAL_ERROR "set CMAKE_BOARD in your toolchain")
 endif()
 
-add_definitions(-DBOARD="${CMAKE_BOARD}")
+include_directories(".")
 
 #Custom target with insane memories. Just to make target link:
 # GCC produces much nicer statistics after linking on  e.g. why

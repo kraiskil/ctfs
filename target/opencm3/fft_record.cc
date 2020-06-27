@@ -1,6 +1,7 @@
 #include "board_config.h"
 #include "datatype.h"
 #include "peak_detect.h"
+#include "target_adaptation_api.h"
 #include <cstdio>
 
 void listen_for_croaks(listen_buf_t &buffer);

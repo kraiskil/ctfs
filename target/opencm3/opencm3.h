@@ -1,16 +1,6 @@
 #pragma once
-
-// Target configs that don't fit into the <board>.cc
-// Consider creating and moving these to a <board>.h
-
-#if CMAKE_BOARD == stm32f4_bluepill
-#define I2S_OUT SPI2
-#elif CMAKE_BOARD == stm32f4_discovery
-#define I2S_OUT SPI3
-#else
-#error unknown CMAKE_BOARD
-#endif
-
+#include <cstdint>
+#include "treefrog.h"
 
 typedef bool led_polarity;
 constexpr led_polarity inverted = true;

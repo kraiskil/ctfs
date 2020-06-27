@@ -12,12 +12,15 @@ set (CMAKE_C_STANDARD 99)
 
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DHAVE_DEBUG_MEASUREMENTS")
 
-add_subdirectory(src)
 if("${CMAKE_SYSTEM_NAME}" STREQUAL Linux)
 	add_subdirectory(target/linux)
+	include_directories(target/linux)
 elseif("${CMAKE_SYSTEM_NAME}" STREQUAL Generic)
 	add_subdirectory(target/opencm3)
+	include_directories(target/opencm3)
 endif()
+
+add_subdirectory(src)
 
 #TODO: a Real Professional (TM) would have the tests running on host even when cross compiling :)
 if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux" )

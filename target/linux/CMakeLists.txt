@@ -1,3 +1,5 @@
+include_directories(".")
+
 add_executable(treefrog_pulse
 	io_pulse.cc
 	posix.cc
