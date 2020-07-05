@@ -3,6 +3,7 @@
 #include "opencm3.h"
 
 extern "C" {
+#include "libopencm3/cm3/itm.h"
 #include "libopencm3/stm32/gpio.h"
 #include "libopencm3/stm32/spi.h"
 #include "libopencm3/stm32/usart.h"
@@ -16,8 +17,13 @@ int _write(int file, char *buf, int len)
 {
 	int i;
 	for (i = 0; i < len; i++) {
-#if HAVE_DEBUG_USART
+#if defined HAVE_DEBUG_USART
 		usart_send_blocking(USART2, buf[i]);
+#elif defined HAVE_DEBUG_SWO
+		while (ITM_STIM32(0) == 0) {
+			;
+		}
+		ITM_STIM8(0) = buf[i];
 #endif
 	}
 	return i;

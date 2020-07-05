@@ -9,3 +9,5 @@ constexpr int config_fs_input = 8000;
 // value for DAC volume registers
 constexpr uint8_t dac_volume = 0xf0;
 
+#define HAVE_DEBUG_SWO
+
