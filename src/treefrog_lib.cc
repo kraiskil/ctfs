@@ -16,7 +16,9 @@ void treefrog(void)
 		wallclock_start();
 		listen_for_croaks(buffer);
 
+		debug_led_on(LED_PROCESSING);
 		enum tone croak = what_to_croak(buffer);
+		debug_led_off(LED_PROCESSING);
 		#ifdef HAVE_DEBUG_MEASUREMENTS
 		total_execution_time = wallclock_time_us();
 		#endif
@@ -31,7 +33,6 @@ void treefrog(void)
 
 static enum tone what_to_croak(listen_buf_t &buffer)
 {
-	debug_led_on(LED_PROCESSING);
 	frequency_buf_t            out;
 	peak_array_t               peaks;
 	peak_detect                pd(buffer, out, peaks);

@@ -39,23 +39,19 @@ extern "C" {
 #include "treefrog.h"
 #include "opencm3.h"
 
-#define I2S_MICROPHONE I2S1_EXT_BASE
-#define I2S_OUT SPI2
 
-
-
-/* Correction term for the audio clock running a bit slow */
-/* TODO: Check - leftover from disco */
-constexpr float frequency_correction = 1.024;
+/* Correction term for the audio clock running a bit fast */
+constexpr float frequency_correction = 0.996;
 float get_input_frequency_correction(void)
 {
 	return frequency_correction;
 }
 
+//NB: the onboard LED is PC13
 struct led leds[LED_LAST] = {
 	{ GPIOC, GPIO13, inverted },     //croak
 	{ GPIOC, GPIO12, not_inverted }, //sleep
-	{ GPIOC, GPIO11, not_inverted }, //processing
+	{ GPIOC, GPIO11, inverted }, //processing
 };
 
 void board_setup_clock(void)
@@ -63,13 +59,14 @@ void board_setup_clock(void)
 	rcc_clock_setup_pll(&rcc_hsi_configs[RCC_CLOCK_3V3_84MHZ]);
 
 	rcc_osc_on(RCC_PLLI2S);
-	rcc_periph_clock_enable(RCC_SPI1); //input i2s
+	rcc_periph_clock_enable(RCC_SPI3); //input i2s
 	rcc_periph_clock_enable(RCC_SPI2); //output i2s
 }
 
 void board_setup_gpio(void)
 {
 	/* PortA is used for:
+	 * I2S input
 	 * PortB:
 	 * PortC is used for:
 	 *  LED
@@ -86,13 +83,6 @@ void board_setup_gpio(void)
 	}
 
 	debug_led_off(LED_CROAK);
-#if 0
-	/* Connects PA2 to USART2 TX */
-	gpio_mode_setup(GPIOA, GPIO_MODE_AF, GPIO_PUPD_NONE, GPIO2);
-	gpio_set_af(GPIOA, GPIO_AF7, GPIO2);
-
-	gpio_mode_setup(GPIOD, GPIO_MODE_OUTPUT, GPIO_PUPD_PULLDOWN, GPIO4); //Audio chip !RESET
-#endif
 }
 
 void board_setup_i2c(void)
@@ -117,39 +107,40 @@ void board_setup_usart(void)
 
 void board_setup_i2s_in(void)
 {
-// Start with I2S communications to audio DAC
-#if 0
-	/* I2S pins:
-	 * Master clock: PA3
-	 * Bit clock: PB13
-	 * Data in: PC3
-	 * L/R clock: PB12
+	/* Using SPI3.
+	 * This means the SWO and bit clock are mapped to the same pin (PB3)
+	 * can use only one at a time. SPI1 can't be used for mic - it lacks I2S.
+	 * I2S pins:
+	 * Master clock: - not enabled
+	 * Bit clock: PB3
+	 * Data in: PB5
+	 * L/R clock: PA4
+	 * SEL: PA3
 	 */
-	gpio_mode_setup(GPIOA, GPIO_MODE_AF, GPIO_PUPD_PULLDOWN, GPIO3);
-	gpio_set_af(GPIOA, GPIO_AF5, GPIO3);
-	gpio_mode_setup(GPIOB, GPIO_MODE_AF, GPIO_PUPD_NONE, GPIO13);
-	gpio_set_af(GPIOB, GPIO_AF5, GPIO13);
+	gpio_mode_setup(GPIOB, GPIO_MODE_AF, GPIO_PUPD_PULLDOWN, GPIO3);
+	gpio_set_af(GPIOB, GPIO_AF6, GPIO3);
+	gpio_mode_setup(GPIOB, GPIO_MODE_AF, GPIO_PUPD_PULLDOWN, GPIO5);
+	gpio_set_af(GPIOB, GPIO_AF6, GPIO5);
+	gpio_mode_setup(GPIOA, GPIO_MODE_AF, GPIO_PUPD_PULLDOWN, GPIO4);
+	gpio_set_af(GPIOA, GPIO_AF6, GPIO4);
 
-	gpio_mode_setup(GPIOC, GPIO_MODE_AF, GPIO_PUPD_PULLDOWN, GPIO3);
-	gpio_set_af(GPIOC, GPIO_AF5, GPIO3);
-
-	gpio_mode_setup(GPIOB, GPIO_MODE_AF, GPIO_PUPD_NONE, GPIO12);
-	gpio_set_af(GPIOB, GPIO_AF5, GPIO12);
+	gpio_mode_setup(GPIOA, GPIO_MODE_OUTPUT, GPIO_PUPD_PULLDOWN, GPIO3);
+	gpio_clear(GPIOA, GPIO3);
 
 	/* I2S is implemented as a HW mode of the SPI peripheral.
 	* Since this is a STM32F411, there is a separate I2S PLL
 	* that needs to be enabled.
 	*/
-	i2s_disable(SPI2);
-	i2s_set_standard(SPI2, i2s_standard_philips);
-	i2s_set_dataformat(SPI2, i2s_dataframe_ch32_data24);
-	i2s_set_mode(SPI2, i2s_mode_master_receive);
-	/* RCC_PLLI2SCFGR configured values are:
+	i2s_disable(SPI3);
+	i2s_set_standard(SPI3, i2s_standard_philips);
+	i2s_set_dataformat(SPI3, i2s_dataframe_ch32_data24);
+	i2s_set_mode(SPI3, i2s_mode_master_receive);
+	/* RCC_PLLI2SCFGR configured values are: (TODO: CHECK!)
 	 * 0x24003010 i.e.
 	 * PLLR = 2
 	 * PLLI2SN = 192
 	 * PLLI2SM = 16
-	 * And since the input is PLL source (i.e. HSI = 16MHz)
+	 * And since the input is PLL source (i.e. HSI = 16MHz) (TODO: check!)
 	 * The I2S clock = 16 / 16 * 192 / 2 = 96MHz
 	 * Calculate sampling frequency from equation given in
 	 * STM32F411 reference manual:
@@ -157,9 +148,8 @@ void board_setup_i2s_in(void)
 	 * I2SDIV = I2Sclk/(128*Fs)
 	 * Fs=48kHz => 15,624 so 15 + ODD bit set
 	 */
-	i2s_set_clockdiv(SPI2, 15, 1);
-	i2s_enable(SPI2);
-#endif
+	i2s_set_clockdiv(SPI3, 15, 1);
+	i2s_enable(SPI3);
 }
 
 void board_setup_wallclock(void)

@@ -1,3 +1,4 @@
+#include "board_config.h"
 #include "config.h"
 #include "datatype.h"
 #include <cstdio>
@@ -15,7 +16,7 @@ extern "C" {
 static int16_t read_sample(void)
 {
 	uint8_t channel;
-	int32_t data = i2s_read32(SPI2, &channel);
+	int32_t data = i2s_read32(I2S_IN, &channel);
 	if (channel == SKIP_CHANNEL)
 		return read_sample();
 	else
