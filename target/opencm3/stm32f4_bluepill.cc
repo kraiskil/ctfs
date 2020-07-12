@@ -8,21 +8,23 @@
  * names on the silk - and these can be matched with the MCU datasheet.
 
  * Connections:
- *  Sound out (SPI3):
- *   ? - master clock
- *   ?- bit clock
- *   ?- data
- *   ? - l/r clock
- *   ? - DAC reset (leftover from disco - my bluepill will be connected to a PCM5102)
- *  Sound in (SPI N):
- *   ? - master clock
- *   ?- bit clock
- *   ?- data
- *   ?- l/r clock
+ *  Sound out (SPI2):
+ *   NA - master clock
+ *   PB13- bit clock
+ *   PB15- data
+ *   PB12 - l/r clock
+ *   FMT - PA8 (TODO: hard-connect low when there is a custom PCB)
+ *   XSMT- PA9 - soft mute (active low)
+ *  Sound in (SPI3):
+ *   PB3- bit clock
+ *   PB5- data
+ *   PA4- l/r clock
+ * USART
+ *   PB6 - TX
  * LEDS:
- *   ? - croak
+ *   PC13 - croak
  *   ? - sleep
- *   PC13- processing
+ *   ? - processing
  *
  */
 
@@ -92,17 +94,19 @@ void board_setup_i2c(void)
 
 void board_setup_usart(void)
 {
-#if 0
-	rcc_periph_clock_enable(RCC_USART2);
+	/* USART1 output on PB6 */
+	static_assert(DEBUG_USART == USART1, "wrong rcc initialization");
+	rcc_periph_clock_enable(RCC_USART1);
+	gpio_mode_setup(GPIOB, GPIO_MODE_AF, GPIO_PUPD_PULLDOWN, GPIO6);
+	gpio_set_af(GPIOB, GPIO_AF7, GPIO6);
 
-	usart_set_baudrate(USART2, 115200);
-	usart_set_databits(USART2, 8);
-	usart_set_stopbits(USART2, USART_STOPBITS_1);
-	usart_set_mode(USART2, USART_MODE_TX);
-	usart_set_parity(USART2, USART_PARITY_NONE);
-	usart_set_flow_control(USART2, USART_FLOWCONTROL_NONE);
-	usart_enable(USART2);
-#endif
+	usart_set_baudrate(DEBUG_USART, 115200);
+	usart_set_databits(DEBUG_USART, 8);
+	usart_set_stopbits(DEBUG_USART, USART_STOPBITS_1);
+	usart_set_mode(DEBUG_USART, USART_MODE_TX);
+	usart_set_parity(DEBUG_USART, USART_PARITY_NONE);
+	usart_set_flow_control(DEBUG_USART, USART_FLOWCONTROL_NONE);
+	usart_enable(DEBUG_USART);
 }
 
 void board_setup_i2s_in(void)

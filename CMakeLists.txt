@@ -10,8 +10,6 @@ set (CMAKE_CXX_STANDARD 14)
 set (CMAKE_C_STANDARD 99)
 
 
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DHAVE_DEBUG_MEASUREMENTS")
-
 if("${CMAKE_SYSTEM_NAME}" STREQUAL Linux)
 	add_subdirectory(target/linux)
 	include_directories(target/linux)

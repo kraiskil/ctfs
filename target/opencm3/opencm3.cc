@@ -18,7 +18,7 @@ int _write(int file, char *buf, int len)
 	int i;
 	for (i = 0; i < len; i++) {
 #if defined HAVE_DEBUG_USART
-		usart_send_blocking(USART2, buf[i]);
+		usart_send_blocking(DEBUG_USART, buf[i]);
 #elif defined HAVE_DEBUG_SWO
 		while (ITM_STIM32(0) == 0) {
 			;
