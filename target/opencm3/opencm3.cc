@@ -46,8 +46,6 @@ void play_croak(enum tone t)
 	debug_led_on(LED_CROAK);
 	audioDAC_setup();
 
-	printf("croak!\r\n");
-
 	for (int i = 0; i < croak_len; i++) {
 		spi_send(I2S_OUT, 0);                    // stereo: other channel is mute
 		spi_send(I2S_OUT, get_croak_data(i, t)); // stereo: other channel is mute

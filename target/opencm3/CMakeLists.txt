@@ -65,6 +65,8 @@ function (common_build_target target_name)
 			-L${CMAKE_CURRENT_SOURCE_DIR}
 			-L${OPENCM3_DIR}/lib
 			-nostartfiles
+			-Wl,-Map=${target_name}.map
+			-Wl,--print-memory-usage
 		)
 	if("${CMAKE_FLASH}" STREQUAL "openocd")
 		add_custom_target(

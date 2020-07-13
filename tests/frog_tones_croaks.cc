@@ -12,8 +12,11 @@ public:
 	void SetUp(void) override
 	{
 		tone = static_cast<enum tone>(GetParam());
+		// Fill in croak from after the attack, to make sure there
+		// is some data in in audio_buffer - not just attack-muted silence
+		// (the detection algorithms don't work well when audio amplitude is <10)
 		for (int i = 0; i < audio_buffer.size(); i++)
-			audio_buffer[i] = get_croak_data(i, tone);
+			audio_buffer[i] = get_croak_data(i + attack_len, tone);
 
 		t = new tones(peaks);
 	}
