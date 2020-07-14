@@ -91,6 +91,7 @@ TEST_F(FrogTonesFreqTest, OnlyLoudNoise)
 {
 	add_audio_noise(400);
 	the_fft.run(audio_buffer, freq_buffer);
+	ft->peak_stddev_limit = 4; // values tuned for this legacy limit
 	ft->find_peaks();
 	/* There might be peak detects at high frequencies, since
 	 * the amplitude shifts are so abrupt. */

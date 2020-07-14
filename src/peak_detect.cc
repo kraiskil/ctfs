@@ -51,12 +51,11 @@ void peak_detect::find_peaks(void)
 	// TODO: this should be a configuration parameter based on how low we must be
 	// able to go, and fft resolution.
 	constexpr int windowsize = 2;
-	tones.fill({ 0, 0 });
+	peak_bins.fill({ 0, 0 });
 
 	for (unsigned i = 0; i < a.size(); i++) {
 		a[i] = s1(freq_buffer, i, windowsize);
 	}
-
 	// C++ can't check the typeof(buffer[0]) == typeof(uint16_t]) ??
 	static_assert(sizeof(freq_buffer[0]) == sizeof(uint16_t), "Check that the following does not overflow");
 	uint32_t mean = 0;
@@ -68,11 +67,11 @@ void peak_detect::find_peaks(void)
 
 	// tone_array is same as O in the algorithm description
 	// Just set those bins without statistically significant value to zero
-	tones[0] = { 0, 0 };
-	tones[tones.size() - 1].bin = tones.size() - 1;
-	tones[tones.size() - 1].val = 0;
+	peak_bins[0] = { 0, 0 };
+	peak_bins[peak_bins.size() - 1].bin = peak_bins.size() - 1;
+	peak_bins[peak_bins.size() - 1].val = 0;
 	for (unsigned i = 1; i < a.size() - 1; i++) {
-		tones[i].bin = i;
+		peak_bins[i].bin = i;
 		// avoid unsigned underflow
 		if (a[i] < mean)
 			continue;
@@ -86,7 +85,7 @@ void peak_detect::find_peaks(void)
 			// This is far from accurate (no sincs involved! :))
 			// Weigh the i'th bin a bit to avoid draws that shift
 			// the interpolated frequency later
-			tones[i].val = max(((freq_buffer[i - 1] * 3) >> 2) + freq_buffer[i],
+			peak_bins[i].val = max(((freq_buffer[i - 1] * 3) >> 2) + freq_buffer[i],
 			        freq_buffer[i] + ((freq_buffer[i + 1] * 3) >> 2));
 		}
 	}
@@ -104,23 +103,23 @@ void peak_detect::find_peaks(void)
 	// peak, but a wide peak will be split into two on the
 	// descending slope.
 	static_assert(windowsize > 0, "bad indexing ensues");
-	for (unsigned i = windowsize; i < tones.size() - 1; i++) {
-		if (tones[i].val == 0)
+	for (unsigned i = windowsize; i < peak_bins.size() - 1; i++) {
+		if (peak_bins[i].val == 0)
 			continue;
 
 		for (unsigned j = i - windowsize; j < i; j++) {
-			if (tones[j].val > tones[i].val)
-				tones[i].val = 0;
+			if (peak_bins[j].val > peak_bins[i].val)
+				peak_bins[i].val = 0;
 			else
-				tones[j].val = 0;
+				peak_bins[j].val = 0;
 		}
 	}
 
 	sort_tones_by_value();
 	for (unsigned i = 0; i < peaks.size(); i++) {
-		if (tones[i].val == 0)
+		if (peak_bins[i].val == 0)
 			break;
-		peaks[i] = peak_at(tones[i].bin);
+		peaks[i] = peak_at(peak_bins[i].bin);
 	}
 
 	#ifdef HAVE_DEBUG_MEASUREMENTS
@@ -133,7 +132,7 @@ void peak_detect::find_peaks(void)
 
 void peak_detect::sort_tones_by_value(void)
 {
-	std::sort(tones.begin(), tones.end(),
+	std::sort(peak_bins.begin(), peak_bins.end(),
 	    [] (struct bin_val &a, struct bin_val &b)
 	    {
 		    return a.val > b.val;
@@ -142,7 +141,7 @@ void peak_detect::sort_tones_by_value(void)
 }
 void peak_detect::sort_tones_by_bin(void)
 {
-	std::sort(tones.begin(), tones.end(),
+	std::sort(peak_bins.begin(), peak_bins.end(),
 	    [] (struct bin_val &a, struct bin_val &b)
 	    {
 		    return a.bin < b.bin;
@@ -154,7 +153,7 @@ unsigned peak_detect::get_num_peaks(void)
 {
 	sort_tones_by_value();
 	int numtones = 0;
-	for (auto v : tones) {
+	for (auto v : peak_bins) {
 		if (v.val == 0)
 			break;
 		numtones++;
@@ -165,17 +164,17 @@ unsigned peak_detect::get_num_peaks(void)
 struct bin_val peak_detect::get_peak_by_val(uint16_t peak_num)
 {
 	sort_tones_by_value();
-	return tones[peak_num];
+	return peak_bins[peak_num];
 }
 struct bin_val peak_detect::get_peak_by_bin(uint16_t peak_num)
 {
 	sort_tones_by_bin();
 	uint16_t cpn = 0;
-	for (unsigned i = 0; i < tones.size(); i++) {
-		if (tones[i].val == 0)
+	for (unsigned i = 0; i < peak_bins.size(); i++) {
+		if (peak_bins[i].val == 0)
 			continue;
 		if (cpn == peak_num)
-			return tones[i];
+			return peak_bins[i];
 		cpn++;
 	}
 	// This should not happen - logically
@@ -226,7 +225,7 @@ struct peak peak_detect::peak_at(uint16_t bin) const
 bool peak_detect::has_peak_at(frequency_t freq)
 {
 	sort_tones_by_bin();
-	for (auto &v: tones) {
+	for (auto &v: peak_bins) {
 		if (v.val == 0)
 			continue;
 		if (freq.close_enough(peak_at(v.bin).freq))

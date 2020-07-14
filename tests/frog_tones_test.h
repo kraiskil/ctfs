@@ -16,7 +16,6 @@ public:
 		freq_buffer.fill(0);
 		audio_buffer.fill(0);
 		ft = new peak_detect(audio_buffer, freq_buffer, peaks);
-		ft->peak_stddev_limit = 4;
 		// TODO: for testing, should be the other way round:
 		// we set config_fs_input here, and peak_detect reads that.
 		fs = 8000; // =config_fs_input;

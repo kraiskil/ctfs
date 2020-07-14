@@ -2,12 +2,12 @@
 #include "datatype.h"
 #include "fft.h"
 
+/* A raw fft bin and its value. */
 struct bin_val
 {
 	uint16_t bin;
 	uint16_t val;
 };
-
 
 class peak_detect
 {
@@ -23,7 +23,7 @@ public:
 		peak_stddev_limit(peak_stddev_limit),
 		frequency_correction(1)
 	{
-		tones.fill({ 0, 0 });
+		peak_bins.fill({ 0, 0 });
 		peaks.fill({ 0, 0 }); //TODO. assume this is in .bss and zeroed?
 	}
 	void find_peaks(void);
@@ -40,16 +40,25 @@ public:
 	bool has_peak_at(frequency_t frequency);
 
 private:
-	typedef std::array<struct bin_val, frequency_buffer_samples> tone_array_t;
 	void sort_tones_by_bin(void);
 	void sort_tones_by_value(void);
 	listen_buf_t &audio_buffer;
 	frequency_buf_t &freq_buffer;
 	peak_array_t &peaks;
-	tone_array_t tones;
+
+	// Similar to frequency buffer, but with bin number data added,
+	// for easier sorting. Also, peak value is calculated from adjacent
+	// bins to combat peak spread (think FFT-sinc). bin numbers are still
+	// integers to show from which bin the amplitude value is calculated
+	// Bins that don't have a candidate peak are set to zero amplitude
+	typedef std::array<struct bin_val, frequency_buffer_samples> binval_array_t;
+	binval_array_t peak_bins;
 public:
 	unsigned peak_stddev_limit;
 	float frequency_correction;
 
+private:
+	friend class FrogTonesPeakTest_MeasuredData1_Test;
+	friend class FrogTonesPeakTest_MeasuredData2_Test;
 };
 

@@ -1,4 +1,8 @@
 #include "frog_tones_test.h"
+#include "measured_croak_frequencies.h"
+#include "gmock/gmock.h"
+
+using namespace testing; //googletest+googlemock
 
 class FrogTonesPeakTest :
 	public FrogTonesTest,
@@ -180,5 +184,44 @@ TEST_F(FrogTonesPeakTest, CalculateStddev)
 	freq_buffer[2] = 100;
 	freq_buffer[3] = 100;
 	EXPECT_NEAR(calculate_stddev(freq_buffer, 4), 5.9912, 0.1);
+}
+
+
+// A few tests from live data - croak at G4 (392Hz, bins 98&196 [sic - bin 98 is 384Hz?])
+// recorded with a bluepill setup (frequency correction 0.996)
+// Meas1 has a significant noise peak at bin 35, and several smaller peaks all over the spectrum
+TEST_F(FrogTonesPeakTest, MeasuredData1)
+{
+	// load measured data
+	for (int i = 0; i < sizeof(freqs_meas1) / sizeof(freqs_meas1[0]); i++)
+		freq_buffer[i] = freqs_meas1[i];
+
+	ft->find_peaks();
+	EXPECT_GE(ft->get_num_peaks(), 3);
+
+	// Fragile!
+	// There are no other significant peaks below bin 196. But peak detect might pick up small noise peaks.
+	// There are equivalent to 35&88 "large" peaks above bin 196
+	ft->sort_tones_by_bin();
+
+	// val is nonzero means a peak was found
+	EXPECT_NE(ft->peak_bins[35].val, 0);
+	EXPECT_NE(ft->peak_bins[98].val, 0);
+	EXPECT_NE(ft->peak_bins[196].val, 0);
+}
+TEST_F(FrogTonesPeakTest, MeasuredData2)
+{
+	// load measured data
+	for (int i = 0; i < sizeof(freqs_meas2) / sizeof(freqs_meas2[0]); i++)
+		freq_buffer[i] = freqs_meas2[i];
+
+	ft->find_peaks();
+	EXPECT_GE(ft->get_num_peaks(), 2);
+
+	// Fragile!
+	ft->sort_tones_by_bin();
+	// val is nonzero means a peak was found
+	EXPECT_NE(ft->peak_bins[98].val, 0);
+	EXPECT_NE(ft->peak_bins[196].val, 0);
 }
 
