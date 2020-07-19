@@ -111,7 +111,7 @@ float filter(float in, float b[N])
 int16_t get_croak_data(int i, enum tone tone)
 {
 	float   d = 0;
-	int16_t uv = 800; //unit volume
+	int16_t uv = config_output_volume_value;
 	static_assert(SIN_TABLE_RESOLUTION <= SIN_TABLE_N_ELEM, "Need better algorithm now");
 
 	frequency_t base = tone_freq[tone];

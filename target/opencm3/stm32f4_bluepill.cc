@@ -51,9 +51,11 @@ float get_input_frequency_correction(void)
 
 //NB: the onboard LED is PC13
 struct led leds[LED_LAST] = {
-	{ GPIOC, GPIO13, inverted },     //croak
+	{
+		GPIOC, GPIO13, inverted
+	},                               //croak
 	{ GPIOC, GPIO12, not_inverted }, //sleep
-	{ GPIOC, GPIO11, inverted }, //processing
+	{ GPIOC, GPIO11, inverted },     //processing
 };
 
 void board_setup_clock(void)
@@ -239,10 +241,11 @@ void i2s_playback_setup(void)
 	 * see datasheet table 11)
 	 * Fs = I2Sclk/ (32*2 * ((2*I2SDIV)+ODD))
 	 * I2SDIV = I2Sclk/(128*Fs)
-	 * I2SDIV=24 => 46,875 so 46 + ODD bit clear
+	 * I2SDIV=24 => 46,875 so 47 + ODD bit clear
+	 * Measurements show 46+ODD is better. Probably bad clock input on bluepill?
 	 */
 	static_assert(config_fs_output == 16000, "calculated I2S clock divisors with wrong values");
-	i2s_set_clockdiv(SPI2, 46, 0);
+	i2s_set_clockdiv(SPI2, 46, 1);
 	i2s_enable(SPI2);
 }
 
