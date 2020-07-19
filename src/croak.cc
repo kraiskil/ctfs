@@ -125,8 +125,14 @@ int16_t get_croak_data(int i, enum tone tone)
 	// echo
 	//d += calc_triangle(i-30, base) * uv/2;
 
-	float tremolo = calc_sine(i, 12) * 0.15 * (i - croak_len) / croak_len + 1;
-	d *= tremolo;
+	// This gives a "froggish" sound
+	float tremolo = calc_sine(i, 35) * 0.35;
+	d -= d * tremolo;
+
+	// Individual croaks. Sawtooth might sound better?
+	// Try adding this only in attack & decay phases - sounds kinda nice
+	//float tremolo2 = calc_sine(i, 2);
+	//d -= d*tremolo2;
 
 	float filter_lfo = calc_sine(i, 2) / 2 + 1 * nfb - 1;
 	int   filter_idx = filter_lfo;
@@ -137,12 +143,12 @@ int16_t get_croak_data(int i, enum tone tone)
 	float amp;
 	if (i < attack_len) {
 		amp = attack_level * i / attack_len;
-		amp *= amp;
+		//amp *= amp;
 	}
 	else if (i < (attack_len + decay_len) ) {
 		int dec_i_left = decay_len - (i - attack_len);
 		amp = sustain_level + (attack_level - sustain_level) * (dec_i_left) / decay_len;
-		amp *= amp;
+		//amp *= amp;
 	}
 	else if (i < (attack_len + decay_len + sustain_len) ) {
 		amp = sustain_level;

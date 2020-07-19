@@ -30,11 +30,11 @@ constexpr float default_fft_scale = 1;
  * Level absolute values are scaled for the PCM5102 DAC - which lacks
  * volume control.
  */
-constexpr float attack_level = 0.8;
-constexpr float sustain_level = 0.4;
-constexpr int   attack_len = 600.0 /*ms*/ * config_fs_output / 1000;
+constexpr float attack_level = 1.5;
+constexpr float sustain_level = 1.0;
+constexpr int   attack_len = 1600.0 /*ms*/ * config_fs_output / 1000;
 constexpr int   decay_len = 1000.0 /*ms*/ * config_fs_output / 1000;
-constexpr int   sustain_len = 600.0 /*ms*/ * config_fs_output / 1000;
-constexpr int   release_len = 1000.0 /*ms*/ * config_fs_output / 1000;
+constexpr int   sustain_len = 1500.0 /*ms*/ * config_fs_output / 1000;
+constexpr int   release_len = 300.0 /*ms*/ * config_fs_output / 1000;
 constexpr int   croak_len = attack_len + decay_len + sustain_len + release_len;
 
