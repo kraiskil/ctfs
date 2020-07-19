@@ -32,13 +32,6 @@ bool tones::has_harmonics(struct peak &base)
 
 bool tones::has_croak(void)
 {
-#if 0
-	for (auto p: peaks)
-		if (p.freq == 0)
-			continue;
-		else if (has_harmonics(p) )
-			return true;
-#endif
 	if (detected_tones[0] == NOT_A_TONE)
 		detect_tones();
 	return detected_tones[0] != NOT_A_TONE;

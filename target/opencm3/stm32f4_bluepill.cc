@@ -43,7 +43,7 @@ extern "C" {
 
 
 /* Correction term for the audio clock running a bit fast */
-constexpr float frequency_correction = 0.996;
+constexpr float frequency_correction = 0.999;
 float get_input_frequency_correction(void)
 {
 	return frequency_correction;
