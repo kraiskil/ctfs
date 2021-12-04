@@ -1,5 +1,6 @@
-cmake_minimum_required(VERSION 3.13)
+cmake_minimum_required(VERSION 3.19)
 # 3.13 because of target_link_options
+# 3.19 because of presets
 set(CMAKE_POLICY_DEFAULT_CMP0048 NEW)
 
 project(treefrog 

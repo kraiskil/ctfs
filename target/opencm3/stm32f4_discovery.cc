@@ -27,6 +27,11 @@
  *
  */
 
+
+#ifndef STM32F4
+#define STM32F4
+#endif
+
 extern "C" {
 #include <libopencm3/cm3/nvic.h>
 #include <libopencm3/stm32/dma.h>

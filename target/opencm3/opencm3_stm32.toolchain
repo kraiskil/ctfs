@@ -1,6 +1,5 @@
 #Use this file as CMake toolchain file to compile for
-#baremetal ARM. e.g.
-# cmake -DCMAKE_TOOLCHAIN_FILE=toolchain.cmake .
+#baremetal ARM. STM32F4
 set(CMAKE_SYSTEM_NAME Generic)
 set(CMAKE_SYSTEM_VERSION OpenCM3)
 set(CMAKE_SYSTEM_PROCESSOR arm)
@@ -10,7 +9,6 @@ set(CMAKE_CROSSCOMPILING 1)
 set(CMAKE_C_FLAGS "--specs=nosys.specs -Wall -Werror -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 -DNDEBUG")
 set(CMAKE_CXX_FLAGS "--specs=nosys.specs -Wall -Werror -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 -DNDEBUG")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-exceptions -fno-rtti")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DSTM32F4 -DSTM32F4_BLUEPILL")
-set(CMAKE_BOARD "stm32f4_bluepill")
-set(CMAKE_FLASH "dfu")
+# TODO: move this to CMakeLists.txt
+#set(CMAKE_FLASH "dfu")
 

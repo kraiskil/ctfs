@@ -1,0 +1,51 @@
+{
+  "version": 3,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 21,
+    "patch": 0
+  },
+  "configurePresets": [
+    {
+      "name": "Linux",
+      "displayName": "Linux desktop",
+      "description": "Desktop builds, including tests."
+    },
+    {
+      "name": "OpenCM3",
+      "displayName": "OpenCM3 generic",
+      "description": "Parent target for unspecified STM32 board.",
+      "toolchainFile": "target/opencm3/opencm3_stm32.toolchain"
+    },
+    {
+      "name": "Bluepill",
+      "displayName": "STM32F4 Bluepill",
+      "description": "Cross compile for the F4 bluepill board.",
+      "inherits": "OpenCM3",
+      "cacheVariables": {
+        "CMAKE_BOARD": {
+          "type": "STRING",
+          "value": "stm32f4_bluepill"
+        }
+      }
+    },
+    {
+      "name": "Nucleo",
+      "displayName": "STM32F4 Nucleo",
+      "description": "Cross compile for the F4 nucleo board.",
+      "inherits": "OpenCM3"
+    },
+    {
+      "name": "Disco",
+      "displayName": "STM32F4 Discovery",
+      "description": "Cross compile for the F4 discovery board",
+      "inherits": "OpenCM3",
+      "cacheVariables": {
+        "CMAKE_BOARD": {
+          "type": "STRING",
+          "value": "stm32f4_disco"
+        }
+      }
+    }
+  ]
+}
