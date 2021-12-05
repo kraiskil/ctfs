@@ -8,3 +8,7 @@ target_link_libraries(main_croak_only libtreefrog)
 add_library(main_treefrog OBJECT
 	treefrog.cc)
 target_link_libraries(main_treefrog libtreefrog)
+
+add_library(main_blink_led OBJECT
+	blink_led.cc)
+target_link_libraries(main_blink_led libtreefrog)

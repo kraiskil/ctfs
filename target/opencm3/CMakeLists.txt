@@ -98,6 +98,7 @@ build_target( fft_record )
 build_target( peak_detect )
 build_target( tone_detect )
 build_link_target( croak_only )
+build_link_target( blink_led )
 
 ## Print some memory usage statistics.
 add_custom_command(

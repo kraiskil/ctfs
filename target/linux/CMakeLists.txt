@@ -18,3 +18,8 @@ add_executable(deaf_frog
 	)
 target_link_libraries(deaf_frog pulse-simple pulse libtreefrog main_croak_only)
 
+add_executable(blink_led
+	posix.cc
+	)
+target_link_libraries(blink_led libtreefrog main_blink_led)
+

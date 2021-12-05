@@ -10,10 +10,14 @@ void sleep_for(void)
 	std::this_thread::sleep_for(std::chrono::seconds(2));
 }
 
-void debug_led_on(enum led_ids)
-{}
-void debug_led_off(enum led_ids)
-{}
+void debug_led_on(enum led_ids led)
+{
+	std::cout << "LED ON: " << led << std::endl;
+}
+void debug_led_off(enum led_ids led)
+{
+	std::cout << "LED OFF: " << led << std::endl;
+}
 void wallclock_start(void)
 {}
 uint32_t wallclock_time_us(void)
