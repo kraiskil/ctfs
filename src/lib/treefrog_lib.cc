@@ -56,9 +56,7 @@ static enum tone what_to_croak(listen_buf_t &buffer)
 // frog-level sleep, when there are no croaks to join
 void sleep_a_bit(void)
 {
-	// TODO: determine how long to sleep
-
-	sleep_for(/*TODO pass value */);
+	sleep_for(3s);
 }
 
 void print_statistics(void)

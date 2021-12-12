@@ -1,6 +1,8 @@
 #pragma once
 #include "datatype.h"
 #include "tones.h"
+#include <chrono>
+using namespace std::chrono_literals;
 
 // entrypoint for treefrog
 void treefrog(void);
@@ -13,7 +15,7 @@ int16_t get_croak_data(int sample_num, enum tone);
 
 /* Platform-level interfaces */
 void play_croak(enum tone);
-void sleep_for(void);
+void sleep_for(const std::chrono::duration<int>&);
 void listen_for_croaks(listen_buf_t &buffer);
 
 enum led_ids

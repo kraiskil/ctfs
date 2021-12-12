@@ -4,10 +4,10 @@
 
 #include "treefrog.h"
 
-void sleep_for(void)
+void sleep_for(const std::chrono::duration<int> &time)
 {
 	using namespace std::chrono_literals;
-	std::this_thread::sleep_for(std::chrono::seconds(2));
+	std::this_thread::sleep_for(time);
 }
 
 void debug_led_on(enum led_ids led)

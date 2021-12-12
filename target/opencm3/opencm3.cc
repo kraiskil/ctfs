@@ -30,11 +30,13 @@ int _write(int file, char *buf, int len)
 }
 }
 
-void sleep_for(void)
+void sleep_for(const std::chrono::duration<int> &time)
 {
+	std::chrono::microseconds us = std::chrono::microseconds(time);
+	wallclock_start();
 	debug_led_on(LED_SLEEP);
-	volatile int i = 1000000; //1M ~ 1Hz
-	while (--i > 0) {
+
+	while (std::chrono::microseconds(wallclock_time_us()) < us) {
 		;
 	}
 	debug_led_off(LED_SLEEP);
