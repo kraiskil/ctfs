@@ -10,34 +10,22 @@ extern "C" {
 #include <pulse/simple.h>
 }
 
+static pa_simple *rec = NULL;
 
 
 void io_init(void)
-{}
-
-void listen_for_croaks(listen_buf_t &buffer)
 {
-	int       rv;
-	int       err;
-	ssize_t   bytes = buffer.size() * sizeof(int16_t);
-	pa_simple *s = NULL;
-
-	/* This doesn't work, so just open the device every time - or the
-	 * data in the buffer would be old
-	rv = pa_simple_flush(s, &err);
-	if (rv) {
-	        std::cerr << "pa_simple_flush() failed with " << err << std::endl;
-	        exit(1);
-	}
-	*/
-
 	static const pa_sample_spec ss = {
 		.format = PA_SAMPLE_S16LE,
 		.rate = config_fs_input,
 		.channels = 1
 	};
+	static const pa_buffer_attr attr = {
+		.maxlength = (uint32_t)-1,
+		.fragsize = 512,
+	};
 	int                         error;
-	s = pa_simple_new(
+	rec = pa_simple_new(
 		NULL, //?
 		"treefrog",
 		PA_STREAM_RECORD,
@@ -45,14 +33,30 @@ void listen_for_croaks(listen_buf_t &buffer)
 		"listening", // stream name
 		&ss,
 		NULL, // channel map - default
-		NULL, // buffering opts - default
+		&attr,
 		&error);
-	if (s == NULL) {
+	if (rec == NULL) {
 		std::cerr << "error opening capture device" << std::endl;
 		exit(1);
 	}
+}
 
-	rv = pa_simple_read(s, buffer.data(), bytes, &err);
+void listen_for_croaks(listen_buf_t &buffer)
+{
+	int     rv;
+	int     err;
+	ssize_t bytes = buffer.size() * sizeof(int16_t);
+
+	/* This doesn't work, so just open the device every time - or the
+	 * data in the buffer would be old
+	*/
+	rv = pa_simple_flush(rec, &err);
+	if (rv) {
+		std::cerr << "pa_simple_flush() failed with " << err << std::endl;
+		exit(1);
+	}
+
+	rv = pa_simple_read(rec, buffer.data(), bytes, &err);
 	if (rv) {
 		std::cerr << "pa_simple_read() failed with " << err << std::endl;
 		exit(1);
@@ -72,12 +76,18 @@ void listen_for_croaks(listen_buf_t &buffer)
 			max = buffer[i];
 	}
 	max = *std::max_element(buffer.begin(), buffer.end());
-
-	if (max > 256) {
-		std::cout << "Input amplitude at " << max << ", please lower it" << std::endl;
+	std::cerr << "Max value from listening: " << max << std::endl;
+	for (int i = 0; i < buffer.size(); i++) {
+		//buffer[i] >>= 1;
+		//	std::cout << std::setw(6) << buffer[i] << " ";
+		//	if( i%32 == 31)
+		//		std::cout << std::endl;
+		buffer[i] *= 200.0 / max;
 	}
 
-	pa_simple_free(s);
+//	if (max > 256) {
+//		std::cout << "Input amplitude at " << max << ", please lower it" << std::endl;
+//	}
 }
 
 void play_croak(enum tone tone_to_croak)

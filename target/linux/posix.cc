@@ -1,8 +1,27 @@
+/* Common components for
+ * the 'board support package'
+ * for (simulation on) Linux/Posix
+ * systems.
+ * See also io_* for the different IO options.
+ */
 #include <chrono>
 #include <iostream>
 #include <thread>
 
 #include "treefrog.h"
+
+#include "io.h"
+
+std::string led_to_string(enum led_ids led)
+{
+	switch (led)
+	{
+	case LED_CROAK: return "CROAK";
+	case LED_SLEEP: return "SLEEP";
+	case LED_PROCESSING: return "PROCESSING";
+	default: return "UNKNOWN";
+	}
+}
 
 void sleep_for(const std::chrono::duration<int> &time)
 {
@@ -12,11 +31,11 @@ void sleep_for(const std::chrono::duration<int> &time)
 
 void debug_led_on(enum led_ids led)
 {
-	std::cout << "LED ON: " << led << std::endl;
+	std::cout << "LED ON: " << led_to_string(led) << std::endl;
 }
 void debug_led_off(enum led_ids led)
 {
-	std::cout << "LED OFF: " << led << std::endl;
+	std::cout << "LED OFF: " << led_to_string(led) << std::endl;
 }
 void wallclock_start(void)
 {}
@@ -31,5 +50,7 @@ float get_input_frequency_correction(void)
 }
 
 void board_init(void)
-{}
+{
+	io_init();
+}
 
