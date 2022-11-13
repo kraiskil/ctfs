@@ -12,6 +12,7 @@ typedef int16_t fixp;
 typedef int16_t audio_sample_t;
 constexpr unsigned listen_buffer_samples_log2 = 11;
 constexpr unsigned listen_buffer_samples = 1 << listen_buffer_samples_log2;
+constexpr unsigned listen_buffer_bytes = listen_buffer_samples * sizeof(audio_sample_t);
 constexpr unsigned frequency_buffer_samples = listen_buffer_samples / 2;
 typedef std::array<audio_sample_t, listen_buffer_samples> listen_buf_t;
 

@@ -21,8 +21,8 @@ void io_init(void)
 		.channels = 1
 	};
 	static const pa_buffer_attr attr = {
-		.maxlength = (uint32_t)-1,
-		.fragsize = 512,
+		.maxlength = listen_buffer_bytes,
+		.fragsize = listen_buffer_bytes,
 	};
 	int                         error;
 	rec = pa_simple_new(
@@ -47,15 +47,15 @@ void listen_for_croaks(listen_buf_t &buffer)
 	int     err;
 	ssize_t bytes = buffer.size() * sizeof(int16_t);
 
-	/* This doesn't work, so just open the device every time - or the
-	 * data in the buffer would be old
+	/* This doesn't work. It should drop all data in the buffer.
 	*/
 	rv = pa_simple_flush(rec, &err);
 	if (rv) {
 		std::cerr << "pa_simple_flush() failed with " << err << std::endl;
 		exit(1);
 	}
-
+	/* so as a work-around, read twice. Its not like we are in a hurry here... */
+	rv = pa_simple_read(rec, buffer.data(), bytes, &err);
 	rv = pa_simple_read(rec, buffer.data(), bytes, &err);
 	if (rv) {
 		std::cerr << "pa_simple_read() failed with " << err << std::endl;
@@ -67,14 +67,6 @@ void listen_for_croaks(listen_buf_t &buffer)
 	 * calculations saturate. This scales down the input.
 	 */
 	float max = 0;
-	for (int i = 0; i < buffer.size(); i++) {
-		//buffer[i] >>= 1;
-		//	std::cout << std::setw(6) << buffer[i] << " ";
-		//	if( i%32 == 31)
-		//		std::cout << std::endl;
-		if (buffer[i] > max)
-			max = buffer[i];
-	}
 	max = *std::max_element(buffer.begin(), buffer.end());
 	std::cerr << "Max value from listening: " << max << std::endl;
 	for (int i = 0; i < buffer.size(); i++) {
@@ -84,10 +76,6 @@ void listen_for_croaks(listen_buf_t &buffer)
 		//		std::cout << std::endl;
 		buffer[i] *= 200.0 / max;
 	}
-
-//	if (max > 256) {
-//		std::cout << "Input amplitude at " << max << ", please lower it" << std::endl;
-//	}
 }
 
 void play_croak(enum tone tone_to_croak)
