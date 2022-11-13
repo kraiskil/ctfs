@@ -29,7 +29,7 @@ void io_init(void)
 		NULL, //?
 		"treefrog",
 		PA_STREAM_RECORD,
-		NULL,        // select default device
+		"treefrogs.monitor", // special Pulse Audio device. Must be set up with accompanying script
 		"listening", // stream name
 		&ss,
 		NULL, // channel map - default
@@ -95,7 +95,7 @@ void play_croak(enum tone tone_to_croak)
 		NULL, //?
 		"treefrog",
 		PA_STREAM_PLAYBACK,
-		NULL,       // select default device
+		"treefrogs", // special Pulse Audio device. Must be set up with accompanying script
 		"croaking", // stream name
 		&ss,
 		NULL, // channel map - default
