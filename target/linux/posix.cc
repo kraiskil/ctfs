@@ -19,6 +19,7 @@ std::string led_to_string(enum led_ids led)
 	case LED_CROAK: return "CROAK";
 	case LED_SLEEP: return "SLEEP";
 	case LED_PROCESSING: return "PROCESSING";
+	case LED_LISTENING: return "LISTENING";
 	default: return "UNKNOWN";
 	}
 }

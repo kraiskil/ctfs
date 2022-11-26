@@ -52,7 +52,6 @@ void tones::detect_tones(void)
 				detected_tones[tone_idx++] = t;
 		}
 	}
-
 }
 
 enum tone tones::first_harmonic(void)

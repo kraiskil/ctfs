@@ -14,17 +14,23 @@ void treefrog(void)
 	listen_buf_t buffer;
 	while (true) {
 		wallclock_start();
+		debug_led_on(LED_LISTENING);
 		listen_for_croaks(buffer);
+		debug_led_off(LED_LISTENING);
+
 
 		debug_led_on(LED_PROCESSING);
 		enum tone croak = what_to_croak(buffer);
 		debug_led_off(LED_PROCESSING);
-		#ifdef HAVE_DEBUG_MEASUREMENTS
+		#ifndef NDEBUG
 		total_execution_time = wallclock_time_us();
 		#endif
 
-		if (croak != NOT_A_TONE)
+		if (croak != NOT_A_TONE){
+			debug_led_on(LED_CROAK);
 			play_croak(croak);
+			debug_led_off(LED_CROAK);
+		}
 		else
 			sleep_a_bit();
 		print_statistics();
@@ -56,12 +62,14 @@ static enum tone what_to_croak(listen_buf_t &buffer)
 // frog-level sleep, when there are no croaks to join
 void sleep_a_bit(void)
 {
-	sleep_for(3s);
+	debug_led_on(LED_SLEEP);
+	sleep_for(8s);
+	debug_led_off(LED_SLEEP);
 }
 
 void print_statistics(void)
 {
-#ifdef HAVE_DEBUG_MEASUREMENTS
+#ifndef NDEBUG
 	/* The trick with %jd and intmax_t is because %d is 16 bit on arm-eabi, and 32 on x86 -> compiler warnings */
 	printf("FFT execution time: %jd ms (%jd us)\n",
 	    (intmax_t)fft_execution_time / 1000, (intmax_t)fft_execution_time);

@@ -88,8 +88,7 @@ public:
 private:
 	void fft_sa(int n, complex_t *x)
 	{
-		complex_t y[MAX_FFT_SIZE];
-		memset(y, 0, sizeof(y));
+		complex_t y[MAX_FFT_SIZE]={0};
 		fft0(n, 1, 0, x, y); // this has overloaded implementations for both internal_data_representation options
 		for (int k = 0; k < n; k++) x[k] /= n / scale;
 	}

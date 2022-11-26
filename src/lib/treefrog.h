@@ -23,7 +23,8 @@ enum led_ids
 	LED_CROAK      = 0,
 	LED_SLEEP      = 1,
 	LED_PROCESSING = 2,
-	LED_LAST       = 3
+	LED_LISTENING  = 3,
+	LED_LAST       = 4
 };
 void debug_led_on(enum led_ids i);
 void debug_led_off(enum led_ids i);

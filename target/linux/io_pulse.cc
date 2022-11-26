@@ -83,7 +83,7 @@ void play_croak(enum tone tone_to_croak)
 	int     croak_samples = croak_len;
 	int16_t croak_sound[croak_samples];
 
-	std::cout << "croaking" << std::endl;
+	std::cout << "croaking tone: " << tone_to_croak << std::endl;
 
 	static const pa_sample_spec ss = {
 		.format = PA_SAMPLE_S16LE,
@@ -108,6 +108,6 @@ void play_croak(enum tone tone_to_croak)
 	}
 
 	pa_simple_write(pas, croak_sound, sizeof(croak_sound), NULL);
-	////pa_simple_free(s);
+	pa_simple_drain(pas, &error);
 }
 
