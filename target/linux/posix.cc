@@ -24,7 +24,7 @@ std::string led_to_string(enum led_ids led)
 	}
 }
 
-void sleep_for(const std::chrono::duration<int> &time)
+void sleep_for(const std::chrono::duration<float> &time)
 {
 	using namespace std::chrono_literals;
 	std::this_thread::sleep_for(time);

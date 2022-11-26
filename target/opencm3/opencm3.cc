@@ -30,7 +30,7 @@ int _write(int file, char *buf, int len)
 }
 }
 
-void sleep_for(const std::chrono::duration<int> &time)
+void sleep_for(const std::chrono::duration<float> &time)
 {
 	std::chrono::microseconds us = std::chrono::microseconds(time);
 	wallclock_start();
@@ -48,7 +48,7 @@ void play_croak(enum tone t)
 	debug_led_on(LED_CROAK);
 	audioDAC_setup();
 
-	for (int i = 0; i < croak_len; i++) {
+	for (int i = 0; i < croak_len_samples; i++) {
 		spi_send(I2S_OUT, 0);                    // stereo: other channel is mute
 		spi_send(I2S_OUT, get_croak_data(i, t)); // stereo: other channel is mute
 	}

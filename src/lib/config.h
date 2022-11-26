@@ -1,8 +1,6 @@
 #pragma once
 #include "board_config.h"
-
-/* The total length, in samples, of a emitted croak */
-constexpr int croak_num_samples = 2 * config_fs_output;
+#include <chrono>
 
 /* Peak detection algorithm: a peak must be
  * this many standard deviations above the average frequency
@@ -36,5 +34,11 @@ constexpr int   attack_len = 1600.0 /*ms*/ * config_fs_output / 1000;
 constexpr int   decay_len = 1000.0 /*ms*/ * config_fs_output / 1000;
 constexpr int   sustain_len = 1500.0 /*ms*/ * config_fs_output / 1000;
 constexpr int   release_len = 300.0 /*ms*/ * config_fs_output / 1000;
-constexpr int   croak_len = attack_len + decay_len + sustain_len + release_len;
+
+/* The length of a croak, in audio samples.
+ * This is the number of samples in a single mono channel. */
+constexpr int croak_len_samples = attack_len + decay_len + sustain_len + release_len;
+
+/* The length of a croak, in milliseconds. */
+constexpr std::chrono::duration<float, std::milli> croak_duration(croak_len_samples * 1000 / config_fs_output);
 

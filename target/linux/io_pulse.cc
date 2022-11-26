@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <iomanip>
 #include <iostream>
+#include <thread>
 
 extern "C" {
 #include <pulse/simple.h>
@@ -30,7 +31,7 @@ void io_init(void)
 		"treefrog",
 		PA_STREAM_RECORD,
 		"treefrogs.monitor", // special Pulse Audio device. Must be set up with accompanying script
-		"listening", // stream name
+		"listening",         // stream name
 		&ss,
 		NULL, // channel map - default
 		&attr,
@@ -80,7 +81,7 @@ void listen_for_croaks(listen_buf_t &buffer)
 
 void play_croak(enum tone tone_to_croak)
 {
-	int     croak_samples = croak_len;
+	int     croak_samples = croak_len_samples;
 	int16_t croak_sound[croak_samples];
 
 	std::cout << "croaking tone: " << tone_to_croak << std::endl;
@@ -96,7 +97,7 @@ void play_croak(enum tone tone_to_croak)
 		"treefrog",
 		PA_STREAM_PLAYBACK,
 		"treefrogs", // special Pulse Audio device. Must be set up with accompanying script
-		"croaking", // stream name
+		"croaking",  // stream name
 		&ss,
 		NULL, // channel map - default
 		NULL, // buffering opts - default
@@ -108,6 +109,10 @@ void play_croak(enum tone tone_to_croak)
 	}
 
 	pa_simple_write(pas, croak_sound, sizeof(croak_sound), NULL);
-	pa_simple_drain(pas, &error);
+
+	// wait for the croak to finish playing.
+	// (I don't trust the pa_simple functions to provide this anymore :))
+	//pa_simple_drain(pas, &error);
+	std::this_thread::sleep_for(croak_duration);
 }
 
