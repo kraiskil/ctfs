@@ -69,7 +69,7 @@ void listen_for_croaks(listen_buf_t &buffer)
 	 */
 	float max = 0;
 	max = *std::max_element(buffer.begin(), buffer.end());
-	std::cerr << "Max value from listening: " << max << std::endl;
+	std::cerr << "\tMax volume from listening: " << max << std::endl;
 	for (int i = 0; i < buffer.size(); i++) {
 		//buffer[i] >>= 1;
 		//	std::cout << std::setw(6) << buffer[i] << " ";
@@ -84,7 +84,7 @@ void play_croak(enum tone tone_to_croak)
 	int     croak_samples = croak_len_samples;
 	int16_t croak_sound[croak_samples];
 
-	std::cout << "croaking tone: " << tone_to_croak << std::endl;
+	std::cout << "\tcroaking tone: " << tone_to_croak << std::endl;
 
 	static const pa_sample_spec ss = {
 		.format = PA_SAMPLE_S16LE,

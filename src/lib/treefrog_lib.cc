@@ -26,14 +26,14 @@ void treefrog(void)
 		total_execution_time = wallclock_time_us();
 		#endif
 
-		if (croak != NOT_A_TONE){
+		if (croak != NOT_A_TONE) {
 			debug_led_on(LED_CROAK);
 			play_croak(croak);
 			debug_led_off(LED_CROAK);
 			// Ignore replies to our croak;
 			sleep_for(10 * croak_duration);
 		}
-		else 
+		else
 			sleep_for(2 * croak_duration);
 
 		print_statistics();
@@ -74,11 +74,11 @@ void print_statistics(void)
 {
 #ifndef NDEBUG
 	/* The trick with %jd and intmax_t is because %d is 16 bit on arm-eabi, and 32 on x86 -> compiler warnings */
-	printf("FFT execution time: %jd ms (%jd us)\n",
+	printf("\tFFT execution time: %jd ms (%jd us)\n",
 	    (intmax_t)fft_execution_time / 1000, (intmax_t)fft_execution_time);
-	printf("peak detetct execution time: %jd ms (%jd us)\n",
+	printf("\tpeak detetct execution time: %jd ms (%jd us)\n",
 	    (intmax_t)peak_detect_execution_time / 1000, (intmax_t)peak_detect_execution_time);
-	printf("total execution time: %jd ms (%jd us)\n",
+	printf("\ttotal execution time: %jd ms (%jd us)\n",
 	    (intmax_t)total_execution_time / 1000, (intmax_t)total_execution_time);
 #endif
 }
