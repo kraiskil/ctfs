@@ -30,7 +30,7 @@ int _write(int file, char *buf, int len)
 }
 }
 
-void sleep_for(const std::chrono::duration<float> &time)
+void sleep_for(const milliseconds_t &time)
 {
 	std::chrono::microseconds us = std::chrono::microseconds(time);
 	wallclock_start();

@@ -40,5 +40,6 @@ constexpr int   release_len = 300.0 /*ms*/ * config_fs_output / 1000;
 constexpr int croak_len_samples = attack_len + decay_len + sustain_len + release_len;
 
 /* The length of a croak, in milliseconds. */
-constexpr std::chrono::duration<float, std::milli> croak_duration(croak_len_samples * 1000 / config_fs_output);
+typedef std::chrono::duration<uint32_t, std::milli> milliseconds_t;
+constexpr milliseconds_t croak_duration(croak_len_samples * 1000 / config_fs_output);
 

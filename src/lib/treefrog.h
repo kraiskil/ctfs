@@ -15,7 +15,7 @@ int16_t get_croak_data(int sample_num, enum tone);
 
 /* Platform-level interfaces */
 void play_croak(enum tone);
-void sleep_for(const std::chrono::duration<float>&);
+void sleep_for(const milliseconds_t&);
 void listen_for_croaks(listen_buf_t &buffer);
 
 enum led_ids
