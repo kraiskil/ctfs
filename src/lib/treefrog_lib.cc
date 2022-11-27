@@ -31,10 +31,10 @@ void treefrog(void)
 			play_croak(croak);
 			debug_led_off(LED_CROAK);
 			// Ignore replies to our croak;
-			sleep_for(10 * croak_duration);
+			sleep_for(2 * croak_duration);
 		}
 		else
-			sleep_for(2 * croak_duration);
+			sleep_for(croak_duration / 2);
 
 		print_statistics();
 	}

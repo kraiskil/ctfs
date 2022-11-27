@@ -111,8 +111,6 @@ void play_croak(enum tone tone_to_croak)
 	pa_simple_write(pas, croak_sound, sizeof(croak_sound), NULL);
 
 	// wait for the croak to finish playing.
-	// (I don't trust the pa_simple functions to provide this anymore :))
-	//pa_simple_drain(pas, &error);
-	std::this_thread::sleep_for(croak_duration);
+	pa_simple_drain(pas, &error);
 }
 
