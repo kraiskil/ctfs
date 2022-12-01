@@ -12,12 +12,11 @@ struct bin_val
 class peak_detect
 {
 public:
-	peak_detect(listen_buf_t &input_buf,
-	    frequency_buf_t &freq_buf,
-	    peak_array_t &peaks,
-	    unsigned peak_stddev_limit = default_peak_stddev_limit
-	    )
-		: audio_buffer(input_buf), // what is this for???
+	peak_detect(
+		frequency_buf_t &freq_buf,
+		peak_array_t &peaks,
+		unsigned peak_stddev_limit = default_peak_stddev_limit
+		) :
 		freq_buffer(freq_buf),
 		peaks(peaks),
 		peak_stddev_limit(peak_stddev_limit),
@@ -42,7 +41,6 @@ public:
 private:
 	void sort_tones_by_bin(void);
 	void sort_tones_by_value(void);
-	listen_buf_t &audio_buffer;
 	frequency_buf_t &freq_buffer;
 	peak_array_t &peaks;
 

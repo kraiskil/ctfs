@@ -5,7 +5,7 @@ class MockPeakDetect : public peak_detect
 {
 public:
 	MockPeakDetect()
-		: peak_detect(abuf, fbuf, pbuf)
+		: peak_detect(fbuf, pbuf)
 	{}
 	MOCK_METHOD0(get_num_peaks, unsigned(void));
 	MOCK_METHOD1(get_peak_by_val, struct bin_val (uint16_t));

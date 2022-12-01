@@ -42,9 +42,9 @@ void treefrog(void)
 
 static enum tone what_to_croak(listen_buf_t &buffer)
 {
-	frequency_buf_t            out;
+	frequency_buf_t            spectrum;
 	peak_array_t               peaks;
-	peak_detect                pd(buffer, out, peaks);
+	peak_detect                pd(spectrum, peaks);
 	tones                      t(peaks);
 	fft<fft_internal_datatype> the_fft;
 	the_fft.fs = config_fs_input;
@@ -52,7 +52,7 @@ static enum tone what_to_croak(listen_buf_t &buffer)
 	pd.frequency_correction = get_input_frequency_correction();
 
 	the_fft.dc_blocker(buffer);
-	the_fft.run(buffer, out);
+	the_fft.run(buffer, spectrum);
 	pd.find_peaks();
 
 

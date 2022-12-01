@@ -184,7 +184,7 @@ struct bin_val peak_detect::get_peak_by_bin(uint16_t peak_num)
 
 frequency_t peak_detect::bin_frequency(uint16_t frequency_bin) const
 {
-	float rv = (float)frequency_bin * config_fs_input / audio_buffer.size();
+	float rv = (float)frequency_bin * config_fs_input / listen_buffer_samples;
 	/* Correct systematic bad clock */
 	rv *= frequency_correction;
 	return rv;
@@ -192,7 +192,7 @@ frequency_t peak_detect::bin_frequency(uint16_t frequency_bin) const
 /* same thing, but allow fractional bins - results of peak interpolation */
 frequency_t peak_detect::bin_frequency(float frequency_bin) const
 {
-	float rv = frequency_bin * config_fs_input / audio_buffer.size();
+	float rv = frequency_bin * config_fs_input / listen_buffer_samples;
 	/* Correct systematic bad clock */
 	rv *= frequency_correction;
 	return rv;
