@@ -41,7 +41,6 @@ public:
 		: peaks(peaks)
 	{
 		detected_tones.fill(NOT_A_TONE);
-		detect_tones();
 	}
 
 	bool has_croak(void);

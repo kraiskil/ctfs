@@ -1,4 +1,5 @@
 #include "tones.h"
+#include "debug.h"
 
 enum tone tones::find_tone(const frequency_t frequency)
 {
@@ -52,6 +53,14 @@ void tones::detect_tones(void)
 				detected_tones[tone_idx++] = t;
 		}
 	}
+	#ifndef NDEBUG
+	DB_PRINT("detected_tones:\n");
+	for (auto t: detected_tones) {
+		if (t == NOT_A_TONE)
+			continue;
+		DB_PRINT("\ttone: %d\n", t);
+	}
+	#endif
 }
 
 enum tone tones::first_harmonic(void)
