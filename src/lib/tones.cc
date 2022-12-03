@@ -1,11 +1,11 @@
 #include "tones.h"
 #include "debug.h"
 
-enum tone tones::find_tone(const frequency_t frequency)
+enum note tones::find_tone(const frequency_t frequency)
 {
 	/* TODO: how about a smarter search algorithm? */
 	for (int i = A3; i < LAST_TONE; i++) {
-		enum tone e = (enum tone)i;
+		enum note e = (enum note)i;
 		if (frequency.close_enough(tone_freq[e]))
 			return e;
 	}
@@ -50,13 +50,12 @@ void tones::detect_tones(void)
 			continue;
 		DB_PRINT("\tpeak: %f, amplitude %d\n", float(p.freq), p.ampl);
 		if (has_harmonics(p)) {
-			enum tone t = find_tone(p.freq);
+			enum note t = find_tone(p.freq);
 			if (t != NOT_A_TONE)
 				detected_tones[tone_idx++] = t;
 		}
 	}
 	#ifndef NDEBUG
-#error todo print tone frequencies to match
 	DB_PRINT("detected_tones:\n");
 	for (auto t: detected_tones) {
 		if (t == NOT_A_TONE)
@@ -66,21 +65,21 @@ void tones::detect_tones(void)
 	#endif
 }
 
-enum tone tones::first_harmonic(void)
+enum note tones::first_harmonic(void)
 {
 	// Assume we want I of detected_tones[0]-major chord
-	return static_cast<enum tone>(detected_tones[0] + 4);
+	return static_cast<enum note>(detected_tones[0] + 4);
 }
-enum tone tones::second_harmonic(void)
+enum note tones::second_harmonic(void)
 {
 	// Assume we want I of detected_tones[0]-major chord
 	if (detected_tones[1] == detected_tones[0] + 4)
-		return static_cast<enum tone>(detected_tones[0] + 7);
+		return static_cast<enum note>(detected_tones[0] + 7);
 	else
 		return NOT_A_TONE;
 }
 
-enum tone tones::what_to_croak(void)
+enum note tones::what_to_croak(void)
 {
 	// TODO: random start-croak
 	if (detected_tones[0] == NOT_A_TONE)

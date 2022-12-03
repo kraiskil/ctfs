@@ -7,7 +7,7 @@
 #include "treefrog.h"
 
 
-static enum tone what_to_croak(listen_buf_t &buffer);
+static enum note what_to_croak(listen_buf_t &buffer);
 
 void treefrog(void)
 {
@@ -20,7 +20,7 @@ void treefrog(void)
 
 
 		debug_led_on(LED_PROCESSING);
-		enum tone croak = what_to_croak(buffer);
+		enum note croak = what_to_croak(buffer);
 		debug_led_off(LED_PROCESSING);
 		#ifndef NDEBUG
 		total_execution_time = wallclock_time_us();
@@ -40,7 +40,7 @@ void treefrog(void)
 	}
 }
 
-static enum tone what_to_croak(listen_buf_t &buffer)
+static enum note what_to_croak(listen_buf_t &buffer)
 {
 	frequency_buf_t            spectrum;
 	peak_array_t               peaks;

@@ -108,7 +108,7 @@ float filter(float in, float b[N])
 	return accu;
 }
 
-int16_t get_croak_data(int i, enum tone tone)
+int16_t get_croak_data(int i, enum note tone)
 {
 	float   d = 0;
 	int16_t uv = config_output_volume_value;

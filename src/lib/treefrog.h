@@ -11,10 +11,10 @@ void treefrog(void);
 void sleep_a_bit(void);
 
 // Get the sample_num'th data in one emitted croak
-int16_t get_croak_data(int sample_num, enum tone);
+int16_t get_croak_data(int sample_num, enum note);
 
 /* Platform-level interfaces */
-void play_croak(enum tone);
+void play_croak(enum note);
 void sleep_for(const milliseconds_t&);
 void listen_for_croaks(listen_buf_t &buffer);
 

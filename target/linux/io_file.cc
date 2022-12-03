@@ -99,8 +99,8 @@ void listen_for_croaks(listen_buf_t &buf)
 	memcpy(buffer, rdptr, sizeof(int16_t) * listen_buffer_samples);
 }
 
-void play_croak(enum tone t)
+void play_croak(enum note t)
 {
-	std::cout << "croaking (enum tone) " << t << std::endl;
+	std::cout << "croaking (enum note) " << t << std::endl;
 }
 

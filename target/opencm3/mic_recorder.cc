@@ -39,7 +39,7 @@ int main(void)
 	listen_buf_t    buf;
 	frequency_buf_t fbuf;
 	peak_array_t    pbuf;
-	peak_detect     ft(buf, fbuf, pbuf);
+	peak_detect     ft(fbuf, pbuf);
 	fft<float>      the_fft;
 
 	while (1) {

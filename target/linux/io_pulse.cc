@@ -79,7 +79,7 @@ void listen_for_croaks(listen_buf_t &buffer)
 	}
 }
 
-void play_croak(enum tone tone_to_croak)
+void play_croak(enum note tone_to_croak)
 {
 	int     croak_samples = croak_len_samples;
 	int16_t croak_sound[croak_samples];

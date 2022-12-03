@@ -2,7 +2,7 @@
 #include "datatype.h"
 #include <cstdint>
 
-enum tone
+enum note
 {
 	/* Lowest note & octave that FFT has currently enough resolution for */
 	A3         = 0, As3 = 1, Bf3 = 1, B3 = 2, C4 = 3, Cs4 = 4, Df4 = 4, D4 = 5,
@@ -34,6 +34,8 @@ const float tone_freq[LAST_TONE + 2] = {
 };
 
 
+// This class is badly named. Its currently a mix of what should be a single tone
+// class and a 'soundscape' class.
 class tones
 {
 public:
@@ -44,18 +46,18 @@ public:
 	}
 
 	bool has_croak(void);
-	enum tone what_to_croak(void);
-	enum tone find_tone(const frequency_t frequency);
+	enum note what_to_croak(void);
+	enum note find_tone(const frequency_t frequency);
 	void detect_tones(void);
 
 private:
-	enum tone first_harmonic(void);
-	enum tone second_harmonic(void);
+	enum note first_harmonic(void);
+	enum note second_harmonic(void);
 
 	bool has_harmonics(struct peak &base);
 	// Array of frequencies and their amplitudes
 	peak_array_t &peaks;
 	// Array of detected tones.
-	std::array<enum tone, max_detected_tones> detected_tones;
+	std::array<enum note, max_detected_tones> detected_tones;
 };
 

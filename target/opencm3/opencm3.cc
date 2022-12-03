@@ -43,7 +43,7 @@ void sleep_for(const milliseconds_t &time)
 }
 
 
-void play_croak(enum tone t)
+void play_croak(enum note t)
 {
 	debug_led_on(LED_CROAK);
 	audioDAC_setup();

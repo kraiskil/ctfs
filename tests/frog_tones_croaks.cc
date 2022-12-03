@@ -5,13 +5,13 @@ class FrogTonesCroakTest :
 	public testing::TestWithParam<int32_t>
 {
 public:
-	enum tone tone;
+	enum note tone;
 	tones *t;
 	uint16_t harmonics[3] = { 42, 42, 42 };
 
 	void SetUp(void) override
 	{
-		tone = static_cast<enum tone>(GetParam());
+		tone = static_cast<enum note>(GetParam());
 		// Fill in croak from after the attack, to make sure there
 		// is some data in in audio_buffer - not just attack-muted silence
 		// (the detection algorithms don't work well when audio amplitude is <10)

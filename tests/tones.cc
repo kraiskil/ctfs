@@ -19,7 +19,7 @@ public:
 
 	//TODO: croaks may change - this is what a croak
 	// looks like at the time of writing this.
-	void add_croak_peak(enum tone base)
+	void add_croak_peak(enum note base)
 	{
 		frequency_t f = tone_freq[base];
 		p[pai] = { f, 100 };
@@ -27,7 +27,7 @@ public:
 		pai += 2;
 		t->detect_tones();
 	}
-	void add_not_croak_peaks(enum tone base)
+	void add_not_croak_peaks(enum note base)
 	{
 		frequency_t f = tone_freq[base];
 		p[pai] = { f, 100 };
