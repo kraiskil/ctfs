@@ -34,8 +34,15 @@ const float tone_freq[LAST_TONE + 2] = {
 };
 
 
-// This class is badly named. Its currently a mix of what should be a single tone
-// class and a 'soundscape' class.
+// This class is badly named.
+// A more descriptive name would be 'soundscape'
+// When constructing an object of this class
+// is fed with collection of peaks found from a FFT
+// (in order to separate responsibilities, the FFT, peak detection
+//  and tone detection (here) are kept separate)
+// TODO: this must be split up:
+//   - detection of tones
+//   - decision on what croaks to generate
 class tones
 {
 public:
@@ -45,11 +52,18 @@ public:
 		detected_tones.fill(NOT_A_TONE);
 	}
 
+	// Does this soundscape contain the sound of a croak (i.e. tone)
 	bool has_croak(void);
+	// Given the existing croaks in this soundscape, what should the next
+	// croak be
 	enum note what_to_croak(void);
-	enum note find_tone(const frequency_t frequency);
+	// process input peaks data, fill detected_tones with
+	// result
 	void detect_tones(void);
 
+// TODO: this function should be private for "production" code,
+//       but unit tests need it
+	enum note find_tone(const frequency_t frequency);
 private:
 	enum note first_harmonic(void);
 	enum note second_harmonic(void);

@@ -6,6 +6,10 @@
 #include <cmath>
 #include <cstdio>
 
+// Filter coefficients for the croak synthesizing filter.
+// No clue anymore where the coefficients come from.
+// The comments at the start seem to be some sort of cutoff-frequency
+// for the filter. See filter() function for implementation.
 constexpr int N = 8;
 constexpr int nfb = 5;
 float         b[nfb][N] = {
@@ -19,6 +23,7 @@ float         b[nfb][N] = {
 /* 3000 */ { -0.0035679, 0.0394313, 0.2540534, 0.4201664, 0.2540534, 0.0394313  - 0.0035679 },
 /* 3000 */ { -0.0035679, 0.0394313, 0.2540534, 0.4201664, 0.2540534, 0.0394313  - 0.0035679 },
 };
+
 // phase-angle of the output wave
 static inline float calc_phase(int i, float freq)
 {
@@ -108,6 +113,8 @@ float filter(float in, float b[N])
 	return accu;
 }
 
+// Get the single audio sample amplitude data for a croak at base note 'tone',
+// at sample index i (from the start of the croak sound)
 int16_t get_croak_data(int i, enum note tone)
 {
 	float   d = 0;
