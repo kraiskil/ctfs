@@ -44,16 +44,19 @@ bool tones::has_croak(void)
 void tones::detect_tones(void)
 {
 	unsigned tone_idx = 0;
+	DB_PRINT("peaks:\n");
 	for (auto p: peaks) {
 		if (p.freq == 0)
 			continue;
-		else if (has_harmonics(p)) {
+		DB_PRINT("\tpeak: %f, amplitude %d\n", float(p.freq), p.ampl);
+		if (has_harmonics(p)) {
 			enum tone t = find_tone(p.freq);
 			if (t != NOT_A_TONE)
 				detected_tones[tone_idx++] = t;
 		}
 	}
 	#ifndef NDEBUG
+#error todo print tone frequencies to match
 	DB_PRINT("detected_tones:\n");
 	for (auto t: detected_tones) {
 		if (t == NOT_A_TONE)
