@@ -26,19 +26,24 @@ template <class internal_data_representation>
 class fft
 {
 	typedef std::complex<internal_data_representation> complex_t;
+	listen_buf_t &audio_buffer;
+	frequency_buf_t &output;
+
 public:
 	unsigned fft_size;
 	unsigned fs;
 	unsigned scale;
 
 	fft(
+		listen_buf_t &audio_buffer,
+		frequency_buf_t &output,
 		unsigned fft_size = MAX_FFT_SIZE,
 		unsigned fs = config_fs_input,
 		unsigned fft_scale = default_fft_scale)
-		: fft_size(fft_size), fs(fs), scale(fft_scale)
+		: audio_buffer(audio_buffer), output(output), fft_size(fft_size), fs(fs), scale(fft_scale)
 	{}
 
-	void dc_blocker(listen_buf_t &audio_buffer)
+	void dc_blocker(void)
 	{
 		// audio_buffer samples are zero-centered. This "should" not overflow
 		int32_t accu = 0;
@@ -51,12 +56,12 @@ public:
 	}
 
 	// bad naming, if the class is not an FFT-only. -> Rename to fft()
-	void run(listen_buf_t &input, frequency_buf_t &output)
+	void run(void)
 	{
 		uint32_t  start_time = wallclock_time_us();
 		complex_t complex_input[MAX_FFT_SIZE];
 		for (unsigned i = 0; i < fft_size; i++) {
-			complex_input[i].real(input[i]);
+			complex_input[i].real(audio_buffer[i]);
 			complex_input[i].imag(0);
 		}
 		fft_sa(fft_size, complex_input);
@@ -70,10 +75,10 @@ public:
 
 	/* Filter out noise.
 	 * Crude version: noise is everything under cutoff_freq Hz */
-	void noise_filter(frequency_buf_t &freq_buf, const int cutoff_freq)
+	void noise_filter(const int cutoff_freq)
 	{
 		for (int i = 0; i < frequency_to_index(cutoff_freq); i++) {
-			freq_buf[i] = 0;
+			output[i] = 0;
 		}
 	}
 

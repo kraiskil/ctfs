@@ -45,17 +45,18 @@ static enum note what_to_croak(listen_buf_t &audio_input)
 {
 	frequency_buf_t            spectrum;
 	peak_array_t               peaks;
+	fft<fft_internal_datatype> the_fft(
+	                                audio_input,
+	                                spectrum,
+	                                listen_buffer_samples, // fft_size
+	                                config_fs_input);      // fs, sampling freq
 	peak_detect                pd(spectrum, peaks);
-	tones                      t(peaks);
-	fft<fft_internal_datatype> the_fft;
-	the_fft.fs = config_fs_input;
-	the_fft.fft_size = audio_input.size();
+	tones t(peaks);
+
+	the_fft.dc_blocker();
+	the_fft.run();
 	pd.frequency_correction = get_input_frequency_correction();
-
-	the_fft.dc_blocker(audio_input);
-	the_fft.run(audio_input, spectrum);
 	pd.find_peaks();
-
 
 	if (t.has_croak() == false)
 		return NOT_A_TONE;

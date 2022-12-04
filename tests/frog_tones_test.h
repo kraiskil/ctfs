@@ -9,20 +9,21 @@ public:
 	peak_array_t peaks;
 	peak_detect *ft;
 	// TODO: maybe mock this. But so much effort is required to rewrite tests.
-	::fft<fft_internal_datatype> the_fft;
+	::fft<fft_internal_datatype> *the_fft;
 
 	FrogTonesTest()
 	{
 		freq_buffer.fill(0);
 		audio_buffer.fill(0);
 		ft = new peak_detect(freq_buffer, peaks);
+		the_fft = new fft<fft_internal_datatype>(audio_buffer, freq_buffer);
 		// TODO: for testing, should be the other way round:
 		// we set config_fs_input here, and peak_detect reads that.
 		fs = 8000; // =config_fs_input;
 		bin_accuracy = ((float)fs) / audio_buffer.size();
-		the_fft.fs = fs;
-		the_fft.fft_size = audio_buffer.size();
-		the_fft.scale = 1;
+		the_fft->fs = fs;
+		the_fft->fft_size = audio_buffer.size();
+		the_fft->scale = 1;
 	}
 
 	void add_audio_sine(int peak, int f_input, float phase = 0.2)

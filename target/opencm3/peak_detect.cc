@@ -17,7 +17,7 @@ int main(void)
 	frequency_buf_t fbuf;
 	peak_array_t    pbuf;
 	peak_detect     ft(fbuf, pbuf);
-	fft<float>      the_fft;
+	fft<float>      the_fft(abuf, fbuf);
 
 	the_fft.fs = config_fs_input;
 	the_fft.fft_size = abuf.size();
@@ -25,9 +25,9 @@ int main(void)
 
 	while (1) {
 		listen_for_croaks(abuf);
-		the_fft.dc_blocker(abuf);
-		the_fft.run(abuf, fbuf);
-		the_fft.noise_filter(fbuf, 100); // 100Hz seems to be a good choice for Spanish towns.
+		the_fft.dc_blocker();
+		the_fft.run();
+		the_fft.noise_filter(100); // 100Hz seems to be a good choice for Spanish towns.
 		ft.find_peaks();
 
 		printf("Frequency bins [0-500):\n        ");

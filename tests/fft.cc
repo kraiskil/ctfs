@@ -12,8 +12,8 @@ public:
 	unsigned fs;
 	unsigned fft_size;
 	unsigned fft_scale;
-	fft<int32_t> int32_fft;
-	fft<float> float_fft;
+	fft<int32_t> *int32_fft;
+	fft<float> *float_fft;
 	listen_buf_t input;
 	frequency_buf_t output;
 
@@ -24,13 +24,15 @@ public:
 		fs = GetParam();
 		fft_size = input.size();
 		fft_scale = 1;
+		int32_fft = new fft<int32_t>(input, output);
+		float_fft = new fft<float>(input, output);
 
-		int32_fft.fs = fs;
-		int32_fft.fft_size = fft_size;
-		float_fft.fs = fs;
-		float_fft.fft_size = fft_size;
-		int32_fft.scale = fft_scale;
-		float_fft.scale = fft_scale;
+		int32_fft->fs = fs;
+		int32_fft->fft_size = fft_size;
+		float_fft->fs = fs;
+		float_fft->fft_size = fft_size;
+		int32_fft->scale = fft_scale;
+		float_fft->scale = fft_scale;
 	}
 };
 
@@ -41,7 +43,7 @@ TEST_P(TestFFT, StepInputFloat)
 	for (int i = fft_size / 2; i < fft_size; i++)
 		input[i] = step_value;
 
-	float_fft.run(input, output);
+	float_fft->run();
 
 	/* Output shape should be a sinc */
 	EXPECT_FLOAT_EQ(output[0] / fft_scale, step_value / 2);
@@ -60,7 +62,7 @@ TEST_P(TestFFT, StepInputInt32)
 	for (int i = fft_size / 2; i < fft_size; i++)
 		input[i] = step_value;
 
-	int32_fft.run(input, output);
+	int32_fft->run();
 
 	/* Output shape should be a sinc */
 	/* NB: output[0] check is missing - it gets normalized, so absolute value is unknonw */
@@ -83,7 +85,7 @@ TEST_P(TestFFT, Normalization)
 	for (int i = fft_size / 2; i < fft_size; i++)
 		input[i] = step_value;
 
-	int32_fft.run(input, output);
+	int32_fft->run();
 
 	/* Output shape should be a sinc */
 	/* NB: output[0] check is missing - it gets normalized, so absolute value is unknonw */

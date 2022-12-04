@@ -19,16 +19,16 @@ int main(void)
 	peak_array_t    pbuf;
 	peak_detect     ft(fbuf, pbuf);
 	uint32_t        elapsed_time;
-	fft<float>      the_fft;
+	fft<float>      the_fft(abuf, fbuf);
 	the_fft.fs = config_fs_input;
 	the_fft.fft_size = abuf.size();
 
 	while (1) {
 		listen_for_croaks(abuf);
-		the_fft.dc_blocker(abuf);
+		the_fft.dc_blocker();
 		wallclock_start();
 		debug_led_on(LED_PROCESSING);
-		the_fft.run(abuf, fbuf);
+		the_fft.run();
 		debug_led_off(LED_PROCESSING);
 		elapsed_time = wallclock_time_us();
 		printf("Calculated fft in %ldus\n", elapsed_time);

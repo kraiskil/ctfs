@@ -25,18 +25,18 @@ public:
 
 TEST_P(FrogTonesCroakTest, PeaksFromCroak)
 {
-	the_fft.dc_blocker(audio_buffer);
-	the_fft.run(audio_buffer, freq_buffer);
-	ft->find_peaks();
+		the_fft->dc_blocker();
+		the_fft->run();
+		ft->find_peaks();
 
-	EXPECT_GT(ft->get_num_peaks(), 1);
-	EXPECT_TRUE(ft->has_peak_at(tone_freq[tone]));
-}
+		EXPECT_GT(ft->get_num_peaks(), 1);
+		EXPECT_TRUE(ft->has_peak_at(tone_freq[tone]));
+	}
 
-TEST_P(FrogTonesCroakTest, DetectCroaks)
-{
-	the_fft.dc_blocker(audio_buffer);
-	the_fft.run(audio_buffer, freq_buffer);
+	TEST_P(FrogTonesCroakTest, DetectCroaks)
+	{
+		the_fft->dc_blocker();
+		the_fft->run();
 	ft->find_peaks();
 	EXPECT_TRUE(t->has_croak());
 }

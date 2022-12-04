@@ -24,7 +24,7 @@ TEST_F(FrogTonesHarmonicsTest, SingleCroak)
 	// (Does this exist, if nobody is there to hear it?)
 	add_frog_sound(200, 1000);
 
-	the_fft.run(audio_buffer, freq_buffer);
+	the_fft->run();
 	ft->find_peaks();
 
 	find_harmonics(*ft, harmonics);
@@ -41,7 +41,7 @@ TEST_F(FrogTonesHarmonicsTest, SingleCroakAndNoise)
 	add_frog_sound(200, 1000);
 	add_audio_noise(200);
 
-	the_fft.run(audio_buffer, freq_buffer);
+	the_fft->run();
 	ft->find_peaks();
 	find_harmonics(*ft, harmonics);
 
@@ -56,7 +56,7 @@ TEST_F(FrogTonesHarmonicsTest, NotACroak)
 	add_audio_sine(200, 1000);
 	add_audio_sine(200, 2300);
 
-	the_fft.run(audio_buffer, freq_buffer);
+	the_fft->run();
 	ft->find_peaks();
 	find_harmonics(*ft, harmonics);
 
@@ -69,7 +69,7 @@ TEST_F(FrogTonesHarmonicsTest, FrogInA4)
 {
 	add_frog_sound(200, 440);
 
-	the_fft.run(audio_buffer, freq_buffer);
+	the_fft->run();
 	ft->find_peaks();
 	find_harmonics(*ft, harmonics);
 
@@ -86,7 +86,7 @@ TEST_F(FrogTonesHarmonicsTest, FourArtificailTreeFrogs)
 	add_frog_sound(200, 1200);
 	add_frog_sound(200, 1500);
 
-	the_fft.run(audio_buffer, freq_buffer);
+	the_fft->run();
 	ft->find_peaks();
 	find_harmonics(*ft, harmonics);
 
@@ -104,7 +104,7 @@ TEST_F(FrogTonesHarmonicsTest, FourTreeFrogs)
 	add_frog_sound(200, 523); //C5
 	add_frog_sound(200, 554); //C#5
 
-	the_fft.run(audio_buffer, freq_buffer);
+	the_fft->run();
 	ft->find_peaks();
 	find_harmonics(*ft, harmonics);
 
@@ -122,7 +122,7 @@ TEST_F(FrogTonesHarmonicsTest, FourBassTreeFrogs)
 	add_frog_sound(200, 245); //B3
 	add_frog_sound(200, 262); //C4
 
-	the_fft.run(audio_buffer, freq_buffer);
+	the_fft->run();
 	ft->find_peaks();
 	find_harmonics(*ft, harmonics);
 
