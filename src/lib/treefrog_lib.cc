@@ -9,6 +9,7 @@
 
 static enum note what_to_croak(listen_buf_t &buffer);
 
+// main entry point for the full frog
 void treefrog(void)
 {
 	listen_buf_t buffer;
@@ -40,7 +41,7 @@ void treefrog(void)
 	}
 }
 
-static enum note what_to_croak(listen_buf_t &buffer)
+static enum note what_to_croak(listen_buf_t &audio_input)
 {
 	frequency_buf_t            spectrum;
 	peak_array_t               peaks;
@@ -48,11 +49,11 @@ static enum note what_to_croak(listen_buf_t &buffer)
 	tones                      t(peaks);
 	fft<fft_internal_datatype> the_fft;
 	the_fft.fs = config_fs_input;
-	the_fft.fft_size = buffer.size();
+	the_fft.fft_size = audio_input.size();
 	pd.frequency_correction = get_input_frequency_correction();
 
-	the_fft.dc_blocker(buffer);
-	the_fft.run(buffer, spectrum);
+	the_fft.dc_blocker(audio_input);
+	the_fft.run(audio_input, spectrum);
 	pd.find_peaks();
 
 

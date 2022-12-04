@@ -37,17 +37,20 @@ public:
 		unsigned fft_scale = default_fft_scale)
 		: fft_size(fft_size), fs(fs), scale(fft_scale)
 	{}
+
 	void dc_blocker(listen_buf_t &audio_buffer)
 	{
+		// audio_buffer samples are zero-centered. This "should" not overflow
 		int32_t accu = 0;
 		for (auto v : audio_buffer)
 			accu += v;
+
 		accu = accu >> listen_buffer_samples_log2;
 		for (auto &v: audio_buffer)
 			v -= accu;
 	}
 
-
+	// bad naming, if the class is not an FFT-only. -> Rename to fft()
 	void run(listen_buf_t &input, frequency_buf_t &output)
 	{
 		uint32_t  start_time = wallclock_time_us();
