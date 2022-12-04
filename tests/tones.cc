@@ -88,6 +88,8 @@ TEST_F(TonesTest, TwoPeaksNotACroak)
  * These tests assume the frog replies with a tone
  * in the 'base' major chord:
  * I.e. if always base-major_3rd-perfect_5th */
+// TODO: This functionality has moved to class croak_reply
+#if 0
 TEST_F(TonesTest, FirstHarmonicC4)
 {
 	add_croak_peak(C4);
@@ -120,4 +122,5 @@ TEST_F(TonesTest, NoHarmonicC4)
 	add_croak_peak(D4);
 	EXPECT_EQ(t->what_to_croak(), NOT_A_TONE);
 }
+#endif
 

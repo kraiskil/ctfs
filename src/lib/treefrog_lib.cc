@@ -3,6 +3,7 @@
 #include "debug.h"
 #include "fft.h"
 #include "peak_detect.h"
+#include "croak_reply.h"
 #include "harmonics.h"
 #include "treefrog.h"
 
@@ -45,6 +46,7 @@ static enum note what_to_croak(listen_buf_t &audio_input)
 {
 	frequency_buf_t            spectrum;
 	peak_array_t               peaks;
+	croak_array_t              croaks;
 	fft<fft_internal_datatype> the_fft(
 	                                audio_input,
 	                                spectrum,
@@ -52,6 +54,7 @@ static enum note what_to_croak(listen_buf_t &audio_input)
 	                                config_fs_input);      // fs, sampling freq
 	peak_detect                pd(spectrum, peaks);
 	tones t(peaks);
+	croak_reply cr(croaks);
 
 	the_fft.dc_blocker();
 	the_fft.run();
@@ -61,7 +64,7 @@ static enum note what_to_croak(listen_buf_t &audio_input)
 	if (t.has_croak() == false)
 		return NOT_A_TONE;
 	else
-		return t.what_to_croak();
+		return cr.what_to_croak();
 }
 
 // frog-level sleep, when there are no croaks to join

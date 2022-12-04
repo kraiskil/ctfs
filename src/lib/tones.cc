@@ -79,6 +79,7 @@ enum note tones::second_harmonic(void)
 		return NOT_A_TONE;
 }
 
+# if 0
 enum note tones::what_to_croak(void)
 {
 	// TODO: random start-croak
@@ -93,4 +94,4 @@ enum note tones::what_to_croak(void)
 
 	return NOT_A_TONE;
 }
-
+#endif
