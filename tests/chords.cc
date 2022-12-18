@@ -2,6 +2,13 @@
  * Tests for the chord algorithms
  * i.e. given a soundscape, what
  * should the next tone be
+
+ * This test stinks.
+ * What chord/tone in chord to play next is videly complex,
+ * depends on previous tones too.
+ * croak_reply is the place to put the AI into, and these tests
+ * are therefore impossible / should be done on the triad/chord classes
+ * instead of the croak_reply (which is more chord progression stuff)
  */
 #include "gtest/gtest.h"
 #include "croak_reply.h"
@@ -40,6 +47,15 @@ TEST_F(ChordsTest, CMajorTriad5th)
 	// TODO: fix replies to the Major scale
 	croaks[0] = C4;
 	croaks[1] = E4;
+	enum note reply = replies->what_to_croak();
+	EXPECT_EQ(reply, G4);
+}
+
+TEST_F(ChordsTest, CMajorTriad5thUnsorted)
+{
+	// TODO: fix replies to the Major scale
+	croaks[3] = C4;
+	croaks[2] = E4;
 	enum note reply = replies->what_to_croak();
 	EXPECT_EQ(reply, G4);
 }

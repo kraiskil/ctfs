@@ -8,7 +8,7 @@ public:
 	enum note tone;
 	tones *t;
 	uint16_t harmonics[3] = { 42, 42, 42 };
-
+	croak_array_t detected_tones;
 	void SetUp(void) override
 	{
 		tone = static_cast<enum note>(GetParam());
@@ -18,25 +18,25 @@ public:
 		for (int i = 0; i < audio_buffer.size(); i++)
 			audio_buffer[i] = get_croak_data(i + attack_len, tone);
 
-		t = new tones(peaks);
+		t = new tones(peaks, detected_tones);
 	}
 };
 
 
 TEST_P(FrogTonesCroakTest, PeaksFromCroak)
 {
-		the_fft->dc_blocker();
-		the_fft->run();
-		ft->find_peaks();
+	the_fft->dc_blocker();
+	the_fft->run();
+	ft->find_peaks();
 
-		EXPECT_GT(ft->get_num_peaks(), 1);
-		EXPECT_TRUE(ft->has_peak_at(tone_freq[tone]));
-	}
+	EXPECT_GT(ft->get_num_peaks(), 1);
+	EXPECT_TRUE(ft->has_peak_at(tone_freq[tone]));
+}
 
-	TEST_P(FrogTonesCroakTest, DetectCroaks)
-	{
-		the_fft->dc_blocker();
-		the_fft->run();
+TEST_P(FrogTonesCroakTest, DetectCroaks)
+{
+	the_fft->dc_blocker();
+	the_fft->run();
 	ft->find_peaks();
 	EXPECT_TRUE(t->has_croak());
 }

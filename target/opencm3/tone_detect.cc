@@ -27,12 +27,14 @@ int main(void)
 	pd.frequency_correction = get_input_frequency_correction();
 
 	while (1) {
+		pbuf.fill({ 0, 0 });
+		cbuf.fill(NOT_A_TONE);
 		listen_for_croaks(abuf);
 		the_fft.dc_blocker();
 		the_fft.run();
 		the_fft.noise_filter(100); // 100Hz seems to be a good choice for Spanish towns.
 		pd.find_peaks();
-		
+
 
 		printf("Peaks:\n");
 		for (unsigned i = 0; i < pd.get_num_peaks(); i++) {
@@ -45,7 +47,7 @@ int main(void)
 		}
 		printf("================\n\n");
 
-		tones t(pbuf);
+		tones t(pbuf, cbuf);
 		if (t.has_croak() ) {
 			printf("--- CROAK found! should reply with (enum tones)%d\n\n", cr.what_to_croak());
 		}

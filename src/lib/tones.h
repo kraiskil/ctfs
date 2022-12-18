@@ -28,8 +28,8 @@ const float tone_freq[LAST_TONE + 2] = {
 class tones
 {
 public:
-	tones(peak_array_t &peaks)
-		: peaks(peaks)
+	tones(peak_array_t &peaks, croak_array_t &tones)
+		: peaks(peaks), detected_tones(tones)
 	{
 		detected_tones.fill(NOT_A_TONE);
 	}
@@ -54,6 +54,6 @@ private:
 	// Array of frequencies and their amplitudes
 	peak_array_t &peaks;
 	// Array of detected tones.
-	std::array<enum note, max_detected_tones> detected_tones;
+	croak_array_t &detected_tones;
 };
 

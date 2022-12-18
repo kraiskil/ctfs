@@ -8,6 +8,15 @@
 #include "treefrog.h"
 
 
+frequency_buf_t spectrum;
+peak_array_t    peaks;
+croak_array_t   croaks;
+peak_detect     pd(spectrum, peaks);
+tones           t(peaks, croaks);
+croak_reply     cr(croaks);
+
+
+
 static enum note what_to_croak(listen_buf_t &buffer);
 
 // main entry point for the full frog
@@ -22,11 +31,14 @@ void treefrog(void)
 
 
 		debug_led_on(LED_PROCESSING);
+		peaks.fill({ 0, 0 });    // Don't save history of the soundscape
+		croaks.fill(NOT_A_TONE); // Don't save history of the soundscape
 		enum note croak = what_to_croak(buffer);
 		debug_led_off(LED_PROCESSING);
 		#ifndef NDEBUG
 		total_execution_time = wallclock_time_us();
 		#endif
+		print_statistics();
 
 		if (croak != NOT_A_TONE) {
 			debug_led_on(LED_CROAK);
@@ -38,33 +50,23 @@ void treefrog(void)
 		else
 			sleep_for(croak_duration / 2);
 
-		print_statistics();
 	}
 }
 
 static enum note what_to_croak(listen_buf_t &audio_input)
 {
-	frequency_buf_t            spectrum;
-	peak_array_t               peaks;
-	croak_array_t              croaks;
+	// TODO: make up my mind. Should audio_input be a global or not?
 	fft<fft_internal_datatype> the_fft(
-	                                audio_input,
-	                                spectrum,
-	                                listen_buffer_samples, // fft_size
-	                                config_fs_input);      // fs, sampling freq
-	peak_detect                pd(spectrum, peaks);
-	tones t(peaks);
-	croak_reply cr(croaks);
-
+		audio_input,
+		spectrum,
+		listen_buffer_samples, // fft_size
+		config_fs_input);      // fs, sampling freq
 	the_fft.dc_blocker();
 	the_fft.run();
 	pd.frequency_correction = get_input_frequency_correction();
 	pd.find_peaks();
-
-	if (t.has_croak() == false)
-		return NOT_A_TONE;
-	else
-		return cr.what_to_croak();
+	t.detect_tones();
+	return cr.what_to_croak();
 }
 
 // frog-level sleep, when there are no croaks to join

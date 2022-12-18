@@ -8,11 +8,11 @@ class TonesTest : public testing::Test
 public:
 	tones *t;
 	peak_array_t p;
-
+	croak_array_t detect_tones;
 
 	void SetUp(void) override
 	{
-		t = new tones(p);
+		t = new tones(p, detect_tones);
 		p.fill({ 0, 0 });
 		pai = 0;
 	}

@@ -8,6 +8,7 @@ public:
 	listen_buf_t audio_buffer;
 	peak_array_t peaks;
 	peak_detect *ft;
+	croak_array_t detected_tones;
 	// TODO: maybe mock this. But so much effort is required to rewrite tests.
 	::fft<fft_internal_datatype> *the_fft;
 

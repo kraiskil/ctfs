@@ -1,4 +1,5 @@
 #include "config.h"
+#include "datatype.h"
 #include "debug.h"
 #include "peak_detect.h"
 #include "fft.h"
