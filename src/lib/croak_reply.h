@@ -7,7 +7,7 @@
 #include "debug.h"
 
 #include <algorithm>
-
+#include <cstdlib>
 
 class croak_reply
 {
@@ -19,7 +19,7 @@ public:
 	croak_reply(croak_array_t &input)
 		: input(input)
 	{
-		steps_of_silence = 10;
+		steps_of_silence = 3;
 	}
 
 	bool input_is_silence(void)
@@ -27,14 +27,21 @@ public:
 		return input[0] == NOT_A_TONE;
 	}
 
+	enum note generate_random_seednote(void)
+	{
+		// Generate note between [A3,G4]
+		unsigned offset = rand() % 10;
+		return static_cast<enum note>(A3 + offset);
+	}
+
 	enum note maybe_break_silence(void)
 	{
 		// TODO: randomize the delay
 		steps_of_silence--;
 		if (steps_of_silence < 0) {
-			DB_PRINT("\tBreaking silence!\n");
+			DB_PRINT("Breaking silence!\n");
 			steps_of_silence = 10;
-			return G4;
+			return generate_random_seednote();
 		}
 		else
 			return NOT_A_TONE;

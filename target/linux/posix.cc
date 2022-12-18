@@ -28,7 +28,9 @@ std::string led_to_string(enum led_ids led)
 
 void sleep_for(const milliseconds_t &time)
 {
+
 	debug_led_on(LED_SLEEP);
+	std::cout << "\t\tsleeping for: " << time.count() << "ms" << std::endl;
 	std::this_thread::sleep_for(time);
 	debug_led_off(LED_SLEEP);
 }

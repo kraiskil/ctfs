@@ -18,39 +18,56 @@ croak_reply     cr(croaks);
 
 
 static enum note what_to_croak(listen_buf_t &buffer);
+static enum note listen_and_process(void);
+
+// helper function to tune delays to sync the sounds
+static void sleep_before_listening(void);
+static void sleep_before_croaking(void);
+static void sleep_after_croaking(void);
+static void sleep_when_silent(void);
+
 
 // main entry point for the full frog
 void treefrog(void)
 {
-	listen_buf_t buffer;
+	enum note croak;
+
 	while (true) {
 		wallclock_start();
-		debug_led_on(LED_LISTENING);
-		listen_for_croaks(buffer);
-		debug_led_off(LED_LISTENING);
 
-
-		debug_led_on(LED_PROCESSING);
-		peaks.fill({ 0, 0 });    // Don't save history of the soundscape
-		croaks.fill(NOT_A_TONE); // Don't save history of the soundscape
-		enum note croak = what_to_croak(buffer);
-		debug_led_off(LED_PROCESSING);
-		#ifndef NDEBUG
-		total_execution_time = wallclock_time_us();
-		#endif
-		print_statistics();
+		sleep_before_listening();
+		croak = listen_and_process();
 
 		if (croak != NOT_A_TONE) {
+			sleep_before_croaking();
 			debug_led_on(LED_CROAK);
 			play_croak(croak);
 			debug_led_off(LED_CROAK);
-			// Ignore replies to our croak;
-			sleep_for(2 * croak_duration);
+			sleep_after_croaking();
 		}
 		else
-			sleep_for(croak_duration / 2);
+			sleep_when_silent();
 
 	}
+}
+
+static enum note listen_and_process(void)
+{
+	listen_buf_t buffer;
+	debug_led_on(LED_LISTENING);
+	listen_for_croaks(buffer);
+	debug_led_off(LED_LISTENING);
+
+	debug_led_on(LED_PROCESSING);
+	peaks.fill({ 0, 0 });    // Don't save history of the soundscape
+	croaks.fill(NOT_A_TONE); // Don't save history of the soundscape
+	enum note croak = what_to_croak(buffer);
+	debug_led_off(LED_PROCESSING);
+	#ifndef NDEBUG
+	total_execution_time = wallclock_time_us();
+	//print_statistics();
+	#endif
+	return croak;
 }
 
 static enum note what_to_croak(listen_buf_t &audio_input)
@@ -88,5 +105,27 @@ void print_statistics(void)
 	printf("\ttotal execution time: %jd ms (%jd us)\n",
 	    (intmax_t)total_execution_time / 1000, (intmax_t)total_execution_time);
 #endif
+}
+
+static void sleep_before_listening(void)
+{
+	milliseconds_t sleep(1000 + rand() % 2000);
+	sleep_for(sleep);
+}
+static void sleep_before_croaking(void)
+{
+	milliseconds_t sleep(croak_duration / 4);
+	sleep_for(sleep);
+}
+static void sleep_after_croaking(void)
+{
+	milliseconds_t sleep(rand() % 2000);
+	sleep_for(sleep);
+	sleep_for(2 * croak_duration);
+}
+static void sleep_when_silent(void)
+{
+	milliseconds_t sleep(croak_duration / 8);
+	sleep_for(sleep);
 }
 
