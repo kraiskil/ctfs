@@ -16,7 +16,7 @@ typedef std::array<audio_sample_t, listen_buffer_samples> listen_buf_t;
 
 
 /******
- * FFT 
+ * FFT
  */
 typedef int16_t fixp;
 // TODO 0x8000 is nicer to divide with, but that would
@@ -95,7 +95,7 @@ enum note
 {
 	/* Lowest note & octave that FFT has currently enough resolution for */
 	A3         = 0, As3 = 1, Bf3 = 1, B3 = 2, C4 = 3, Cs4 = 4, Df4 = 4, D4 = 5,
-	Ds4        = 6, E4  = 7, F4  = 8, Fs4 = 9, G4  = 10, Gs4 = 11,
+	Ds4        = 6, Ef4 = 6, E4  = 7, F4  = 8, Fs4 = 9, G4  = 10, Gs4 = 11,
 	/* Next one */
 	A4         = 12, As4 = 13, B4  = 14, C5  = 15, Cs5 = 16, D5  = 17, Ds5 = 18,
 	E5         = 19, F5  = 20, Fs5 = 21, G5  = 22, Gs5 = 23,

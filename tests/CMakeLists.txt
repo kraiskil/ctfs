@@ -1,4 +1,5 @@
 add_executable(unittests
+	chords.cc
 	frog_tones_croaks.cc
 	frog_tones_freq.cc
 	frog_tones_harmonics.cc
