@@ -37,7 +37,6 @@ endif()
 function(build_target target_name)
 	add_executable( ${target_name}
 		${target_name}.cc
-		io.cc
 		opencm3.cc
 		${BOARD_SUPPORT_FILE}
 	)
@@ -48,7 +47,6 @@ endfunction()
 #Build target with main in common src/ directory
 function(build_link_target target_name)
 	add_executable( ${target_name}
-		io.cc
 		opencm3.cc
 		${BOARD_SUPPORT_FILE}
 	)

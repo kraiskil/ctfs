@@ -44,6 +44,7 @@ extern "C" {
 }
 #include "treefrog.h"
 #include "opencm3.h"
+#include "input_i2s.h"
 
 
 /* Correction term for the audio clock running a bit fast */

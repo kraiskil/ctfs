@@ -1,3 +1,8 @@
+/*
+ * Input handling adaptation.
+ * Intended to be #include'd from the
+ * BOARD_SUPPORT_FILE
+ */
 #include "board_config.h"
 #include "config.h"
 #include "datatype.h"

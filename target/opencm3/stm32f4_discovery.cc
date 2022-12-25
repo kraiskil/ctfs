@@ -44,6 +44,7 @@ extern "C" {
 }
 #include "treefrog.h"
 #include "opencm3.h"
+#include "input_i2s.h"
 
 /* Correction term for the audio clock running a bit slow */
 constexpr float frequency_correction = 1.024;
@@ -53,9 +54,11 @@ float get_input_frequency_correction(void)
 }
 
 struct led leds[LED_LAST] = {
-	{ GPIOD, GPIO12, not_inverted}, //croak
-	{ GPIOD, GPIO14, not_inverted}, //sleep
-	{ GPIOD, GPIO15, not_inverted}, //processing
+	{
+		GPIOD, GPIO12, not_inverted
+	},                               //croak
+	{ GPIOD, GPIO14, not_inverted }, //sleep
+	{ GPIOD, GPIO15, not_inverted }, //processing
 };
 
 
