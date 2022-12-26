@@ -13,5 +13,8 @@ constexpr uint16_t config_output_volume_value = 600;
 // value for DAC volume registers
 constexpr uint8_t dac_volume = 0xf0;
 
-#define HAVE_DEBUG_SWO
+//#define HAVE_DEBUG_SWO
+#define HAVE_DEBUG_USART
+#define DEBUG_USART USART2
+#define DEBUG_USART_RCC RCC_USART2
 

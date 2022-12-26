@@ -125,15 +125,15 @@ void board_setup_i2c(void)
 
 void board_setup_usart(void)
 {
-	rcc_periph_clock_enable(RCC_USART2);
+	rcc_periph_clock_enable(DEBUG_USART_RCC);
 
-	usart_set_baudrate(USART2, 115200);
-	usart_set_databits(USART2, 8);
-	usart_set_stopbits(USART2, USART_STOPBITS_1);
-	usart_set_mode(USART2, USART_MODE_TX);
-	usart_set_parity(USART2, USART_PARITY_NONE);
-	usart_set_flow_control(USART2, USART_FLOWCONTROL_NONE);
-	usart_enable(USART2);
+	usart_set_baudrate(DEBUG_USART, 115200);
+	usart_set_databits(DEBUG_USART, 8);
+	usart_set_stopbits(DEBUG_USART, USART_STOPBITS_1);
+	usart_set_mode(DEBUG_USART, USART_MODE_TX);
+	usart_set_parity(DEBUG_USART, USART_PARITY_NONE);
+	usart_set_flow_control(DEBUG_USART, USART_FLOWCONTROL_NONE);
+	usart_enable(DEBUG_USART);
 }
 
 void board_setup_i2s_in(void)
