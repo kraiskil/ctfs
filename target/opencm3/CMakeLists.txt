@@ -81,8 +81,9 @@ function (common_build_target target_name)
 			flash_${target_name}
 			DEPENDS ${target_name}
 			COMMAND arm-none-eabi-objcopy -O binary ${target_name} ${target_name}.bin
-			COMMAND dfu-tool convert raw ${target_name}.bin ${target_name}.dfu
-			COMMAND dfu-util -a 0 -s 0x08000000 -D ${target_name}.dfu
+			# convert to a DFU file and upload it. Press the correct reset & boot buttons :)
+			COMMAND dfu-suffix -a ${target_name}.bin
+			COMMAND dfu-util -a 0 -s 0x08000000 -D ${target_name}.bin
 			)
 	else()
 		message(FATAL_ERROR "Select flashing method by setting CMAKE_FLASH")
