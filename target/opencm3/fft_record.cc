@@ -11,7 +11,7 @@ int main(void)
 	board_setup_clock();
 	board_setup_gpio();
 	board_setup_usart();
-	board_setup_i2s_in();
+	board_setup_audio_in();
 	board_setup_wallclock();
 
 	listen_buf_t    abuf;

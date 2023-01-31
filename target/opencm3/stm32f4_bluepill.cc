@@ -116,7 +116,7 @@ void board_setup_usart(void)
 	usart_enable(DEBUG_USART);
 }
 
-void board_setup_i2s_in(void)
+void board_setup_audio_in(void)
 {
 	/* Using SPI3.
 	 * This means the SWO and bit clock are mapped to the same pin (PB3)

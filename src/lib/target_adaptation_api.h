@@ -18,7 +18,7 @@ void board_setup_clock(void);
 void board_setup_gpio(void);
 void board_setup_i2c(void);
 void board_setup_usart(void);
-void board_setup_i2s_in(void);
+void board_setup_audio_in(void);
 void board_setup_wallclock(void);
 
 void write_i2c_to_audiochip(uint8_t reg, uint8_t contents);

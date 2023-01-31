@@ -136,7 +136,7 @@ void board_setup_usart(void)
 	usart_enable(DEBUG_USART);
 }
 
-void board_setup_i2s_in(void)
+void board_setup_audio_in(void)
 {
 	/* I2S pins:
 	 * Master clock: PA3

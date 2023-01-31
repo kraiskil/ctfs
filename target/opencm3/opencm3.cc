@@ -82,7 +82,7 @@ void board_init(void)
 	board_setup_gpio();
 	board_setup_i2c();
 	board_setup_usart();
-	board_setup_i2s_in();
+	board_setup_audio_in();
 	board_setup_wallclock();
 	i2s_playback_setup();
 }
