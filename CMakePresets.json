@@ -33,7 +33,13 @@
       "name": "Nucleo",
       "displayName": "STM32F4 Nucleo",
       "description": "Cross compile for the F4 nucleo board.",
-      "inherits": "OpenCM3"
+      "inherits": "OpenCM3",
+      "cacheVariables": {
+        "CMAKE_BOARD": {
+          "type": "STRING",
+          "value": "stm32f4_nucleo"
+        }
+      }
     },
     {
       "name": "Disco",
