@@ -6,24 +6,21 @@
  *   (internal to the ST-LINK-v2-1)
  *   PA2 - TX
  *   PA3 - RX
- *  Sound out (SPI/I2S tbd):
- *   old values!
- *   PC7 - master clock
- *   PC10- bit clock
- *   PC12- data
- *   PA4 - l/r clock
- *   PD4 - DAC reset
- *  Sound in (ADC? 1):
- *   old values!
- *   PA3 - master clock
+ *  Sound out (SPI/I2S 2):
  *   PB13- bit clock
- *   PC3- data
- *   PB12- l/r clock
+ *   PB15- data
+ *   PB12 - l/r clock
+ *  Sound in (ADC? 1):
+ *   select one of these
+ *   PA0 - ADC1, ch0
+ *   PA1 - ADC1, ch1
  * LEDS:
  *   old values! there is just the one led on this board
  *   PA5 - (builtin red) listening
  *   PA6 - (unknown. Hopefully disconnected) all the other ones
- *
+ * Timers:
+ *   TIM2 - wallclock. 1ms tick
+ *   TIM5 - Audio input ADC trigger
  */
 
 
@@ -44,7 +41,7 @@ extern "C" {
 }
 #include "treefrog.h"
 #include "opencm3.h"
-#include "input_i2s.h"
+#include "input_adc.h"
 
 /* Correction term for the audio clock running a bit slow */
 constexpr float frequency_correction = 1.024;
@@ -53,13 +50,16 @@ float get_input_frequency_correction(void)
 	return frequency_correction;
 }
 
+// GPIO A5 - onboard red LED
+//      A6 - unconnected pin. Used as dummy
+
 struct led leds[LED_LAST] = {
 	{
 		GPIOA, GPIO6, not_inverted
-	},                              //croak - unconnected
-	{ GPIOA, GPIO6, not_inverted }, //sleep - unconnected
-	{ GPIOA, GPIO6, not_inverted }, //processing - unconnected
-	{ GPIOA, GPIO5, not_inverted }, //listening - red
+	},                              //croak
+	{ GPIOA, GPIO6, not_inverted }, //sleep
+	{ GPIOA, GPIO6, not_inverted }, //processing
+	{ GPIOA, GPIO6, not_inverted }, //listening
 };
 
 
@@ -68,42 +68,21 @@ void board_setup_clock(void)
 	rcc_clock_setup_pll(&rcc_hsi_configs[RCC_CLOCK_3V3_84MHZ]);
 
 	rcc_osc_on(RCC_PLLI2S);
-	rcc_periph_clock_enable(RCC_SPI2); //input i2s
-	rcc_periph_clock_enable(RCC_SPI3); //output i2s
-
+	rcc_periph_clock_enable(RCC_SPI2); //output i2s
 }
 
 void board_setup_gpio(void)
 {
-	/* PortA is used for:
-	 *  USART
-	 *  Digital audio in
-	 *  LED
-	 * PortB:
-	 *  DAC I2C
-	 *  Digital audio in
-	 * PortC is used for:
-	 *  Digital audio out
-	 */
 	rcc_periph_clock_enable(RCC_GPIOA);
 	rcc_periph_clock_enable(RCC_GPIOB);
 	rcc_periph_clock_enable(RCC_GPIOC);
 	rcc_periph_clock_enable(RCC_GPIOD);
 
+	gpio_mode_setup(GPIOA, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, GPIO5);
+
 	for (int id = 0; id < LED_LAST; id++) {
 		gpio_mode_setup(leds[id].port, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, leds[id].pin);
-		gpio_mode_setup(leds[id].port, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, leds[id].pin);
 	}
-
-#if 0
-	/* I2C to Audio chip */
-	gpio_mode_setup(GPIOB, GPIO_MODE_AF, GPIO_PUPD_PULLUP, GPIO6); //SCL
-	gpio_mode_setup(GPIOB, GPIO_MODE_AF, GPIO_PUPD_PULLUP, GPIO9); //SDA
-	gpio_set_af(GPIOB, GPIO_AF4, GPIO6);
-	gpio_set_af(GPIOB, GPIO_AF4, GPIO9);
-	gpio_set_output_options(GPIOB, GPIO_OTYPE_OD, GPIO_OSPEED_25MHZ, GPIO6);
-	gpio_set_output_options(GPIOB, GPIO_OTYPE_OD, GPIO_OSPEED_25MHZ, GPIO9);
-#endif
 
 	/* Connects PA2 to USART2 TX */
 	gpio_mode_setup(GPIOA, GPIO_MODE_AF, GPIO_PUPD_NONE, GPIO2);
@@ -127,48 +106,46 @@ void board_setup_usart(void)
 	usart_enable(DEBUG_USART);
 }
 
+void tim5_isr(void)
+{
+	// clear something, or this ISR gets hit without pause
+	TIM_SR(TIM5) &= ~TIM_SR_UIF;
+	gpio_toggle(GPIOA, GPIO5); // red led
+	// TODO: toggle the ADC conversion
+	adc_start_conversion_regular(ADC1);
+}
+
 void board_setup_audio_in(void)
 {
-	/* I2S pins:
-	 * Master clock: PA3
-	 * Bit clock: PB13
-	 * Data in: PC3
-	 * L/R clock: PB12
-	 */
-	gpio_mode_setup(GPIOA, GPIO_MODE_AF, GPIO_PUPD_PULLDOWN, GPIO3);
-	gpio_set_af(GPIOA, GPIO_AF5, GPIO3);
-	gpio_mode_setup(GPIOB, GPIO_MODE_AF, GPIO_PUPD_NONE, GPIO13);
-	gpio_set_af(GPIOB, GPIO_AF5, GPIO13);
+	rcc_periph_clock_enable(RCC_ADC1);
+	// PA0 -> ADC1, ch0
+	gpio_mode_setup(GPIOA, GPIO_MODE_ANALOG, GPIO_PUPD_NONE, GPIO0);
+	//gpio_mode_setup(GPIOA, GPIO_MODE_ANALOG, GPIO_PUPD_NONE, GPIO1);
 
-	gpio_mode_setup(GPIOC, GPIO_MODE_AF, GPIO_PUPD_PULLDOWN, GPIO3);
-	gpio_set_af(GPIOC, GPIO_AF5, GPIO3);
+	// Timer5 to trigger the ADC conversion at audio input frequency
+	// 16 bit prescaler, 32bit counter.
+	rcc_periph_clock_enable(RCC_TIM5);
+	rcc_periph_reset_pulse(RST_TIM5);
+	timer_set_prescaler(TIM5, 84); // 84MHz -> 1us count
+	constexpr int counts = 1e6 / config_fs_input;
+	// 1s blinky test
+	//constexpr int counts = 1e6;
+	timer_set_period(TIM5, counts);
+	nvic_enable_irq(NVIC_TIM5_IRQ);
+	timer_enable_update_event(TIM5);
+	timer_enable_irq(TIM5, TIM_DIER_UIE);
+	timer_enable_counter(TIM5);
 
-	gpio_mode_setup(GPIOB, GPIO_MODE_AF, GPIO_PUPD_NONE, GPIO12);
-	gpio_set_af(GPIOB, GPIO_AF5, GPIO12);
 
-	/* I2S is implemented as a HW mode of the SPI peripheral.
-	* Since this is a STM32F411, there is a separate I2S PLL
-	* that needs to be enabled.
-	*/
-	i2s_disable(SPI2);
-	i2s_set_standard(SPI2, i2s_standard_philips);
-	i2s_set_dataformat(SPI2, i2s_dataframe_ch32_data24);
-	i2s_set_mode(SPI2, i2s_mode_master_receive);
-	/* RCC_PLLI2SCFGR configured values are:
-	 * 0x24003010 i.e.
-	 * PLLR = 2
-	 * PLLI2SN = 192
-	 * PLLI2SM = 16
-	 * And since the input is PLL source (i.e. HSI = 16MHz)
-	 * The I2S clock = 16 / 16 * 192 / 2 = 96MHz
-	 * Calculate sampling frequency from equation given in
-	 * STM32F411 reference manual:
-	 * Fs = I2Sclk/ (32*2 * ((2*I2SDIV)+ODD))
-	 * I2SDIV = I2Sclk/(128*Fs)
-	 * Fs=48kHz => 15,624 so 15 + ODD bit set
-	 */
-	i2s_set_clockdiv(SPI2, 15, 1);
-	i2s_enable(SPI2);
+	adc_power_off(ADC1);
+	adc_disable_scan_mode(ADC1);
+	adc_set_sample_time_on_all_channels(ADC1, ADC_SMPR_SMP_3CYC);
+	adc_power_on(ADC1);
+
+	// Select channel 0as the ADC input - PA0
+	uint8_t channel_array[16];
+	channel_array[0] = 0; // Check which one
+	adc_set_regular_sequence(ADC1, 1, channel_array);
 }
 
 void board_setup_wallclock(void)
@@ -196,6 +173,7 @@ uint32_t wallclock_time_us(void)
 	return timer_get_counter(TIM2);
 }
 
+#if 0
 void write_i2c_to_audiochip(uint8_t reg, uint8_t contents)
 {
 	uint8_t packet[2];
@@ -207,54 +185,41 @@ void write_i2c_to_audiochip(uint8_t reg, uint8_t contents)
 
 	i2c_transfer7(I2C1, address, packet, 2, NULL, 0);
 }
+#endif
 
 void audioDAC_shutdown(void)
 {
-	// TODO: does this clear all register settings?
-	// there is an alternative to power down the chip internally too
-	// this way audioDAC_setup() can be split into _init() and _start()
-	gpio_clear(GPIOD, GPIO4);
+	// TODO: this is not nucleo specific, rather DAC specific.. Move to separate file
 }
 void audioDAC_setup(void)
-{
-	// Set !RESET
-	gpio_set(GPIOD, GPIO4);
-
-	write_i2c_to_audiochip(0x20, dac_volume); // Master A volume
-	write_i2c_to_audiochip(0x21, dac_volume); // Master B volume
-
-	write_i2c_to_audiochip(0x06, 0x04); // interface control 1: set I2S dataformat
-	write_i2c_to_audiochip(0x02, 0x9e); // power control 1: Magic value to power up the chip
-}
+{}
 
 void i2s_playback_setup(void)
 {
 	/* I2S pins:
-	 * Master clock: PC7
-	 * Bit clock: PC10
-	 * Data: PC12
-	 * L/R clock: PA4
+	 * Master clock: -
+	 * Bit clock: PB13
+	 * Data: PB15
+	 * L/R clock: PB12
 	 */
-	gpio_mode_setup(GPIOC, GPIO_MODE_AF, GPIO_PUPD_NONE, GPIO7);
-	gpio_set_af(GPIOC, GPIO_AF6, GPIO7);
-	gpio_mode_setup(GPIOC, GPIO_MODE_AF, GPIO_PUPD_NONE, GPIO10);
-	gpio_set_af(GPIOC, GPIO_AF6, GPIO10);
-	gpio_mode_setup(GPIOC, GPIO_MODE_AF, GPIO_PUPD_NONE, GPIO12);
-	gpio_set_af(GPIOC, GPIO_AF6, GPIO12);
-	gpio_mode_setup(GPIOA, GPIO_MODE_AF, GPIO_PUPD_NONE, GPIO4);
-	gpio_set_af(GPIOA, GPIO_AF6, GPIO4);
+	gpio_mode_setup(GPIOB, GPIO_MODE_AF, GPIO_PUPD_NONE, GPIO13);
+	gpio_set_af(GPIOB, GPIO_AF5, GPIO13);
+	gpio_mode_setup(GPIOB, GPIO_MODE_AF, GPIO_PUPD_NONE, GPIO15);
+	gpio_set_af(GPIOB, GPIO_AF5, GPIO15);
+	gpio_mode_setup(GPIOB, GPIO_MODE_AF, GPIO_PUPD_NONE, GPIO12);
+	gpio_set_af(GPIOB, GPIO_AF5, GPIO12);
 
 	/* I2S is implemented as a HW mode of the SPI peripheral.
 	* Since this is a STM32F411, there is a separate I2S PLL
 	* that needs to be enabled.
 	*/
 	rcc_osc_on(RCC_PLLI2S);
-	rcc_periph_clock_enable(RCC_SPI3);
-	i2s_disable(SPI3);
-	i2s_set_standard(SPI3, i2s_standard_philips);
-	i2s_set_dataformat(SPI3, i2s_dataframe_ch16_data16);
-	i2s_set_mode(SPI3, i2s_mode_master_transmit);
-	i2s_masterclock_enable(SPI3);
+	rcc_periph_clock_enable(RCC_SPI2);
+	i2s_disable(SPI2);
+	i2s_set_standard(SPI2, i2s_standard_philips);
+	i2s_set_dataformat(SPI2, i2s_dataframe_ch16_data16);
+	i2s_set_mode(SPI2, i2s_mode_master_transmit);
+	i2s_masterclock_enable(SPI2);
 	/* RCC_PLLI2SCFGR configured values are:
 	 * 0x24003010 i.e.
 	 * PLLR = 2
@@ -268,7 +233,7 @@ void i2s_playback_setup(void)
 	 * I2SDIV = I2Sclk/(512*Fs)
 	 * I2SDIV=24 => 23,4 so 23 + ODD bit set
 	 */
-	i2s_set_clockdiv(SPI3, 23, 1);
-	i2s_enable(SPI3);
+	i2s_set_clockdiv(SPI2, 23, 1);
+	i2s_enable(SPI2);
 }
 

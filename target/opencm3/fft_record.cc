@@ -18,7 +18,6 @@ int main(void)
 	frequency_buf_t fbuf;
 	peak_array_t    pbuf;
 	peak_detect     ft(fbuf, pbuf);
-	uint32_t        elapsed_time;
 	fft<float>      the_fft(abuf, fbuf);
 	the_fft.fs = config_fs_input;
 	the_fft.fft_size = abuf.size();
@@ -30,8 +29,9 @@ int main(void)
 		debug_led_on(LED_PROCESSING);
 		the_fft.run();
 		debug_led_off(LED_PROCESSING);
-		elapsed_time = wallclock_time_us();
-		printf("Calculated fft in %ldus\n", elapsed_time);
+		//uint32_t        elapsed_time;
+		//elapsed_time = wallclock_time_us();
+		//printf("Calculated fft in %ldus\n", elapsed_time);
 
 		for (unsigned i = 0; i < fbuf.size(); i++) {
 			printf("%d ", fbuf[i]);
