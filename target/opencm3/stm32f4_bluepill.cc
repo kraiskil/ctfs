@@ -1,6 +1,6 @@
 /* board configuration for
  * a bluepill, bluepill2 or blackpill, with
- * STM32F407CC. Yeah, I'm not quite sure what I've
+ * STM32F401xB/C. Yeah, I'm not quite sure what I've
  * bought, but it was cheap, and the vendor swore the
  * board has a genuine ST chip on it. Sure looks like it does.
  * Some sources claim the board is open hardware, but documentation
@@ -57,7 +57,7 @@ float get_input_frequency_correction(void)
 //NB: the onboard LED is PC13
 struct led leds[LED_LAST] = {
 	{
-		GPIOC, GPIO13, inverted
+		GPIOC, GPIO13, not_inverted
 	},                               //croak
 	{ GPIOC, GPIO12, not_inverted }, //sleep
 	{ GPIOC, GPIO11, inverted },     //processing
@@ -66,6 +66,10 @@ struct led leds[LED_LAST] = {
 void board_setup_clock(void)
 {
 	rcc_clock_setup_pll(&rcc_hsi_configs[RCC_CLOCK_3V3_84MHZ]);
+	// This would cause the I2S to have 12.5 kHz frame clock.
+	// Not really interested in debugging why now. Maybe the crystal is
+	// not 16MHz after all...?
+	//rcc_clock_setup_pll(&rcc_hse_16mhz_3v3[RCC_CLOCK_3V3_84MHZ]);
 
 	rcc_osc_on(RCC_PLLI2S);
 	rcc_periph_clock_enable(RCC_SPI3); //input i2s
@@ -117,51 +121,7 @@ void board_setup_usart(void)
 }
 
 void board_setup_audio_in(void)
-{
-	/* Using SPI3.
-	 * This means the SWO and bit clock are mapped to the same pin (PB3)
-	 * can use only one at a time. SPI1 can't be used for mic - it lacks I2S.
-	 * I2S pins:
-	 * Master clock: - not enabled
-	 * Bit clock: PB3
-	 * Data in: PB5
-	 * L/R clock: PA4
-	 * SEL: PA3
-	 */
-	gpio_mode_setup(GPIOB, GPIO_MODE_AF, GPIO_PUPD_PULLDOWN, GPIO3);
-	gpio_set_af(GPIOB, GPIO_AF6, GPIO3);
-	gpio_mode_setup(GPIOB, GPIO_MODE_AF, GPIO_PUPD_PULLDOWN, GPIO5);
-	gpio_set_af(GPIOB, GPIO_AF6, GPIO5);
-	gpio_mode_setup(GPIOA, GPIO_MODE_AF, GPIO_PUPD_PULLDOWN, GPIO4);
-	gpio_set_af(GPIOA, GPIO_AF6, GPIO4);
-
-	gpio_mode_setup(GPIOA, GPIO_MODE_OUTPUT, GPIO_PUPD_PULLDOWN, GPIO3);
-	gpio_clear(GPIOA, GPIO3);
-
-	/* I2S is implemented as a HW mode of the SPI peripheral.
-	* Since this is a STM32F411, there is a separate I2S PLL
-	* that needs to be enabled.
-	*/
-	i2s_disable(SPI3);
-	i2s_set_standard(SPI3, i2s_standard_philips);
-	i2s_set_dataformat(SPI3, i2s_dataframe_ch32_data24);
-	i2s_set_mode(SPI3, i2s_mode_master_receive);
-	/* RCC_PLLI2SCFGR configured values are: (TODO: CHECK!)
-	 * 0x24003010 i.e.
-	 * PLLR = 2
-	 * PLLI2SN = 192
-	 * PLLI2SM = 16
-	 * And since the input is PLL source (i.e. HSI = 16MHz) (TODO: check!)
-	 * The I2S clock = 16 / 16 * 192 / 2 = 96MHz
-	 * Calculate sampling frequency from equation given in
-	 * STM32F411 reference manual:
-	 * Fs = I2Sclk/ (32*2 * ((2*I2SDIV)+ODD))
-	 * I2SDIV = I2Sclk/(128*Fs)
-	 * Fs=48kHz => 15,624 so 15 + ODD bit set
-	 */
-	i2s_set_clockdiv(SPI3, 15, 1);
-	i2s_enable(SPI3);
-}
+{}
 
 void board_setup_wallclock(void)
 {
@@ -228,9 +188,8 @@ void i2s_playback_setup(void)
 	rcc_periph_clock_enable(RCC_SPI2);
 	i2s_disable(SPI2);
 	i2s_set_standard(SPI2, i2s_standard_philips);
-	i2s_set_dataformat(SPI2, i2s_dataframe_ch32_data16);
+	i2s_set_dataformat(SPI2, i2s_dataframe_ch16_data16);
 	i2s_set_mode(SPI2, i2s_mode_master_transmit);
-	//i2s_masterclock_enable(SPI2); Don't set this - not routed out
 	/* RCC_PLLI2SCFGR configured values are:
 	 * 0x24003010 i.e. TODO: CHECK!
 	 * PLLR = 2
@@ -239,18 +198,11 @@ void i2s_playback_setup(void)
 	 * And since the input is PLL source (i.e. HSI = 16MHz) TODO: chekc!
 	 * The I2S clock = 16 / 16 * 192 / 2 = 96MHz
 	 *
-	 * Calculate sampling frequency from equation given in
-	 * STM32F4xx reference manual RM0090:
-	 * (Channel must be 32bits and Fs 16kHz, minimum, for the PCM5102
-	 * to be able to generate clocks without master/system clock input
-	 * see datasheet table 11)
-	 * Fs = I2Sclk/ (32*2 * ((2*I2SDIV)+ODD))
-	 * I2SDIV = I2Sclk/(128*Fs)
-	 * I2SDIV=24 => 46,875 so 47 + ODD bit clear
-	 * Measurements show 46+ODD is better. Probably bad clock input on bluepill?
+	 * RM0368, table 91 gives the I2SDIV as 187, ODD bit =1
+	 * Measuring on Saleae, one single unit -> 7931Hz, so 1% error :)
 	 */
-	static_assert(config_fs_output == 16000, "calculated I2S clock divisors with wrong values");
-	i2s_set_clockdiv(SPI2, 46, 1);
+	i2s_set_clockdiv(SPI2, 187, 1);
+	static_assert(config_fs_output == 8000, "calculated I2S clock divisors with wrong values");
 	i2s_enable(SPI2);
 }
 

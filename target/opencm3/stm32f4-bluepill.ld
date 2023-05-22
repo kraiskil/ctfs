@@ -18,9 +18,10 @@
  * along with this library.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* Linker script for ST STM32F4-Discovery (MB1115) with STM32F411VET6U. */
-
-/* Define memory regions. */
+/* Linker script for ST STM32F401BC - "bluepill" (bluepill2, blackpill...,
+ * probably this one https://stm32-base.org/boards/STM32F401CCU6-WeAct-Black-Pill-V1.2
+ * 64k RAM, 256k Flash
+ */
 MEMORY
 {
 	rom (rx) : ORIGIN = 0x08000000, LENGTH = 256K
