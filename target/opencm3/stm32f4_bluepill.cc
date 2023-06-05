@@ -65,11 +65,8 @@ struct led leds[LED_LAST] = {
 
 void board_setup_clock(void)
 {
-	rcc_clock_setup_pll(&rcc_hsi_configs[RCC_CLOCK_3V3_84MHZ]);
-	// This would cause the I2S to have 12.5 kHz frame clock.
-	// Not really interested in debugging why now. Maybe the crystal is
-	// not 16MHz after all...?
-	//rcc_clock_setup_pll(&rcc_hse_16mhz_3v3[RCC_CLOCK_3V3_84MHZ]);
+	// 25MHz HSE crystal
+	rcc_clock_setup_pll(&rcc_hse_25mhz_3v3[RCC_CLOCK_3V3_84MHZ]);
 
 	rcc_osc_on(RCC_PLLI2S);
 	rcc_periph_clock_enable(RCC_SPI3); //input i2s
@@ -190,16 +187,11 @@ void i2s_playback_setup(void)
 	i2s_set_standard(SPI2, i2s_standard_philips);
 	i2s_set_dataformat(SPI2, i2s_dataframe_ch16_data16);
 	i2s_set_mode(SPI2, i2s_mode_master_transmit);
-	/* RCC_PLLI2SCFGR configured values are:
-	 * 0x24003010 i.e. TODO: CHECK!
-	 * PLLR = 2
-	 * PLLI2SN = 192
-	 * PLLI2SM = 16
-	 * And since the input is PLL source (i.e. HSI = 16MHz) TODO: chekc!
-	 * The I2S clock = 16 / 16 * 192 / 2 = 96MHz
-	 *
-	 * RM0368, table 91 gives the I2SDIV as 187, ODD bit =1
-	 * Measuring on Saleae, one single unit -> 7931Hz, so 1% error :)
+	/*
+	 * RM0368, table 91 gives the I2SDIV as 187, ODD bit =1,
+	 * when "PLLM VCO =1 MHz or 2 MHz." TODO: check where this is is, but
+	 * it seems to be working just fine:
+	 * Measuring on Saleae, one single unit, 8kHz on the dot :)
 	 */
 	i2s_set_clockdiv(SPI2, 187, 1);
 	static_assert(config_fs_output == 8000, "calculated I2S clock divisors with wrong values");
