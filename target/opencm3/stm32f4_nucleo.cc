@@ -110,7 +110,7 @@ void tim5_isr(void)
 {
 	// clear something, or this ISR gets hit without pause
 	TIM_SR(TIM5) &= ~TIM_SR_UIF;
-	gpio_toggle(GPIOA, GPIO5); // red led
+	gpio_toggle(GPIOA, GPIO5); // green led
 	// TODO: toggle the ADC conversion
 	adc_start_conversion_regular(ADC1);
 }
