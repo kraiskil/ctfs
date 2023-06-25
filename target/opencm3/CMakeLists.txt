@@ -100,8 +100,8 @@ endfunction()
 
 
 build_link_target( treefrog )
-build_target( mic_recorder )
-build_target( fft_record )
+build_link_target( mic_recorder )
+build_link_target( fft_record )
 build_target( peak_detect )
 build_target( tone_detect )
 build_link_target( croak_only )

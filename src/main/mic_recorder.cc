@@ -31,10 +31,7 @@ void print_as_c_header(listen_buf_t &buf)
 
 int main(void)
 {
-	board_setup_clock();
-	board_setup_gpio();
-	board_setup_usart();
-	board_setup_audio_in();
+	board_init();
 
 	listen_buf_t    buf;
 	frequency_buf_t fbuf;

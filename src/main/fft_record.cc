@@ -8,11 +8,7 @@ void listen_for_croaks(listen_buf_t &buffer);
 
 int main(void)
 {
-	board_setup_clock();
-	board_setup_gpio();
-	board_setup_usart();
-	board_setup_audio_in();
-	board_setup_wallclock();
+	board_init();
 
 	listen_buf_t    abuf;
 	frequency_buf_t fbuf;
