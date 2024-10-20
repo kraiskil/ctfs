@@ -8,12 +8,15 @@
 #include <thread>
 
 extern "C" {
+#include <pulse/error.h>
 #include <pulse/simple.h>
 }
 
 static pa_simple *rec = NULL;
 
-
+// Connects to a special local loopback Pulse Aaudio
+// device (named "treefrogs"). Needs to be set up with
+// the script target/linux/setup_pulse.sh
 void io_init(void)
 {
 	static const pa_sample_spec ss = {
@@ -25,7 +28,7 @@ void io_init(void)
 		.maxlength = listen_buffer_bytes,
 		.fragsize = listen_buffer_bytes,
 	};
-	int                         error;
+	int                         errorCode;
 	rec = pa_simple_new(
 		NULL, //?
 		"treefrog",
@@ -35,9 +38,9 @@ void io_init(void)
 		&ss,
 		NULL, // channel map - default
 		&attr,
-		&error);
+		&errorCode);
 	if (rec == NULL) {
-		std::cerr << "error opening capture device" << std::endl;
+		std::cerr << "error opening capture device: " << pa_strerror(errorCode) << std::endl;
 		exit(1);
 	}
 }

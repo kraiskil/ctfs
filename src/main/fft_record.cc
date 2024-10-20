@@ -32,7 +32,7 @@ int main(void)
 		for (unsigned i = 0; i < fbuf.size(); i++) {
 			printf("%d ", fbuf[i]);
 		}
-		printf("\n\n");
+		printf("\n");
 	}
 
 	return 0;
